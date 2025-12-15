@@ -1,0 +1,29 @@
+contrib/zlib/CMakeFiles/zlibstatic.dir/compress.c.obj: \
+ C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\assimp\contrib\zlib\compress.c \
+ C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\assimp\contrib\zlib\zlib.h \
+ C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/assimp/build/contrib/zlib/zconf.h \
+ F:/DEVELOPMENT/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/stddef.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/crtdefs.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/corecrt.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/_mingw.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/_mingw_mac.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/_mingw_secapi.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/vadefs.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/sdks/_mingw_ddk.h \
+ F:/DEVELOPMENT/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
+ F:/DEVELOPMENT/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/limits.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/sys/types.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/_mingw_off_t.h \
+ F:/DEVELOPMENT/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/stdarg.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/_mingw_stdarg.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/unistd.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/io.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/string.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/sec_api/string_s.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/process.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/corecrt_startup.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/getopt.h \
+ F:/DEVELOPMENT/msys64/ucrt64/include/pthread_unistd.h

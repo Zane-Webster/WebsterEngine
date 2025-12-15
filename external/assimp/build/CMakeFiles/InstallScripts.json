@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/assimp/build/cmake_install.cmake",
+		"C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/assimp/build/contrib/zlib/cmake_install.cmake",
+		"C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/assimp/build/code/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

@@ -43,12 +43,6 @@ set(ZLIB_BUILD ${ZLIB_ROOT}/build)
 find_package(OpenGL REQUIRED)
 
 # ===============================
-# SDL3 + SDL3_image
-# ===============================
-find_package(SDL3 CONFIG REQUIRED)
-find_package(SDL3_image CONFIG REQUIRED)
-
-# ===============================
 # Source files
 # ===============================
 file(GLOB_RECURSE ENGINE_SRC
@@ -74,7 +68,7 @@ set(IMGUI_SRC
 add_executable(WebsterEngine
     ${ENGINE_SRC}
     ${IMGUI_SRC}
-    external/glad/src/glad.c
+    external/glad/src/gl.c
 )
 
 # ===============================
@@ -83,6 +77,9 @@ add_executable(WebsterEngine
 target_include_directories(WebsterEngine PRIVATE
     src
     include
+
+    external/SDL3/include
+    external/SDL3_image/include
 
     external/glad/include
     external/glm
@@ -94,37 +91,39 @@ target_include_directories(WebsterEngine PRIVATE
 )
 
 # ===============================
-# Link libraries
+# Link libraries (MSVC)
 # ===============================
 target_link_libraries(WebsterEngine PRIVATE
-    SDL3::SDL3
-    SDL3_image::SDL3_image
     OpenGL::GL
 
-    ${ASSIMP_BUILD}/lib/libassimp.a
-    ${ZLIB_BUILD}/libz.dll.a
+    ${CMAKE_SOURCE_DIR}/external/SDL3/lib/libSDL3.dll.a
+    ${CMAKE_SOURCE_DIR}/external/SDL3_image/lib/libSDL3_image.dll.a
+
+    ${ASSIMP_BUILD}/lib/Release/assimp-vc143-mt.lib
+    ${ZLIB_BUILD}/Release/zs.lib
 )
 
 # ===============================
-# Windows / MinGW system libs
+# Copy runtime DLLs
 # ===============================
-if (WIN32)
-    target_link_libraries(WebsterEngine PRIVATE
-        winmm
-        imm32
-        setupapi
-        version
-        ws2_32
-    )
-endif()
+add_custom_command(TARGET WebsterEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_SOURCE_DIR}/external/SDL3/bin/SDL3.dll
+        $<TARGET_FILE_DIR:WebsterEngine>
+)
+
+add_custom_command(TARGET WebsterEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_SOURCE_DIR}/external/SDL3_image/bin/SDL3_image.dll
+        $<TARGET_FILE_DIR:WebsterEngine>
+)
 
 # ===============================
 # Warnings
 # ===============================
-if (MINGW)
+if (MSVC)
     target_compile_options(WebsterEngine PRIVATE
-        -Wall
-        -Wextra
-        -Wno-unused-parameter
+        /W4
+        /wd4100   # unreferenced formal parameter
     )
 endif()

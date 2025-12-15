@@ -1,0 +1,10 @@
+^C:\USERS\TLZGA\DESKTOP\CODINGPROJECTS\C++\WEBSTERENGINE\EXTERNAL\ASSIMP\BUILD\CMAKEFILES\E2C92F4DE5BFB86B27A126A942255533\GENERATE.STAMP.RULE
+setlocal
+F:\DEVELOPMENT\CMake\bin\cmake.exe -SC:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/assimp -BC:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/assimp/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/assimp/build/Assimp.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

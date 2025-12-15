@@ -1,0 +1,10 @@
+# CMake generation dependency list for this directory.
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/assimp/contrib/zlib/CMakeLists.txt
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/assimp/contrib/zlib/zconf.h.cmakein
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/assimp/contrib/zlib/zlib.pc.cmakein
+F:/DEVELOPMENT/CMake/share/cmake-4.2/Modules/CheckCSourceCompiles.cmake
+F:/DEVELOPMENT/CMake/share/cmake-4.2/Modules/CheckFunctionExists.cmake
+F:/DEVELOPMENT/CMake/share/cmake-4.2/Modules/CheckIncludeFile.cmake
+F:/DEVELOPMENT/CMake/share/cmake-4.2/Modules/CheckIncludeFileCXX.cmake
+F:/DEVELOPMENT/CMake/share/cmake-4.2/Modules/CheckTypeSize.cmake
+F:/DEVELOPMENT/CMake/share/cmake-4.2/Modules/Internal/CheckSourceCompiles.cmake

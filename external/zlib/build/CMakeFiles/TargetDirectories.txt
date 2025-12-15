@@ -1,0 +1,14 @@
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/CMakeFiles/zlib.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/CMakeFiles/zlibstatic.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/CMakeFiles/PACKAGE.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/CMakeFiles/RUN_TESTS.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/CMakeFiles/INSTALL.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/test/CMakeFiles/zlib_example.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/test/CMakeFiles/minigzip.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/test/CMakeFiles/zlib_static_example.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/test/CMakeFiles/static_minigzip.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/test/CMakeFiles/PACKAGE.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/test/CMakeFiles/RUN_TESTS.dir
+C:/Users/TLZGa/Desktop/CodingProjects/C++/WebsterEngine/external/zlib/build/test/CMakeFiles/INSTALL.dir

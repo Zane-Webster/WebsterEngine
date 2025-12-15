@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\zlib\build\CMakeFiles\8cc2656f56bb6ab933fa154556b15910\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{35F3FC96-C8A1-3755-A4A3-94D32CACF984}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

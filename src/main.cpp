@@ -1,10 +1,20 @@
+#include <iostream>
+
 #include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 
 #include <glad/gl.h>
+
+#include <glm/glm.hpp>
 
 #include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_opengl3.h>
+
+#include "cfg.h"
+#include "window/Window.h"
+#include "core/Logger.h"
+
 
 int main(int, char**)
 {
@@ -48,7 +58,6 @@ int main(int, char**)
             if (e.type == SDL_EVENT_QUIT)
                 running = false;
         }
-
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();

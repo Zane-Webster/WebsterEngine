@@ -456,7 +456,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\cfg\cfg.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\main.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\utils\utils.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\window\window.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\imgui\imgui.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\imgui\imgui_draw.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\imgui\imgui_tables.cpp" />

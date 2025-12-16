@@ -1,1 +1,68 @@
-external/*.zip
+# ===============================
+# Build directories
+# ===============================
+build/
+out/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# ===============================
+# Binaries / artifacts
+# ===============================
+*.exe
+*.o
+
+# ===============================
+# MSVC
+# ===============================
+.vs/
+*.vcxproj*
+*.sln
+Debug/
+Release/
+RelWithDebInfo/
+MinSizeRel/
+
+# ===============================
+# MinGW / GCC
+# ===============================
+*.gcda
+*.gcno
+*.gcov
+
+# ===============================
+# ImGui (build artifacts only)
+# ===============================
+imgui.ini
+
+# ===============================
+# OS junk
+# ===============================
+Thumbs.db
+.DS_Store
+
+# ===============================
+# Editor junk
+# ===============================
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json
+
+# ===============================
+# Logs / temp
+# ===============================
+*.log
+*.tmp
+*.tlog
+
+# ===============================
+# Emscripten / Web builds (future)
+# ===============================
+*.wasm
+*.js
+*.html

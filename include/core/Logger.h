@@ -5,6 +5,8 @@
 #include <sstream>
 #include <string>
 
+#include "core/WebsterEngine.h"
+
 class Logger {
 public:
     template<typename T>
@@ -15,6 +17,8 @@ public:
     static void Warn(const T& value) { Log("[WARN] ", value); }
     template<typename T>
     static void Error(const T& value) { Log("[ERROR] ", value); }
+
+    static void LoadState(const std::string function, const WE_LOAD_STATE state);
 
 private:
     template<typename T>

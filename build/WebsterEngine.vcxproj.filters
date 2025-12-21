@@ -16,7 +16,22 @@
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\prim\Triangle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\renderer\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\shader\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\shader\ShaderHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\state\State.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\state\StateHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\utils\utils.cpp">

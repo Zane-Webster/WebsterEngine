@@ -11,4 +11,26 @@ enum WE_WINDOW_RESOLUTION {
     QHD
 };
 
+enum WE_STATE {
+    BOOT,
+    MAIN_MENU,
+    EDITOR,
+    PAUSE_MENU,
+    EXIT
+};
+
+enum WE_LOAD_STATE {
+    SUCCESS,
+    FAIL,
+    PATH_NOT_FOUND,
+    UNKNOWN_FILE_TYPE
+};
+
+class WE {
+public:
+    struct RenderItem {
+        
+    };
+};
+
 #endif // SRC_WEBSTERENGINE_H_

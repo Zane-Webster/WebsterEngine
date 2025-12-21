@@ -11,23 +11,28 @@
 #include "core/WebsterEngine.h"
 #include "core/Window.h"
 #include "core/Logger.h"
+#include "state/StateHandler.h"
 
 int main(int, char**) {
     Window window(WE_WINDOW_RESOLUTION::HD, "Webster Engine | 0.1.0");
+    StateHandler state_handler;
 
-    bool running = true;
+    state_handler.SetState(WE_STATE::EDITOR);
 
-    while (running) {
-        SDL_Event e;
-        while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_EVENT_QUIT) {
-                running = false;
+    while (state_handler.GetState() != WE_STATE::EXIT) {
+        // ===============================
+        // EDITOR
+        // ===============================
+        if (state_handler.GetState() == WE_STATE::EDITOR) {
+            SDL_Event e;
+            while (SDL_PollEvent(&e)) {
+                if (e.type == SDL_EVENT_QUIT) state_handler.SetState(WE_STATE::EXIT);
             }
-        }
 
-        if (window.StartRender()) {
+            if (window.StartRender()) {
 
-            window.EndRender();
+                window.EndRender();
+            }
         }
     }
 

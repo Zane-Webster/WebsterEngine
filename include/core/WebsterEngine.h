@@ -5,6 +5,8 @@
 
 #define WE_VSYNC 1
 
+#define WE_EMPTY_STRING "WE_EMPTY_STRING"
+
 enum WE_WINDOW_RESOLUTION {
     HD,
     FHD,
@@ -23,7 +25,8 @@ enum WE_LOAD_STATE {
     SUCCESS,
     FAIL,
     PATH_NOT_FOUND,
-    UNKNOWN_FILE_TYPE
+    UNKNOWN_FILE_TYPE,
+    INCORRECT_FILE_TYPE
 };
 
 class WE {

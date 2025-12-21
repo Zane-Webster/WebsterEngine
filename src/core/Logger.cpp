@@ -15,5 +15,8 @@ static void LoadState(const std::string function, const WE_LOAD_STATE state) {
         case WE_LOAD_STATE::UNKNOWN_FILE_TYPE:
             std::cout << "[LOAD STATE] [" << function << "]: UNKNOWN FILE TYPE PASSED";
             break;
+        case WE_LOAD_STATE::INCORRECT_FILE_TYPE:
+            std::cout << "[LOAD STATE] [" << function << "]: INCORRECT FILE TYPE PASSED";
+            break;
     }
 }

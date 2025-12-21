@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include <glad/gl.h>
+
 #include <unordered_map>
 
 #include "core/WebsterEngine.h"
@@ -19,7 +21,7 @@ public:
 
 private:
     std::unordered_map<std::string, Shader> shaders = {};
-    std::unordered_map<std::string, unsigned int> shader_programs = {};
+    std::unordered_map<std::string, GLuint> shader_programs = {};
 
 };
 

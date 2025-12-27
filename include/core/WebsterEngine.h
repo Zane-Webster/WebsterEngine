@@ -2,8 +2,14 @@
 #define SRC_WEBSTERENGINE_H_
 
 #include <iostream>
+#include <array>
+
+#include <glad/gl.h>
 
 #define WE_EMPTY_STRING "WE_EMPTY_STRING"
+
+using WE_TRIANGLE_VERTICES = std::array<GLfloat, 18>;
+using WE_TRIANGLE_VERTICES_NORMAL = std::array<GLfloat, 27>;
 
 enum WE_WINDOW_RESOLUTION {
     HD,

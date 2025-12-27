@@ -5,6 +5,7 @@
 
 #include <glad/gl.h>
 
+#include <memory>
 #include <unordered_map>
 
 #include "core/WebsterEngine.h"
@@ -15,12 +16,15 @@
 class ShaderHandler {
 public:
     ShaderHandler();
-    ~ShaderHandler();
+    void Destroy();
 
-    WE_LOAD_STATE NewShader();
+    WE_LOAD_STATE AddShader(std::string name, std::string path, GLenum type);
+    void CompileProgram(std::string name);
+
+    GLuint GetProgram(std::string name);
 
 private:
-    std::unordered_map<std::string, Shader> shaders = {};
+    std::unordered_map<std::string, std::vector<std::unique_ptr<Shader>>> shaders = {};
     std::unordered_map<std::string, GLuint> shader_programs = {};
 
 };

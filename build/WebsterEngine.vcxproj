@@ -467,7 +467,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\shader\ShaderHandler.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\state\State.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\state\StateHandler.cpp" />
-    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\utils\utils.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\utils\Utils.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\imgui\imgui.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\imgui\imgui_draw.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\imgui\imgui_tables.cpp" />

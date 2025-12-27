@@ -34,7 +34,7 @@
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\state\StateHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\utils\utils.cpp">
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\utils\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\imgui\imgui.cpp">

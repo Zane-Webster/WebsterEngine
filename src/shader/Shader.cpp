@@ -4,10 +4,6 @@ Shader::Shader(std::string p_name, std::string p_path, GLenum p_type) : name(p_n
     ;
 }
 
-Shader::~Shader() {
-    ;
-}
-
 WE_LOAD_STATE Shader::Load() {
     std::filesystem::path fs_path = path;
 

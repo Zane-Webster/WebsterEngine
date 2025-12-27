@@ -1,7 +1,7 @@
 #include <core/Logger.h>
 #include <iostream>
 
-static void LoadState(const std::string function, const WE_LOAD_STATE state) {
+void Logger::LoadState(const std::string function, const WE_LOAD_STATE state) {
     switch (state) {
         case WE_LOAD_STATE::SUCCESS:
             std::cout << "[LOAD STATE] [" << function << "]: LOAD SUCCESSFUL";

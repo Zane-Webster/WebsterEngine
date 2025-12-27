@@ -11,6 +11,7 @@
 
 // ===== CONFIG =====
 #include "cfg/cfg.h"
+#include "cfg/launch_options.h"
 
 // ===== CORE =====
 #include "core/WebsterEngine.h"
@@ -18,6 +19,7 @@
 #include "core/Logger.h"
 
 // ===== PRIM =====
+#include "prim/Triangle.h"
 
 // ===== RENDERER =====
 
@@ -32,11 +34,11 @@
 #include "utils/Utils.h"
 
 int main(int, char**) {
-    Window window(WE_WINDOW_RESOLUTION::HD, "Webster Engine | 0.1.0");
+    Window window(WE_LAUNCH_WINDOW_RESOLUTION, "Webster Engine | 0.1.0");
     StateHandler state_handler;
     ShaderHandler shader_handler;
 
-    state_handler.SetState(WE_STATE::EDITOR);
+    state_handler.SetState(WE_LAUNCH_STATE);
 
     shader_handler.AddShader("basic", "assets/shaders/basic/frag/triangle.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("basic", "assets/shaders/basic/vert/triangle.vert", GL_VERTEX_SHADER);

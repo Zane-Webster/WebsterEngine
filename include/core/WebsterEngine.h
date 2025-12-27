@@ -3,8 +3,6 @@
 
 #include <iostream>
 
-#define WE_VSYNC 1
-
 #define WE_EMPTY_STRING "WE_EMPTY_STRING"
 
 enum WE_WINDOW_RESOLUTION {

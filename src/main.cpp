@@ -1,79 +1,68 @@
+// ===== C++ =====
+#include <iostream>
+
+// ===== EXTERNAL =====
 #include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 
 #include <glad/gl.h>
 
-#include <imgui.h>
-#include <backends/imgui_impl_sdl3.h>
-#include <backends/imgui_impl_opengl3.h>
+#include <glm/glm.hpp>
 
-int main(int, char**)
-{
-    if (!SDL_Init(SDL_INIT_VIDEO))
-        return -1;
+// ===== CONFIG =====
+#include "cfg/cfg.h"
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+// ===== CORE =====
+#include "core/WebsterEngine.h"
+#include "core/Window.h"
+#include "core/Logger.h"
 
-    SDL_Window* window = SDL_CreateWindow(
-        "SDL3 + OpenGL + ImGui",
-        800, 600,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
-    );
+// ===== PRIM =====
 
-    if (!window)
-        return -1;
+// ===== RENDERER =====
 
-    SDL_GLContext gl_ctx = SDL_GL_CreateContext(window);
-    SDL_GL_MakeCurrent(window, gl_ctx);
-    SDL_GL_SetSwapInterval(1);
+// ===== SHADER =====
+#include "shader/Shader.h"
+#include "shader/ShaderHandler.h"
 
-    if (!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress))
-        return -1;
+// ===== STATE =====
+#include "state/StateHandler.h"
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
+// ===== UTILS =====
+#include "utils/Utils.h"
 
-    ImGui_ImplSDL3_InitForOpenGL(window, gl_ctx);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
+int main(int, char**) {
+    Window window(WE_WINDOW_RESOLUTION::HD, "Webster Engine | 0.1.0");
+    StateHandler state_handler;
+    ShaderHandler shader_handler;
 
-    bool running = true;
-    while (running)
-    {
-        SDL_Event e;
-        while (SDL_PollEvent(&e))
-        {
-            ImGui_ImplSDL3_ProcessEvent(&e);
-            if (e.type == SDL_EVENT_QUIT)
-                running = false;
+    state_handler.SetState(WE_STATE::EDITOR);
+
+    shader_handler.AddShader("basic", "assets/shaders/basic/frag/triangle.frag", GL_FRAGMENT_SHADER);
+    shader_handler.AddShader("basic", "assets/shaders/basic/vert/triangle.vert", GL_VERTEX_SHADER);
+    shader_handler.CompileProgram("basic");
+
+    while (state_handler.GetState() != WE_STATE::EXIT) {
+        // ===============================
+        // EDITOR
+        // ===============================
+        if (state_handler.GetState() == WE_STATE::EDITOR) {
+            SDL_Event e;
+            while (SDL_PollEvent(&e)) {
+                if (e.type == SDL_EVENT_QUIT) state_handler.SetState(WE_STATE::EXIT);
+            }
+
+            if (window.StartRender()) {
+
+                window.EndRender();
+            }
         }
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL3_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::Begin("Hello");
-        ImGui::Text("SDL3 + OpenGL + ImGui");
-        ImGui::End();
-
-        ImGui::Render();
-
-        glViewport(0, 0, 800, 600);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        SDL_GL_SwapWindow(window);
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL3_Shutdown();
-    ImGui::DestroyContext();
+    shader_handler.Destroy();
 
-    SDL_GL_DestroyContext(gl_ctx);
-    SDL_DestroyWindow(window);
     SDL_Quit();
 
     return 0;
 }
+    

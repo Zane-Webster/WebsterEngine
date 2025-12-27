@@ -456,7 +456,18 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\cfg\cfg.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\core\Logger.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\core\WebsterEngine.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\core\Window.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\main.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\prim\Triangle.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\renderer\Renderer.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\shader\Shader.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\shader\ShaderHandler.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\state\State.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\state\StateHandler.cpp" />
+    <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\src\utils\Utils.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\imgui\imgui.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\imgui\imgui_draw.cpp" />
     <ClCompile Include="C:\Users\TLZGa\Desktop\CodingProjects\C++\WebsterEngine\external\imgui\imgui_tables.cpp" />

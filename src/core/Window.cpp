@@ -20,7 +20,7 @@ Window::Window(WE_WINDOW_RESOLUTION p_resolution, std::string p_title) : resolut
 
     SDL_GL_MakeCurrent(window, context);
 
-    if (WE_VSYNC) SDL_GL_SetSwapInterval(1);
+    if (WE_LAUNCH_VSYNC) SDL_GL_SetSwapInterval(1);
 }
 
 Window::~Window() {

@@ -9,6 +9,7 @@
 
 #include "core/WebsterEngine.h"
 #include "core/Logger.h"
+#include "cfg/launch_options.h"
 
 class Window {
 public:

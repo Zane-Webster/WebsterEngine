@@ -11,6 +11,11 @@ Makefile
 compile_commands.json
 
 # ===============================
+# Launch Options
+# ===============================
+include/cfg/launch_options.h
+
+# ===============================
 # Binaries / artifacts
 # ===============================
 *.exe

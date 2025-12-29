@@ -74,7 +74,6 @@ int main(int, char**) {
     }
 
     shader_handler.Destroy();
-
     ball->Destroy();
 
     SDL_Quit();

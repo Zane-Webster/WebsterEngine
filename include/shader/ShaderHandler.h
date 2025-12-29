@@ -1,5 +1,5 @@
-#ifndef SRC_SHADERHANDLER_H_
-#define SRC_SHADERHANDLER_H_
+#ifndef WE_SHADER_SHADERHANDLER_H_
+#define WE_SHADER_SHADERHANDLER_H_
 
 #include <iostream>
 
@@ -29,4 +29,4 @@ private:
 
 };
 
-#endif // SRC_SHADERHANDLER_H_
+#endif // WE_SHADER_SHADERHANDLER_H_

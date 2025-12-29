@@ -1,5 +1,5 @@
-#ifndef SRC_RENDERER_H_
-#define SRC_RENDERER_H_
+#ifndef WE_RENDERER_RENDERER_H_
+#define WE_RENDERER_RENDERER_H_
 
 #include <iostream>
 #include <SDL3/SDL.h>
@@ -12,4 +12,4 @@ private:
 };
 
 
-#endif // SRC_RENDERER_H_
+#endif // WE_RENDERER_RENDERER_H_

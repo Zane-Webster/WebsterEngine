@@ -1,5 +1,5 @@
-#ifndef SRC_STATEHANDLER_H_
-#define SRC_STATEHANDLER_H_
+#ifndef WE_STATE_STATEHANDLER_H_
+#define WE_STATE_STATEHANDLER_H_
 
 #include <iostream>
 
@@ -22,4 +22,4 @@ private:
 
 };
 
-#endif // SRC_STATEHANDLER_H_
+#endif // WE_STATE_STATEHANDLER_H_

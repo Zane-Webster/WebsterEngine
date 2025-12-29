@@ -1,5 +1,5 @@
-#ifndef SRC_MODELLOADER_H_
-#define SRC_MODELLOADER_H_
+#ifndef WE_LOAD_MODELLOADER_H_
+#define WE_LOAD_MODELLOADER_H_
 
 #include <iostream>
 #include <vector>
@@ -25,4 +25,4 @@ private:
 
 };
 
-#endif // SRC_MODELLOADER_H_
+#endif // WE_LOAD_MODELLOADER_H_

@@ -1,0 +1,25 @@
+{
+  "WebsterEngine Header + Class": {
+    "prefix": "weclass",
+    "body": [
+      "#ifndef WE_${TM_DIRECTORY/.*[\\\\\\/](.*)/${1:/upcase}/}_${TM_FILENAME_BASE/(.*)/${1:/upcase}/}_H_",
+      "#define WE_${TM_DIRECTORY/.*[\\\\\\/](.*)/${1:/upcase}/}_${TM_FILENAME_BASE/(.*)/${1:/upcase}/}_H_",
+      "",
+      "#include <iostream>",
+      "",
+      "#include \"core/WebsterEngine.h\"",
+      "#include \"core/Logger.h\"",
+      "",
+      "class ${TM_FILENAME_BASE} {",
+      "public:",
+      "    ${TM_FILENAME_BASE}();",
+      "    ",
+      "private:",
+      "    ",
+      "};",
+      "",
+      "#endif // WE_${TM_DIRECTORY/.*[\\\\\\/](.*)/${1:/upcase}/}_${TM_FILENAME_BASE/(.*)/${1:/upcase}/}_H_"
+    ],
+    "description": "WebsterEngine header guard + includes + class (dir + filename)"
+  }
+}

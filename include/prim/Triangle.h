@@ -1,5 +1,5 @@
-#ifndef SRC_TRIANGLE_H_
-#define SRC_TRIANGLE_H_
+#ifndef WE_PRIM_TRIANGLE_H_
+#define WE_PRIM_TRIANGLE_H_
 
 #include <iostream>
 
@@ -47,4 +47,4 @@ private:
     GLuint vertex_buffer = 0;
 };
 
-#endif // SRC_TRIANGLE_H_
+#endif // WE_PRIM_TRIANGLE_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_WEBSTERENGINE_H_
-#define SRC_WEBSTERENGINE_H_
+#ifndef WE_CORE_WEBSTERENGINE_H_
+#define WE_CORE_WEBSTERENGINE_H_
 
 #include <iostream>
 #include <array>
@@ -40,4 +40,4 @@ public:
     };
 };
 
-#endif // SRC_WEBSTERENGINE_H_
+#endif // WE_CORE_WEBSTERENGINE_H_

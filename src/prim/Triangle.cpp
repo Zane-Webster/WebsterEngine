@@ -1,6 +1,6 @@
 #include "prim/Triangle.h"
 
-Triangle::Triangle(WE_TRIANGLE_VERTICES p_vertices) {
+Triangle::Triangle(std::vector<GLfloat> p_vertices) {
     Triangle::LoadVertices(p_vertices);
     Triangle::Build();
 }
@@ -21,7 +21,7 @@ bool Triangle::Verify() {
     return true;
 }
 
-void Triangle::LoadVertices(WE_TRIANGLE_VERTICES p_vertices) {
+void Triangle::LoadVertices(std::vector<GLfloat> p_vertices) {
     vertices = std::make_shared<WE_TRIANGLE_VERTICES>();
     full_vertices = std::make_shared<WE_TRIANGLE_VERTICES_NORMAL>();
     normal = glm::vec3(0.0f);

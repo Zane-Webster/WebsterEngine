@@ -87,6 +87,7 @@ target_include_directories(WebsterEngine PRIVATE
     external/imgui/backends
 
     ${ASSIMP_ROOT}/include
+    ${ASSIMP_BUILD}/include
     ${ZLIB_ROOT}
 )
 

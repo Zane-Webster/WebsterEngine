@@ -1,5 +1,8 @@
 // ===== C++ =====
 #include <iostream>
+#include <vector>
+#include <memory>
+#include <string>
 
 // ===== EXTERNAL =====
 #include <SDL3/SDL.h>
@@ -17,6 +20,9 @@
 #include "core/WebsterEngine.h"
 #include "core/Window.h"
 #include "core/Logger.h"
+
+// ===== RENDERER =====
+#include "load/ModelLoader.h"
 
 // ===== PRIM =====
 #include "prim/Triangle.h"
@@ -40,11 +46,9 @@ int main(int, char**) {
 
     state_handler.SetState(WE_LAUNCH_STATE);
 
-    Triangle tri({
-        -0.5f, -0.5f, 0.0f, 1.f, 0.f, 0.f,
-        0.5f, -0.5f, 0.0f, 0.f, 1.f, 0.f,
-        0.0f,  0.5f, 0.0f, 0.f, 0.f, 1.f
-    });
+    ModelLoader model_loader;
+
+    std::vector<std::unique_ptr<Triangle>> ball = model_loader.Load("assets/objs/ball.obj");
 
     shader_handler.AddShader("basic", "assets/shaders/basic/frag/triangle.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("basic", "assets/shaders/basic/vert/triangle.vert", GL_VERTEX_SHADER);
@@ -62,14 +66,21 @@ int main(int, char**) {
 
             if (window.StartRender()) {
                 glUseProgram(shader_handler.GetProgram("basic"));
-                tri.Render();
+
+                for (auto& tri: ball) {
+                    tri->Render();
+                }
+
                 window.EndRender();
             }
         }
     }
 
     shader_handler.Destroy();
-    tri.Destroy();
+
+    for (auto& tri: ball) {
+        tri->Destroy();
+    }
 
     SDL_Quit();
 

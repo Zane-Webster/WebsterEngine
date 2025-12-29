@@ -40,6 +40,12 @@ int main(int, char**) {
 
     state_handler.SetState(WE_LAUNCH_STATE);
 
+    Triangle tri({
+        -0.5f, -0.5f, 0.0f, 1.f, 0.f, 0.f,
+        0.5f, -0.5f, 0.0f, 0.f, 1.f, 0.f,
+        0.0f,  0.5f, 0.0f, 0.f, 0.f, 1.f
+    });
+
     shader_handler.AddShader("basic", "assets/shaders/basic/frag/triangle.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("basic", "assets/shaders/basic/vert/triangle.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("basic");
@@ -55,13 +61,15 @@ int main(int, char**) {
             }
 
             if (window.StartRender()) {
-
+                glUseProgram(shader_handler.GetProgram("basic"));
+                tri.Render();
                 window.EndRender();
             }
         }
     }
 
     shader_handler.Destroy();
+    tri.Destroy();
 
     SDL_Quit();
 

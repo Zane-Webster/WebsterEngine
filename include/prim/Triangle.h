@@ -15,7 +15,7 @@
 
 class Triangle {
 public:
-    Triangle(std::vector<GLfloat> vertices);
+    Triangle(WE_TRIANGLE_VERTICES vertices);
     void Destroy();
 
     //////// BASIC ATTRIBUTES
@@ -24,7 +24,7 @@ public:
     //////// BASIC FUNCTIONS
     // verifys vertex_array and vertex_buffer is valid (non-zero)
     bool Verify();
-    void LoadVertices(std::vector<GLfloat> vertices);
+    void LoadVertices(WE_TRIANGLE_VERTICES vertices);
     void Build();
     void Render();
     void RenderOutline();

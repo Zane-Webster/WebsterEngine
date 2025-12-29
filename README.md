@@ -1,5 +1,5 @@
 # WEBSTER ENGINE
-### Version 0.1.0
+#### Version 0.1.0
 
 ## ABOUT
 WebsterEngine is a simple 3D engine written in C++ using OpenGL, SDL3 and GLAD.

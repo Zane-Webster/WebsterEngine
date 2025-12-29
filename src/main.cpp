@@ -43,12 +43,11 @@ int main(int, char**) {
     Window window(WE_LAUNCH_WINDOW_RESOLUTION, "Webster Engine | 0.1.0");
     StateHandler state_handler;
     ShaderHandler shader_handler;
+    ModelLoader model_loader;
 
     state_handler.SetState(WE_LAUNCH_STATE);
 
-    ModelLoader model_loader;
-
-    std::vector<std::unique_ptr<Triangle>> ball = model_loader.Load("assets/objs/ball.obj");
+    std::unique_ptr<Object> ball = model_loader.Load("ball", "assets/objs/ball.obj");
 
     shader_handler.AddShader("basic", "assets/shaders/basic/frag/triangle.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("basic", "assets/shaders/basic/vert/triangle.vert", GL_VERTEX_SHADER);
@@ -65,11 +64,9 @@ int main(int, char**) {
             }
 
             if (window.StartRender()) {
-                glUseProgram(shader_handler.GetProgram("basic"));
+                shader_handler.UseProgram("basic");
 
-                for (auto& tri: ball) {
-                    tri->Render();
-                }
+                ball->Render();
 
                 window.EndRender();
             }
@@ -78,9 +75,7 @@ int main(int, char**) {
 
     shader_handler.Destroy();
 
-    for (auto& tri: ball) {
-        tri->Destroy();
-    }
+    ball->Destroy();
 
     SDL_Quit();
 

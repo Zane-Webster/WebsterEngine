@@ -1,5 +1,5 @@
-#ifndef SRC_STATE_H_
-#define SRC_STATE_H_
+#ifndef WE_STATE_STATE_H_
+#define WE_STATE_STATE_H_
 
 #include <iostream>
 
@@ -14,4 +14,4 @@ private:
 
 };
 
-#endif // SRC_STATE_H_
+#endif // WE_STATE_STATE_H_

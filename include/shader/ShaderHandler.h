@@ -1,5 +1,5 @@
-#ifndef SRC_SHADERHANDLER_H_
-#define SRC_SHADERHANDLER_H_
+#ifndef WE_SHADER_SHADERHANDLER_H_
+#define WE_SHADER_SHADERHANDLER_H_
 
 #include <iostream>
 
@@ -21,12 +21,13 @@ public:
     WE_LOAD_STATE AddShader(std::string name, std::string path, GLenum type);
     void CompileProgram(std::string name);
 
+    void UseProgram(std::string name);
     GLuint GetProgram(std::string name);
 
 private:
-    std::unordered_map<std::string, std::vector<std::unique_ptr<Shader>>> shaders = {};
-    std::unordered_map<std::string, GLuint> shader_programs = {};
+    std::unordered_map<std::string, std::vector<std::unique_ptr<Shader>>> shaders = WE_EMPTY_MAP;
+    std::unordered_map<std::string, GLuint> shader_programs = WE_EMPTY_MAP;
 
 };
 
-#endif // SRC_SHADERHANDLER_H_
+#endif // WE_SHADER_SHADERHANDLER_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_WINDOW_H_
-#define SRC_WINDOW_H_
+#ifndef WE_CORE_WINDOW_H_
+#define WE_CORE_WINDOW_H_
 
 #include <iostream>
 #include <SDL3/SDL.h>
@@ -41,4 +41,4 @@ private:
     void _ResolutionToSize();
 };
 
-#endif // SRC_WINDOW_H_
+#endif // WE_CORE_WINDOW_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_WEBSTERENGINE_H_
-#define SRC_WEBSTERENGINE_H_
+#ifndef WE_CORE_WEBSTERENGINE_H_
+#define WE_CORE_WEBSTERENGINE_H_
 
 #include <iostream>
 #include <array>
@@ -7,6 +7,8 @@
 #include <glad/gl.h>
 
 #define WE_EMPTY_STRING "WE_EMPTY_STRING"
+#define WE_EMPTY_VECTOR {}
+#define WE_EMPTY_MAP {}
 
 using WE_TRIANGLE_VERTICES = std::array<GLfloat, 18>;
 using WE_TRIANGLE_VERTICES_NORMAL = std::array<GLfloat, 27>;
@@ -40,4 +42,4 @@ public:
     };
 };
 
-#endif // SRC_WEBSTERENGINE_H_
+#endif // WE_CORE_WEBSTERENGINE_H_

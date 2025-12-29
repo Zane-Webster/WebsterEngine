@@ -1,5 +1,5 @@
-#ifndef SRC_SHADER_H_
-#define SRC_SHADER_H_
+#ifndef WE_SHADER_SHADER_H_
+#define WE_SHADER_SHADER_H_
 
 #include <iostream>
 
@@ -39,4 +39,4 @@ private:
 
 };
 
-#endif // SRC_SHADER_H_
+#endif // WE_SHADER_SHADER_H_

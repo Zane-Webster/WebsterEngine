@@ -1,5 +1,5 @@
-#ifndef SRC_LOGGER_H_
-#define SRC_LOGGER_H_
+#ifndef WE_CORE_LOGGER_H_
+#define WE_CORE_LOGGER_H_
 
 #include <iostream>
 #include <sstream>
@@ -29,4 +29,4 @@ private:
 
 };
 
-#endif //SRC_LOGGER_H_ 
+#endif // WE_CORE_LOGGER_H_

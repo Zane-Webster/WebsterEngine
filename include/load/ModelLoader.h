@@ -1,5 +1,5 @@
-#ifndef SRC_MODELLOADER_H_
-#define SRC_MODELLOADER_H_
+#ifndef WE_LOAD_MODELLOADER_H_
+#define WE_LOAD_MODELLOADER_H_
 
 #include <iostream>
 #include <vector>
@@ -14,15 +14,17 @@
 
 #include "prim/Triangle.h"
 
+#include "obj/Object.h"
+
 class ModelLoader {
 public:
     ModelLoader();
 
-    std::vector<std::unique_ptr<Triangle>> Load(std::string path);
+    std::unique_ptr<Object> Load(std::string name, std::string path);
 
 private:
     glm::vec3 default_color = glm::vec3(0.50f);
 
 };
 
-#endif // SRC_MODELLOADER_H_
+#endif // WE_LOAD_MODELLOADER_H_

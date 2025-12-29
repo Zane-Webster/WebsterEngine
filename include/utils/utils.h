@@ -1,5 +1,5 @@
-#ifndef SRC_UTILS_H_
-#define SRC_UTILS_H_
+#ifndef WE_UTILS_UTILS_H_
+#define WE_UTILS_UTILS_H_
 
 #include <iostream>
 
@@ -15,4 +15,4 @@ private:
 
 };
 
-#endif // SRC_UTILS_H_
+#endif // WE_UTILS_UTILS_H_

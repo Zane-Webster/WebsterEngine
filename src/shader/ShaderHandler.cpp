@@ -92,6 +92,14 @@ void ShaderHandler::CompileProgram(std::string name) {
     Logger::Info("SHADER: [" + name + "] SUCCESSFULLY COMPILED");
 }
 
+void ShaderHandler::UseProgram(std::string name) {
+    if (!shaders.contains(name)) {
+        Logger::Error("[ShaderHandler::UseProgram] PROGRAM NOT FOUND: " + name);
+        return;
+    }
+    glUseProgram(shader_programs[name]);
+}
+
 GLuint ShaderHandler::GetProgram(std::string name) {
     if (!shaders.contains(name)) {
         Logger::Error("[ShaderHandler::GetProgram] PROGRAM NOT FOUND: " + name);

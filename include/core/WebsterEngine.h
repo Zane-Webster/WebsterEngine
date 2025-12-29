@@ -7,6 +7,8 @@
 #include <glad/gl.h>
 
 #define WE_EMPTY_STRING "WE_EMPTY_STRING"
+#define WE_EMPTY_VECTOR {}
+#define WE_EMPTY_MAP {}
 
 using WE_TRIANGLE_VERTICES = std::array<GLfloat, 18>;
 using WE_TRIANGLE_VERTICES_NORMAL = std::array<GLfloat, 27>;

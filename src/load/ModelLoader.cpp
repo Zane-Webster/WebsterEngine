@@ -4,7 +4,7 @@ ModelLoader::ModelLoader() {
     ;
 }
 
-std::vector<std::unique_ptr<Triangle>> ModelLoader::Load(std::string path) {
+std::unique_ptr<Object> ModelLoader::Load(std::string name, std::string path) {
     std::vector<std::unique_ptr<Triangle>> triangles = {};
 
     Assimp::Importer importer;
@@ -19,7 +19,7 @@ std::vector<std::unique_ptr<Triangle>> ModelLoader::Load(std::string path) {
 
     if (!scene || !scene->mRootNode) {
         Logger::Error("[ModelLoader] Failed to load: " + path);
-        return {};
+        return nullptr;
     }
 
     for (unsigned int m = 0; m < scene->mNumMeshes; m++) {
@@ -51,6 +51,6 @@ std::vector<std::unique_ptr<Triangle>> ModelLoader::Load(std::string path) {
         }
     }
 
-    Logger::Info("MODEL: [" + path + "] SUCESSFULLY LOADED");
-    return triangles;
+    Logger::Info("MODEL: [" + name + "] SUCESSFULLY LOADED");
+    return std::make_unique<Object>(name, std::move(triangles));
 }

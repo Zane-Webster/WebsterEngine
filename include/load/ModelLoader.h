@@ -14,11 +14,13 @@
 
 #include "prim/Triangle.h"
 
+#include "obj/Object.h"
+
 class ModelLoader {
 public:
     ModelLoader();
 
-    std::vector<std::unique_ptr<Triangle>> Load(std::string path);
+    std::unique_ptr<Object> Load(std::string name, std::string path);
 
 private:
     glm::vec3 default_color = glm::vec3(0.50f);

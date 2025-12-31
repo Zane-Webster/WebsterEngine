@@ -4,7 +4,7 @@ ModelLoader::ModelLoader() {
     ;
 }
 
-std::unique_ptr<Object> ModelLoader::Load(std::string name, std::string path) {
+std::shared_ptr<Object> ModelLoader::Load(std::string name, std::string path) {
     std::vector<std::unique_ptr<Triangle>> triangles = {};
 
     Assimp::Importer importer;
@@ -52,5 +52,5 @@ std::unique_ptr<Object> ModelLoader::Load(std::string name, std::string path) {
     }
 
     Logger::Info("MODEL: [" + name + "] SUCESSFULLY LOADED");
-    return std::make_unique<Object>(name, std::move(triangles));
+    return std::make_shared<Object>(name, std::move(triangles));
 }

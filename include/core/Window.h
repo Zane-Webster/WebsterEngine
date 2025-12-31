@@ -13,7 +13,7 @@
 
 class Window {
 public:
-    Window(WE_WINDOW_RESOLUTION resolution, std::string title);
+    Window(WE::WINDOW_RESOLUTION resolution, std::string title);
     ~Window();
 
     void NeedRender();
@@ -25,11 +25,11 @@ public:
     SDL_Window* GetWindow() { return window; };
     SDL_GLContext GetContext() { return context; };
     glm::vec2 GetSize() { return size; };
-    WE_WINDOW_RESOLUTION GetResolution() { return resolution; };
+    WE::WINDOW_RESOLUTION GetResolution() { return resolution; };
     std::string GetTitle() { return title; };
 
 private:
-    WE_WINDOW_RESOLUTION resolution;
+    WE::WINDOW_RESOLUTION resolution;
     std::string title;
     glm::vec2 size;
     

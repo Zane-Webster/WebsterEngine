@@ -19,7 +19,7 @@ public:
     void Destroy();
 
     //////// BASIC ATTRIBUTES
-    std::shared_ptr<WE_TRIANGLE_VERTICES> vertices = std::make_shared<WE_TRIANGLE_VERTICES>();
+    std::shared_ptr<WE::TRIANGLE_VERTICES> vertices = std::make_shared<WE::TRIANGLE_VERTICES>();
 
     //////// BASIC FUNCTIONS
     // verifys vertex_array and vertex_buffer is valid (non-zero)
@@ -39,7 +39,7 @@ public:
     glm::vec3 GetColor();
 
 private:
-    std::shared_ptr<WE_TRIANGLE_VERTICES_NORMAL> full_vertices = std::make_shared<WE_TRIANGLE_VERTICES_NORMAL>();
+    std::shared_ptr<WE::TRIANGLE_VERTICES_NORMAL> full_vertices = std::make_shared<WE::TRIANGLE_VERTICES_NORMAL>();
 
     glm::vec3 normal = glm::vec3(0.0f);
     

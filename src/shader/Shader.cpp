@@ -4,23 +4,23 @@ Shader::Shader(std::string p_name, std::string p_path, GLenum p_type) : name(p_n
     ;
 }
 
-WE_LOAD_STATE Shader::Load() {
+WE::LOAD_STATE Shader::Load() {
     std::filesystem::path fs_path = path;
 
     ext = fs_path.extension().string();
 
     // ensure path exists and is correct file type
-    if (!std::filesystem::exists(fs_path)) return WE_LOAD_STATE::PATH_NOT_FOUND;
-    if (!Utils::VectorContains(valid_exts, ext)) return WE_LOAD_STATE::UNKNOWN_FILE_TYPE;
-    if (!Shader::_VerifyExtMatch()) return WE_LOAD_STATE::INCORRECT_FILE_TYPE;
+    if (!std::filesystem::exists(fs_path)) return WE::LOAD_STATE::PATH_NOT_FOUND;
+    if (!Utils::VectorContains(valid_exts, ext)) return WE::LOAD_STATE::UNKNOWN_FILE_TYPE;
+    if (!Shader::_VerifyExtMatch()) return WE::LOAD_STATE::INCORRECT_FILE_TYPE;
 
     // read source from path
     source = Shader::_ReadFromPath();
-    if (source == WE_EMPTY_STRING) return WE_LOAD_STATE::FAIL;
+    if (source == WE_EMPTY_STRING) return WE::LOAD_STATE::FAIL;
 
     // mark shader as ready to compile
     ready_to_compile = true;
-    return WE_LOAD_STATE::SUCCESS;
+    return WE::LOAD_STATE::SUCCESS;
 }
 
 GLuint Shader::Compile() {

@@ -18,7 +18,7 @@ public:
     template<typename T>
     static void Error(const T& value) { Log("[ERROR] ", value); }
 
-    static void LoadState(const std::string function, const WE_LOAD_STATE state);
+    static void LoadState(const std::string function, const WE::LOAD_STATE state);
 
 private:
     template<typename T>

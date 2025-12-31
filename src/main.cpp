@@ -28,6 +28,7 @@
 #include "prim/Triangle.h"
 
 // ===== RENDERER =====
+#include "renderer/Renderer.h"
 
 // ===== SHADER =====
 #include "shader/Shader.h"
@@ -41,37 +42,45 @@
 
 int main(int, char**) {
     Window window(WE_LAUNCH_WINDOW_RESOLUTION, "Webster Engine | 0.1.0");
+    Renderer renderer;
     StateHandler state_handler;
     ShaderHandler shader_handler;
     ModelLoader model_loader;
 
     state_handler.SetState(WE_LAUNCH_STATE);
 
-    std::unique_ptr<Object> ball = model_loader.Load("ball", "assets/objs/ball.obj");
+    std::shared_ptr<Object> ball = model_loader.Load("ball", "assets/objs/ball.obj");
 
     shader_handler.AddShader("basic", "assets/shaders/basic/frag/triangle.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("basic", "assets/shaders/basic/vert/triangle.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("basic");
 
-    while (state_handler.GetState() != WE_STATE::EXIT) {
+    while (state_handler.GetState() != WE::STATE::EXIT) {
         // ===============================
         // EDITOR
         // ===============================
-        if (state_handler.GetState() == WE_STATE::EDITOR) {
+        if (state_handler.GetState() == WE::STATE::EDITOR) {
+            if (state_handler.Load()) {
+                renderer.AddItem(std::make_shared<WE::RenderItem>("ball", WE::RENDERITEM_TYPE::OBJECT, shader_handler.GetProgram("basic"), ball));
+                renderer.Build();
+            }
+            
             SDL_Event e;
             while (SDL_PollEvent(&e)) {
-                if (e.type == SDL_EVENT_QUIT) state_handler.SetState(WE_STATE::EXIT);
+                if (e.type == SDL_EVENT_QUIT) state_handler.SetState(WE::STATE::EXIT);
             }
 
             if (window.StartRender()) {
                 shader_handler.UseProgram("basic");
 
-                ball->Render();
+                renderer.RenderAll();
 
                 window.EndRender();
             }
         }
     }
+
+    renderer.Clear();
 
     shader_handler.Destroy();
     ball->Destroy();

@@ -13,12 +13,15 @@ public:
     StateHandler();
     ~StateHandler();
 
-    void SetState(WE_STATE state);
+    bool Load();
 
-    WE_STATE GetState() { return *current; }; 
+    void SetState(WE::STATE state);
+
+    WE::STATE GetState() { return *current; }; 
 
 private:
-    std::shared_ptr<WE_STATE> current = std::make_shared<WE_STATE>(WE_STATE::BOOT);
+    std::shared_ptr<WE::STATE> current = std::make_shared<WE::STATE>(WE::STATE::BOOT);
+    bool initial_load = true;
 
 };
 

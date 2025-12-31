@@ -26,7 +26,7 @@ public:
 
     bool ready_to_compile = false;
 
-    WE_LOAD_STATE Load();
+    WE::LOAD_STATE Load();
     GLuint Compile();
 
 private:

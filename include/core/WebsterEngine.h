@@ -51,7 +51,7 @@ namespace WE {
     };
 
     struct RenderItem {
-        RenderItem(std::string p_name, WE::RENDERITEM_TYPE p_type, GLuint p_shader_program, WE::UINT8 p_layer, bool p_active, glm::vec2 p_origin = glm::vec2(0.0f)) : name(p_name), type(p_type), shader_program(p_shader_program), layer(p_layer), active(p_active), origin(p_origin) {
+        RenderItem(std::string p_name, WE::RENDERITEM_TYPE p_type, GLuint p_shader_program, std::shared_ptr<void> p_ptr = nullptr, WE::UINT8 p_layer = 0, bool p_active = true, glm::vec2 p_origin = glm::vec2(0.0f)) : name(p_name), type(p_type), shader_program(p_shader_program), ptr(p_ptr), layer(p_layer), active(p_active), origin(p_origin) {
             ;
         }
         std::string name = WE_EMPTY_STRING;
@@ -68,6 +68,7 @@ namespace WE {
         RenderItem() = default;
     };
 
+    // shader program, list of items that use that program 
     using RENDER_BATCH = std::pair<GLuint, std::vector<std::shared_ptr<WE::RenderItem>>>;
 }
 

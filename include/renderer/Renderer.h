@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #include "core/WebsterEngine.h"
 #include "core/Logger.h"
@@ -28,8 +29,8 @@ public:
     void RenderAll();
     
 private:
-    // LAYER, ITEM
-    std::map<WE::UINT8, WE::RENDER_BATCH> items = WE_EMPTY_MAP;
+    std::vector<std::shared_ptr<WE::RenderItem>> unbatched_items = WE_EMPTY_VECTOR;
+    std::vector<WE::RENDER_BATCH> items = WE_EMPTY_VECTOR;
 
     void _MakeBatches();
 };

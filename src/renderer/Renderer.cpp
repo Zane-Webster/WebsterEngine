@@ -5,24 +5,43 @@ Renderer::Renderer() {
 }
 
 void Renderer::Build() {
+    // add scene items to renderer
+    for (auto& [name, scene] : scenes) {
+        for (auto& item : scene->items) {
+            Renderer::AddItem(item);
+        }
+    }
+
     Renderer::_MakeBatches();
+}
+
+void Renderer::AddScene(std::shared_ptr<Scene> scene) {
+    scenes.emplace(scene->name, scene);
+}
+
+void Renderer::RemoveScene(std::string name) {
+    if (scenes.contains(name)) scenes.erase(name);
+    else Logger::Warn("[Renderer::RemoveScene] SCENE: " + name + " COULD NOT BE FOUND");
 }
 
 void Renderer::AddItem(std::shared_ptr<WE::RenderItem> item) {
     unbatched_items.push_back(item);
 }
 
-void Renderer::AddItems(std::vector<std::shared_ptr<WE::RenderItem>> items) {
-    for (const auto& item : items) {
+void Renderer::AddItems(std::vector<std::shared_ptr<WE::RenderItem>> p_items) {
+    for (const auto& item : p_items) {
        Renderer::AddItem(item);
     }
 }
 
 void Renderer::RemoveItem(std::string name) {
+    bool removed = false;
+
     for (auto batch_it = items.begin(); batch_it != items.end(); ) {
         auto& batch_items = batch_it->second;
 
-        // remove matching items from this batch
+        const size_t pre_size = batch_items.size();
+
         batch_items.erase(
             std::remove_if(
                 batch_items.begin(),
@@ -34,10 +53,19 @@ void Renderer::RemoveItem(std::string name) {
             batch_items.end()
         );
 
-        // remove empty batch
-        if (batch_items.empty()) batch_it = items.erase(batch_it);
-        else batch_it++;
+        if (batch_items.size() != pre_size) {
+            removed = true;
+        }
+
+        // erase empty batch
+        if (batch_items.empty()) {
+            batch_it = items.erase(batch_it);
+        } else {
+            ++batch_it;
+        }
     }
+
+    if (!removed) Logger::Warn("[Renderer::RemoveItem] ITEM: " + name + " COULD NOT BE FOUND");
 }
 
 void Renderer::RemoveItems(std::vector<std::string> names) {
@@ -49,6 +77,7 @@ void Renderer::RemoveItems(std::vector<std::string> names) {
 void Renderer::Clear() {
     unbatched_items.clear();
     items.clear();
+    scenes.clear();
 }
 
 void Renderer::RenderAll() {

@@ -12,11 +12,16 @@
 
 #include "obj/Object.h"
 
+#include "scene/Scene.h"
+
 class Renderer {
 public:
     Renderer();
 
     void Build();
+
+    void AddScene(std::shared_ptr<Scene> scene);
+    void RemoveScene(std::string name);
 
     void AddItem(std::shared_ptr<WE::RenderItem> item);
     void AddItems(std::vector<std::shared_ptr<WE::RenderItem>> items);
@@ -31,6 +36,7 @@ public:
 private:
     std::vector<std::shared_ptr<WE::RenderItem>> unbatched_items = WE_EMPTY_VECTOR;
     std::vector<WE::RENDER_BATCH> items = WE_EMPTY_VECTOR;
+    std::unordered_map<std::string, std::shared_ptr<Scene>> scenes = WE_EMPTY_MAP;
 
     void _MakeBatches();
 };

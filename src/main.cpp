@@ -55,16 +55,19 @@ int main(int, char**) {
     shader_handler.AddShader("basic", "assets/shaders/basic/vert/triangle.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("basic");
 
+    std::shared_ptr<Scene> test_scene = std::make_shared<Scene>("test_scene");
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("ball", WE::RENDERITEM_TYPE::OBJECT, shader_handler.GetProgram("basic"), ball));
+
     while (state_handler.GetState() != WE::STATE::EXIT) {
         // ===============================
         // EDITOR
         // ===============================
         if (state_handler.GetState() == WE::STATE::EDITOR) {
             if (state_handler.Load()) {
-                renderer.AddItem(std::make_shared<WE::RenderItem>("ball", WE::RENDERITEM_TYPE::OBJECT, shader_handler.GetProgram("basic"), ball));
+                renderer.AddScene(test_scene);
                 renderer.Build();
             }
-            
+
             SDL_Event e;
             while (SDL_PollEvent(&e)) {
                 if (e.type == SDL_EVENT_QUIT) state_handler.SetState(WE::STATE::EXIT);
@@ -80,7 +83,12 @@ int main(int, char**) {
         }
     }
 
+    // ===============================
+    // EXIT
+    // ===============================
+
     renderer.Clear();
+    test_scene->Clear();
 
     shader_handler.Destroy();
     ball->Destroy();

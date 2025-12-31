@@ -12,18 +12,18 @@ void ShaderHandler::Destroy() {
     }
 }
 
-WE_LOAD_STATE ShaderHandler::AddShader(std::string name, std::string path, GLenum type) {
+WE::LOAD_STATE ShaderHandler::AddShader(std::string name, std::string path, GLenum type) {
     shaders[name].push_back(std::make_unique<Shader>(name, path, type));
 
-    WE_LOAD_STATE load_state = WE_LOAD_STATE::SUCCESS;
+    WE::LOAD_STATE load_state = WE::LOAD_STATE::SUCCESS;
 
     load_state = shaders[name].back()->Load();
-    if (load_state != WE_LOAD_STATE::SUCCESS) {
+    if (load_state != WE::LOAD_STATE::SUCCESS) {
         Logger::LoadState("ShaderHandler::NewShader", load_state);
         return load_state;
     }
 
-    return WE_LOAD_STATE::SUCCESS;
+    return WE::LOAD_STATE::SUCCESS;
 }
 
 void ShaderHandler::CompileProgram(std::string name) {

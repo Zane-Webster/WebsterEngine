@@ -22,8 +22,8 @@ bool Triangle::Verify() {
 }
 
 void Triangle::LoadVertices(std::vector<GLfloat> p_vertices) {
-    vertices = std::make_shared<WE_TRIANGLE_VERTICES>();
-    full_vertices = std::make_shared<WE_TRIANGLE_VERTICES_NORMAL>();
+    vertices = std::make_shared<WE::TRIANGLE_VERTICES>();
+    full_vertices = std::make_shared<WE::TRIANGLE_VERTICES_NORMAL>();
     normal = glm::vec3(0.0f);
 
     if (p_vertices.size() == 18) {

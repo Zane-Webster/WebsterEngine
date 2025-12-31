@@ -1,6 +1,6 @@
 #include "core/Window.h"
 
-Window::Window(WE_WINDOW_RESOLUTION p_resolution, std::string p_title) : resolution(p_resolution), title(p_title) {
+Window::Window(WE::WINDOW_RESOLUTION p_resolution, std::string p_title) : resolution(p_resolution), title(p_title) {
     if (!SDL_Init(SDL_INIT_VIDEO)) Logger::Error("SDL VIDEO FAILED TO INIT");
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
@@ -52,13 +52,13 @@ void Window::SetTitle() {
 
 void Window::_ResolutionToSize() {
     switch (resolution) {
-        case HD:
+        case WE::WINDOW_RESOLUTION::HD:
             size = glm::vec2(1280, 720);
             break;
-        case FHD:
+        case WE::WINDOW_RESOLUTION::FHD:
             size = glm::vec2(1920, 1080);
             break;
-        case QHD:
+        case WE::WINDOW_RESOLUTION::QHD:
             size = glm::vec2(2560, 1440);
             break;
     }

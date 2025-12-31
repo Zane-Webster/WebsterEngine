@@ -18,7 +18,7 @@ public:
     ShaderHandler();
     void Destroy();
 
-    WE_LOAD_STATE AddShader(std::string name, std::string path, GLenum type);
+    WE::LOAD_STATE AddShader(std::string name, std::string path, GLenum type);
     void CompileProgram(std::string name);
 
     void UseProgram(std::string name);

@@ -8,6 +8,6 @@ StateHandler::~StateHandler() {
     ;
 }
 
-void StateHandler::SetState(WE_STATE p_state) {
+void StateHandler::SetState(WE::STATE p_state) {
     *current = p_state;
 }

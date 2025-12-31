@@ -53,14 +53,14 @@ int main(int, char**) {
     shader_handler.AddShader("basic", "assets/shaders/basic/vert/triangle.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("basic");
 
-    while (state_handler.GetState() != WE_STATE::EXIT) {
+    while (state_handler.GetState() != WE::STATE::EXIT) {
         // ===============================
         // EDITOR
         // ===============================
-        if (state_handler.GetState() == WE_STATE::EDITOR) {
+        if (state_handler.GetState() == WE::STATE::EDITOR) {
             SDL_Event e;
             while (SDL_PollEvent(&e)) {
-                if (e.type == SDL_EVENT_QUIT) state_handler.SetState(WE_STATE::EXIT);
+                if (e.type == SDL_EVENT_QUIT) state_handler.SetState(WE::STATE::EXIT);
             }
 
             if (window.StartRender()) {

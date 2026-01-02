@@ -20,6 +20,10 @@ public:
     std::string name = WE_EMPTY_STRING;
 
 private:
+    std::shared_ptr<glm::mat4> model_matrix = std::make_shared<glm::mat4>(1.0f);
+    std::shared_ptr<glm::mat4> stretched_model_matrix = std::make_shared<glm::mat4>(1.0f);
+    std::shared_ptr<glm::mat4> origin_model_matrix = std::make_shared<glm::mat4>(1.0f);
+
     std::vector<std::unique_ptr<Triangle>> triangles = WE_EMPTY_VECTOR;
 
 };

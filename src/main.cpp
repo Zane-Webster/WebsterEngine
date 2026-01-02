@@ -12,6 +12,9 @@
 
 #include <glm/glm.hpp>
 
+// ===== CAMERA =====
+#include "cam/Camera.h"
+
 // ===== CONFIG =====
 #include "cfg/cfg.h"
 #include "cfg/launch_options.h"

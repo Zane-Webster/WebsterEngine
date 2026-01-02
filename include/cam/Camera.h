@@ -1,0 +1,59 @@
+#ifndef WE_CAM_CAMERA_H_
+#define WE_CAM_CAMERA_H_
+
+#include <iostream>
+#include <memory>
+
+#include "core/WebsterEngine.h"
+#include "core/Logger.h"
+
+class Camera {
+public:
+    Camera(float aspect_ratio = (16.0f/9.0f));
+
+    // ======== MATRICES ========
+    glm::mat4 GetViewMatrix();
+    glm::mat4 GetProjectionMatrix();
+    glm::mat4 GetViewProjectionMatrix();
+
+    // ======== POSITION ========
+    void SetPosition(glm::vec3 new_position);
+    glm::vec3 GetPosition();
+
+    void Translate(glm::vec3 translation);
+
+    void ProcessKeyboard();
+
+    // ======== MOUSE ========
+    void LookAt(glm::vec3 target);
+    void SetYawPitch(float yaw, float pitch);
+
+    void ProcessMouse(float x, float y);
+
+private:
+    std::unique_ptr<glm::vec3> position = std::make_unique<glm::vec3>(0.0f, 0.0f, 3.0f);
+
+    const glm::vec3 true_up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
+
+    float yaw = -90.0f;
+    float pitch = 0.0f;
+
+    float fov = 90.0f;
+    float aspect_ratio = (16.0f / 9.0f);
+    float near_plane = 0.1f;
+    float far_plane = 1000.0f;
+
+    float move_speed = 5.0f;
+    float mouse_sens = 0.1f;
+
+    glm::mat4 view_matrix = glm::mat4(1.0f);
+    glm::mat4 projection_matrix = glm::mat4(1.0f);
+    
+    void _UpdateViewMatrix();
+    void _UpdateProjectionMatrix();
+};
+
+#endif // WE_CAM_CAMERA_H_

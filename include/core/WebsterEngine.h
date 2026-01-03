@@ -6,15 +6,23 @@
 #include <cstdint>
 #include <vector>
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 #include <glad/gl.h>
 #include <glm/glm.hpp>
+
+#include <SDL3/SDL.h>
+
+#include "cfg/cfg.h"
 
 #define WE_EMPTY_STRING "WE_EMPTY_STRING"
 #define WE_EMPTY_VECTOR {}
 #define WE_EMPTY_MAP {}
 
 namespace WE {
+    inline const std::string WINDOW_TITLE = "WebsterEngine | " + std::to_string(WE_VERSION_MAJOR) + "." + std::to_string(WE_VERSION_MINOR) + "." + std::to_string(WE_VERSION_PATCH);
+
     using UINT8 = std::uint8_t;
     using UINT16 = std::uint16_t;
 
@@ -48,6 +56,11 @@ namespace WE {
         SKYBOX,
         TEXT,
         TEXTURE
+    };
+
+    enum class KEYSET {
+        WASD,
+        ARROWS
     };
 
     struct RenderItem {

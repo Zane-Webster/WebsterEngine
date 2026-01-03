@@ -27,6 +27,7 @@ public:
     glm::vec2 GetSize() { return size; };
     WE::WINDOW_RESOLUTION GetResolution() { return resolution; };
     std::string GetTitle() { return title; };
+    float GetAspectRatio() { return (size.x / size.y); };
 
 private:
     WE::WINDOW_RESOLUTION resolution;

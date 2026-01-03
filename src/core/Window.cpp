@@ -18,6 +18,14 @@ Window::Window(WE::WINDOW_RESOLUTION p_resolution, std::string p_title) : resolu
 
     if (!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress)) Logger::Error("FAILED TO INIT GLAD");
 
+    // gl settings
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
+
     SDL_GL_MakeCurrent(window, context);
 
     if (WE_LAUNCH_VSYNC) SDL_GL_SetSwapInterval(1);

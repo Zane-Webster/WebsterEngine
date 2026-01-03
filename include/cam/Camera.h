@@ -6,10 +6,11 @@
 
 #include "core/WebsterEngine.h"
 #include "core/Logger.h"
+#include "utils/Utils.h"
 
 class Camera {
 public:
-    Camera(float aspect_ratio = (16.0f/9.0f));
+    Camera(float aspect_ratio, WE::KEYSET keyset);
 
     // ======== MATRICES ========
     glm::mat4 GetViewMatrix();
@@ -22,15 +23,21 @@ public:
 
     void Translate(glm::vec3 translation);
 
-    void ProcessKeyboard();
+    // ======== KEYBOARD ========
+    void StartKey(SDL_Scancode scancode);
+    bool ProcessKey();
+    void EndKey(SDL_Scancode scancode);
+    void StopAllKey();
 
     // ======== MOUSE ========
     void LookAt(glm::vec3 target);
     void SetYawPitch(float yaw, float pitch);
 
-    void ProcessMouse(float x, float y);
+    bool ProcessMouse(float x, float y);
 
 private:
+    WE::KEYSET keyset = WE::KEYSET::WASD;
+
     std::unique_ptr<glm::vec3> position = std::make_unique<glm::vec3>(0.0f, 0.0f, 3.0f);
 
     const glm::vec3 true_up = glm::vec3(0.0f, 1.0f, 0.0f);

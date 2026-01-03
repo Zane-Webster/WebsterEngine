@@ -44,11 +44,14 @@
 #include "utils/Utils.h"
 
 int main(int, char**) {
-    Window window(WE_LAUNCH_WINDOW_RESOLUTION, "Webster Engine | 0.1.0");
+    WE::KEYSET keyset = WE::KEYSET::WASD;
+
+    Window window(WE_LAUNCH_WINDOW_RESOLUTION, WE::WINDOW_TITLE);
     Renderer renderer;
     StateHandler state_handler;
     ShaderHandler shader_handler;
     ModelLoader model_loader;
+    Camera camera(window.GetAspectRatio(), keyset);
 
     state_handler.SetState(WE_LAUNCH_STATE);
 
@@ -73,8 +76,25 @@ int main(int, char**) {
 
             SDL_Event e;
             while (SDL_PollEvent(&e)) {
-                if (e.type == SDL_EVENT_QUIT) state_handler.SetState(WE::STATE::EXIT);
+                switch (e.type) {
+                    case SDL_EVENT_QUIT: 
+                        state_handler.SetState(WE::STATE::EXIT);
+                        break;
+                    case SDL_EVENT_KEY_DOWN:
+                        camera.StartKey(e.key.scancode);
+                        break;
+                    case SDL_EVENT_KEY_UP: 
+                        camera.EndKey(e.key.scancode);
+                        break;
+                    case SDL_EVENT_MOUSE_MOTION:
+                        if (camera.ProcessMouse(0, 0)) window.NeedRender();
+                        break;
+                    default:
+                        break;
+                };
             }
+
+            if (camera.ProcessKey()) window.NeedRender();
 
             if (window.StartRender()) {
                 shader_handler.UseProgram("basic");

@@ -54,6 +54,46 @@ void Window::EndRender() {
     need_render = false;
 }
 
+void Window::UpdateDeltaTime() {
+    const uint64_t freq = SDL_GetPerformanceFrequency();
+
+    uint64_t now = SDL_GetPerformanceCounter();
+
+    if (last_counter == 0) {
+        last_counter = now;
+        *delta_time = 0.0;
+        return;
+    }
+
+    // time elapsed since last frame
+    double frame_time = static_cast<double>(now - last_counter) / static_cast<double>(freq);
+
+    // ===============================
+    // FPS LIMITING (no vsync)
+    // ===============================
+    if (!WE_LAUNCH_VSYNC) {
+        const double target_frame_time = 1.0 / static_cast<double>(WE_LAUNCH_FPS_CAP);
+
+        if (frame_time < target_frame_time) {
+            double remaining = target_frame_time - frame_time;
+
+            // sleep most of the remaining time (milliseconds)
+            if (remaining > 0.001) {
+                SDL_Delay(static_cast<Uint32>(remaining * 1000.0));
+            }
+
+            // busy-wait the final microseconds for precision
+            do {
+                now = SDL_GetPerformanceCounter();
+                frame_time = static_cast<double>(now - last_counter) / static_cast<double>(freq);
+            } while (frame_time < target_frame_time);
+        }
+    }
+
+    *delta_time = frame_time;
+    last_counter = now;
+}
+
 void Window::SetTitle() {
     ;
 }

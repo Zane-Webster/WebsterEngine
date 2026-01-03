@@ -65,6 +65,9 @@ int main(int, char**) {
     test_scene->AddItem(std::make_shared<WE::RenderItem>("ball", WE::RENDERITEM_TYPE::OBJECT, shader_handler.GetProgram("basic"), ball));
 
     while (state_handler.GetState() != WE::STATE::EXIT) {
+        window.UpdateDeltaTime();
+        Logger::Debug(*window.delta_time);
+
         // ===============================
         // EDITOR
         // ===============================

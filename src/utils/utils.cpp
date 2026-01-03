@@ -1,8 +1,8 @@
 #include "utils/Utils.h"
 
 const std::unordered_map<SDL_Scancode, glm::vec3> Utils::wasd_keyset_map = {
-    { SDL_SCANCODE_W,      {  0,  0, -1 } },
-    { SDL_SCANCODE_S,      {  0,  0,  1 } },
+    { SDL_SCANCODE_W,      {  0,  0, 1 } },
+    { SDL_SCANCODE_S,      {  0,  0,  -1 } },
     { SDL_SCANCODE_A,      { -1,  0,  0 } },
     { SDL_SCANCODE_D,      {  1,  0,  0 } },
     { SDL_SCANCODE_SPACE,  {  0,  1,  0 } },

@@ -23,7 +23,6 @@ public:
     glm::mat4 GetViewProjectionMatrix();
 
     // ======== POSITION ========
-    void SetPosition(glm::vec3 new_position);
     glm::vec3 GetPosition();
 
     void Translate(glm::vec3 translation);
@@ -60,8 +59,10 @@ private:
     float near_plane = 0.1f;
     float far_plane = 1000.0f;
 
+    glm::vec3 velocity = glm::vec3(0.0f);
     float max_speed = 5.0f;
-    float acceleration = 1.0f;
+    float acceleration = 3.5f;
+    float deceleration = 12.0f;
 
     float mouse_sens = 0.1f;
 
@@ -69,7 +70,7 @@ private:
     glm::mat4 projection_matrix = glm::mat4(1.0f);
     glm::mat4 view_projection_matrix = glm::mat4(1.0f);
     
-    void _HandleMovement();
+    void _HandleMovement(glm::vec3 local);
 
     void _UpdateViewMatrix();
     void _UpdateProjectionMatrix();

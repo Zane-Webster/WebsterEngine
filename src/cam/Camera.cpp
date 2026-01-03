@@ -56,17 +56,92 @@ void Camera::StartKey(SDL_Scancode scancode) {
 }
 
 bool Camera::ProcessKey() {
-    if (keys.empty()) return false;
+    glm::vec3 local = glm::vec3(0.0f);
 
-    for (auto& key : keys) {
-        //
+    for (SDL_Scancode key : keys) {
+        local += Utils::MovementFromScancode(keyset, key);
     }
 
-    return true;
+    Camera::_HandleMovement(local);
+
+    if (velocity != glm::vec3(0.0f)) {
+        Translate(velocity * static_cast<float>(*delta_time));
+        return true;
+    }
+
+    return false;
 }
 
-void Camera::_HandleMovement() {
-    ;
+void Camera::_HandleMovement(glm::vec3 local) {
+    float dt = static_cast<float>(*delta_time);
+
+    if (local != glm::vec3(0.0f)) {
+        // normalize diagonals
+        local = glm::normalize(local);
+
+        // switch to world (front facing rather than world axis aligned)
+        glm::vec3 desired = front * local.z + right * local.x + up * local.y;
+
+        // normalize diagonals
+        desired = glm::normalize(desired);
+
+        float alignment = glm::dot(velocity, desired);
+
+        // =========================
+        // SAME-AXIS DIRECTION SWITCH
+        // e.g. switching from left to right, deceleration should be applied while slowing down, then accecleration should be applied in the next direction
+        // =========================
+        if (alignment < 0.0f) {
+            // brake first
+            float speed = glm::length(velocity);
+            speed = std::max(speed - deceleration * dt, 0.0f);
+
+            velocity = (speed > 0.0f)
+                ? glm::normalize(velocity) * speed
+                : glm::vec3(0.0f);
+        }
+        else {
+            // =========================
+            // NORMAL STEERING
+            // =========================
+
+            // decompose velocity
+            glm::vec3 parallel = desired * alignment;
+            glm::vec3 perpendicular = velocity - parallel;
+
+            // accelerate forward
+            parallel += desired * acceleration * dt;
+
+            // decelerate sideways drift
+            float perp_speed = glm::length(perpendicular);
+            if (perp_speed > 0.0f) {
+                float drop = deceleration * dt;
+                perp_speed = std::max(perp_speed - drop, 0.0f);
+                perpendicular = (perp_speed > 0.0f)
+                    ? glm::normalize(perpendicular) * perp_speed
+                    : glm::vec3(0.0f);
+            }
+
+            velocity = parallel + perpendicular;
+        }
+
+        // clamp max speed
+        float speed = glm::length(velocity);
+        if (speed > max_speed)
+            velocity = glm::normalize(velocity) * max_speed;
+
+    } else {
+        // =========================
+        // NO INPUT → FULL DECEL
+        // =========================
+        float speed = glm::length(velocity);
+        if (speed > 0.0f) {
+            speed = std::max(speed - deceleration * dt, 0.0f);
+            velocity = (speed > 0.0f)
+                ? glm::normalize(velocity) * speed
+                : glm::vec3(0.0f);
+        }
+    }
 }
 
 void Camera::EndKey(SDL_Scancode scancode) {

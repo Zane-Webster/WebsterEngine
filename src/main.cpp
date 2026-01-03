@@ -84,6 +84,9 @@ int main(int, char**) {
                         break;
                     case SDL_EVENT_KEY_DOWN:
                         camera.StartKey(e.key.scancode);
+
+                        if (e.key.scancode == SDL_SCANCODE_DELETE) state_handler.SetState(WE::STATE::EXIT);
+
                         break;
                     case SDL_EVENT_KEY_UP: 
                         camera.EndKey(e.key.scancode);

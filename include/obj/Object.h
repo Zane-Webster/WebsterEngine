@@ -17,9 +17,13 @@ public:
 
     void Render();
 
+    glm::mat4 GetModelMatrix() { return *model_matrix; };
+
     std::string name = WE_EMPTY_STRING;
 
 private:
+    std::shared_ptr<glm::mat4> model_matrix = std::make_shared<glm::mat4>(1.0f);
+
     std::vector<std::unique_ptr<Triangle>> triangles = WE_EMPTY_VECTOR;
 
 };

@@ -2,6 +2,8 @@
 #define WE_CORE_WINDOW_H_
 
 #include <iostream>
+#include <memory>
+
 #include <SDL3/SDL.h>
 
 #include <glm/glm.hpp>
@@ -16,9 +18,13 @@ public:
     Window(WE::WINDOW_RESOLUTION resolution, std::string title);
     ~Window();
 
+    std::shared_ptr<double> delta_time = std::make_shared<double>(0.0f);
+
     void NeedRender();
     bool StartRender();
     void EndRender();
+
+    void UpdateDeltaTime();
 
     void SetTitle();
 
@@ -27,6 +33,7 @@ public:
     glm::vec2 GetSize() { return size; };
     WE::WINDOW_RESOLUTION GetResolution() { return resolution; };
     std::string GetTitle() { return title; };
+    float GetAspectRatio() { return (size.x / size.y); };
 
 private:
     WE::WINDOW_RESOLUTION resolution;
@@ -37,6 +44,8 @@ private:
 
     SDL_Window* window = NULL;
     SDL_GLContext context = NULL;
+
+    uint64_t last_counter = 0;
 
     void _ResolutionToSize();
 };

@@ -6,6 +6,7 @@
 #include <string>
 
 #include "core/WebsterEngine.h"
+#include "utils/GLMStream.h"
 
 class Logger {
 public:

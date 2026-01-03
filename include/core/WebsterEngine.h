@@ -6,15 +6,23 @@
 #include <cstdint>
 #include <vector>
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 #include <glad/gl.h>
 #include <glm/glm.hpp>
+
+#include <SDL3/SDL.h>
+
+#include "cfg/cfg.h"
 
 #define WE_EMPTY_STRING "WE_EMPTY_STRING"
 #define WE_EMPTY_VECTOR {}
 #define WE_EMPTY_MAP {}
 
 namespace WE {
+    inline const std::string WINDOW_TITLE = "WebsterEngine | " + std::to_string(WE_VERSION_MAJOR) + "." + std::to_string(WE_VERSION_MINOR) + "." + std::to_string(WE_VERSION_PATCH);
+
     using UINT8 = std::uint8_t;
     using UINT16 = std::uint16_t;
 
@@ -50,6 +58,11 @@ namespace WE {
         TEXTURE
     };
 
+    enum class KEYSET {
+        WASD,
+        ARROWS
+    };
+
     struct RenderItem {
         RenderItem(std::string p_name, WE::RENDERITEM_TYPE p_type, GLuint p_shader_program, std::shared_ptr<void> p_ptr = nullptr, WE::UINT8 p_layer = 0, bool p_active = true, glm::vec2 p_origin = glm::vec2(0.0f)) : name(p_name), type(p_type), shader_program(p_shader_program), ptr(p_ptr), layer(p_layer), active(p_active), origin(p_origin) {
             ;
@@ -68,8 +81,16 @@ namespace WE {
         RenderItem() = default;
     };
 
-    // shader program, list of items that use that program 
-    using RENDER_BATCH = std::pair<GLuint, std::vector<std::shared_ptr<WE::RenderItem>>>;
+    struct ShaderUniforms {
+        GLint model = -1;
+        GLint view_projection = -1;
+    };
+
+    struct RenderBatch {
+        GLuint program = 0;
+        std::vector<std::shared_ptr<WE::RenderItem>> items = WE_EMPTY_VECTOR;
+        WE::ShaderUniforms uniforms = {};
+    };
 }
 
 #endif // WE_CORE_WEBSTERENGINE_H_

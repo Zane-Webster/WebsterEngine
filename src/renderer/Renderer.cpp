@@ -38,7 +38,7 @@ void Renderer::RemoveItem(std::string name) {
     bool removed = false;
 
     for (auto batch_it = items.begin(); batch_it != items.end(); ) {
-        auto& batch_items = batch_it->second;
+        auto& batch_items = batch_it->items;
 
         const size_t pre_size = batch_items.size();
 
@@ -80,16 +80,19 @@ void Renderer::Clear() {
     scenes.clear();
 }
 
-void Renderer::RenderAll() {
-    for (auto& [shader, batch] : items) {
-        glUseProgram(shader);
+void Renderer::RenderAll(glm::mat4 view_projection_matrix) {
+    for (auto& batch : items) {
+        glUseProgram(batch.program);
+        
+        glUniformMatrix4fv(batch.uniforms.view_projection, 1, GL_FALSE, glm::value_ptr(view_projection_matrix));
 
-        for (auto& item : batch) {
+        for (auto& item : batch.items) {
             if (!item->active) continue;
 
             switch (item->type) {
                 case WE::RENDERITEM_TYPE::OBJECT: {
                     auto object = std::static_pointer_cast<Object>(item->ptr);
+                    glUniformMatrix4fv(batch.uniforms.model, 1, GL_FALSE, glm::value_ptr(object->GetModelMatrix()));
                     object->Render();
                     break;
                 }
@@ -117,11 +120,20 @@ void Renderer::_MakeBatches() {
         GLuint shader = item->shader_program;
 
         // make new batch if it doesn't exist
-        if (items.empty() || items.back().first != shader) {
-            items.emplace_back(shader, std::vector<std::shared_ptr<WE::RenderItem>>{});
+        if (items.empty() || items.back().program != shader) {
+            WE::RenderBatch batch = {};
+            batch.program = shader;
+
+            batch.uniforms.model =
+                glGetUniformLocation(shader, "model");
+
+            batch.uniforms.view_projection =
+                glGetUniformLocation(shader, "view_projection");
+
+            items.push_back(std::move(batch));
         }
 
-        items.back().second.push_back(item);
+        items.back().items.push_back(item);
     }
 
     unbatched_items.clear();

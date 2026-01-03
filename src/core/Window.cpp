@@ -28,6 +28,8 @@ Window::Window(WE::WINDOW_RESOLUTION p_resolution, std::string p_title) : resolu
 
     SDL_GL_MakeCurrent(window, context);
 
+    SDL_SetWindowRelativeMouseMode(window, true);
+    
     if (WE_LAUNCH_VSYNC) SDL_GL_SetSwapInterval(1);
 }
 

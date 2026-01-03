@@ -18,7 +18,7 @@ public:
     Window(WE::WINDOW_RESOLUTION resolution, std::string title);
     ~Window();
 
-    std::unique_ptr<double> delta_time = std::make_unique<double>(0.0f);
+    std::shared_ptr<double> delta_time = std::make_shared<double>(0.0f);
 
     void NeedRender();
     bool StartRender();

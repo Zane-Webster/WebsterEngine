@@ -7,6 +7,8 @@
 #include <map>
 #include <algorithm>
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include "core/WebsterEngine.h"
 #include "core/Logger.h"
 
@@ -31,12 +33,14 @@ public:
 
     void Clear();
 
-    void RenderAll();
+    void RenderAll(glm::mat4 view_projection_matrix);
     
 private:
     std::vector<std::shared_ptr<WE::RenderItem>> unbatched_items = WE_EMPTY_VECTOR;
-    std::vector<WE::RENDER_BATCH> items = WE_EMPTY_VECTOR;
+    std::vector<WE::RenderBatch> items = WE_EMPTY_VECTOR;
     std::unordered_map<std::string, std::shared_ptr<Scene>> scenes = WE_EMPTY_MAP;
+
+    std::unordered_map<GLuint, WE::ShaderUniforms> uniforms = WE_EMPTY_MAP;
 
     void _MakeBatches();
 };

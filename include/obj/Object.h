@@ -17,6 +17,8 @@ public:
 
     void Render();
 
+    glm::mat4 GetModelMatrix() { return *model_matrix; };
+
     std::string name = WE_EMPTY_STRING;
 
 private:

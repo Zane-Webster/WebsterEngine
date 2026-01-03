@@ -3,6 +3,11 @@
 
 #include <iostream>
 #include <memory>
+#include <vector>
+#include <algorithm>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "core/WebsterEngine.h"
 #include "core/Logger.h"
@@ -10,7 +15,7 @@
 
 class Camera {
 public:
-    Camera(float aspect_ratio, WE::KEYSET keyset);
+    Camera(float aspect_ratio, WE::KEYSET keyset, std::shared_ptr<double> delta_time);
 
     // ======== MATRICES ========
     glm::mat4 GetViewMatrix();
@@ -31,12 +36,14 @@ public:
 
     // ======== MOUSE ========
     void LookAt(glm::vec3 target);
-    void SetYawPitch(float yaw, float pitch);
 
     bool ProcessMouse(float x, float y);
 
 private:
     WE::KEYSET keyset = WE::KEYSET::WASD;
+    std::shared_ptr<double> delta_time = nullptr;
+
+    std::vector<SDL_Scancode> keys = {};
 
     std::unique_ptr<glm::vec3> position = std::make_unique<glm::vec3>(0.0f, 0.0f, 3.0f);
 
@@ -53,14 +60,21 @@ private:
     float near_plane = 0.1f;
     float far_plane = 1000.0f;
 
-    float move_speed = 5.0f;
+    float max_speed = 5.0f;
+    float acceleration = 1.0f;
+
     float mouse_sens = 0.1f;
 
     glm::mat4 view_matrix = glm::mat4(1.0f);
     glm::mat4 projection_matrix = glm::mat4(1.0f);
+    glm::mat4 view_projection_matrix = glm::mat4(1.0f);
     
+    void _HandleMovement();
+
     void _UpdateViewMatrix();
     void _UpdateProjectionMatrix();
+    void _UpdateMatrices();
+    void _UpdateVectors();
 };
 
 #endif // WE_CAM_CAMERA_H_

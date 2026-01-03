@@ -51,7 +51,7 @@ int main(int, char**) {
     StateHandler state_handler;
     ShaderHandler shader_handler;
     ModelLoader model_loader;
-    Camera camera(window.GetAspectRatio(), keyset);
+    Camera camera(window.GetAspectRatio(), keyset, window.delta_time);
 
     state_handler.SetState(WE_LAUNCH_STATE);
 
@@ -66,7 +66,6 @@ int main(int, char**) {
 
     while (state_handler.GetState() != WE::STATE::EXIT) {
         window.UpdateDeltaTime();
-        Logger::Debug(*window.delta_time);
 
         // ===============================
         // EDITOR
@@ -90,9 +89,7 @@ int main(int, char**) {
                         camera.EndKey(e.key.scancode);
                         break;
                     case SDL_EVENT_MOUSE_MOTION:
-                        if (camera.ProcessMouse(0, 0)) window.NeedRender();
-                        break;
-                    default:
+                        if (camera.ProcessMouse(static_cast<float>(e.motion.xrel), static_cast<float>(e.motion.yrel))) window.NeedRender();
                         break;
                 };
             }
@@ -100,9 +97,7 @@ int main(int, char**) {
             if (camera.ProcessKey()) window.NeedRender();
 
             if (window.StartRender()) {
-                shader_handler.UseProgram("basic");
-
-                renderer.RenderAll();
+                renderer.RenderAll(camera.GetViewProjectionMatrix());
 
                 window.EndRender();
             }

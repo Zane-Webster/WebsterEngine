@@ -81,8 +81,16 @@ namespace WE {
         RenderItem() = default;
     };
 
-    // shader program, list of items that use that program 
-    using RENDER_BATCH = std::pair<GLuint, std::vector<std::shared_ptr<WE::RenderItem>>>;
+    struct ShaderUniforms {
+        GLint model = -1;
+        GLint view_projection = -1;
+    };
+
+    struct RenderBatch {
+        GLuint program = 0;
+        std::vector<std::shared_ptr<WE::RenderItem>> items = WE_EMPTY_VECTOR;
+        WE::ShaderUniforms uniforms = {};
+    };
 }
 
 #endif // WE_CORE_WEBSTERENGINE_H_

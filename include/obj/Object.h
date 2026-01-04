@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "core/WebsterEngine.h"
 #include "core/Logger.h"
@@ -22,6 +23,9 @@ public:
     void Render();
     void Destroy();
 
+    // ======== MOVEMENT ========
+    void Translate(glm::vec3 translation);
+
     // ======== RAYCASTING ========
     bool Raycast(WE::Ray ray, WE::RayHit& hit);
 
@@ -33,6 +37,7 @@ public:
     WE::Material material;
 
 private:
+    std::shared_ptr<glm::vec3> position = std::make_shared<glm::vec3>(0.0f);
     std::shared_ptr<glm::mat4> model_matrix = std::make_shared<glm::mat4>(1.0f);
 
     std::vector<std::unique_ptr<Triangle>> triangles = WE_EMPTY_VECTOR;

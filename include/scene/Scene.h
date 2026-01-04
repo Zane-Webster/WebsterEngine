@@ -26,6 +26,9 @@ public:
     void RemoveItem(std::string name);
     void RemoveItems(std::vector<std::string> names);
 
+    std::shared_ptr<WE::RenderItem> GetItem(std::string name);
+    std::shared_ptr<Object> GetObject(std::string name);
+
     // ======== LIGHTS ========
     void AddLight(std::shared_ptr<WE::Light> light);
     void RemoveLight(std::string name);

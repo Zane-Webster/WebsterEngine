@@ -56,12 +56,12 @@ int main(int, char**) {
     state_handler.SetState(WE_LAUNCH_STATE);
 
     std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
-    WE::Material basic_material = {0.1f, 0.5f, 32.0f};
+    WE::Material basic_material = {0.15f, 0.5f, 32.0f};
 
     std::shared_ptr<Object> ball = model_loader.Load("ball", "assets/objs/ball.obj", basic_material);
 
-    shader_handler.AddShader("basic", "assets/shaders/basic/frag/triangle.frag", GL_FRAGMENT_SHADER);
-    shader_handler.AddShader("basic", "assets/shaders/basic/vert/triangle.vert", GL_VERTEX_SHADER);
+    shader_handler.AddShader("basic", "assets/shaders/basic/frag/basic.frag", GL_FRAGMENT_SHADER);
+    shader_handler.AddShader("basic", "assets/shaders/basic/vert/basic.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("basic");
 
     std::shared_ptr<Scene> test_scene = std::make_shared<Scene>("test_scene");
@@ -103,6 +103,8 @@ int main(int, char**) {
                         WE::RayHit hit;
                         if (test_scene->Raycast(camera.GetForwardRay(), hit)) {
                             Logger::Debug(hit.item->name);
+                            test_scene->GetObject("ball")->Translate(glm::vec3(0.0f, 0.1f, 0.0f));
+                            window.NeedRender();
                         }
                         break;
                 };
@@ -123,7 +125,7 @@ int main(int, char**) {
     // ===============================
 
     renderer.Clear();
-    
+
     test_scene->Destroy();
 
     shader_handler.Destroy();

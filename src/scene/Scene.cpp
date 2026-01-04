@@ -59,6 +59,27 @@ void Scene::RemoveItems(std::vector<std::string> names) {
     }
 }
 
+std::shared_ptr<WE::RenderItem> Scene::GetItem(std::string p_name) {
+    for (const auto& item : items) {
+        if (item && item->name == p_name) return item;
+    }
+
+    Logger::Warn("[Scene::GetItem] ITEM: " + p_name + " COULD NOT BE FOUND");
+    return nullptr;
+}
+
+std::shared_ptr<Object> Scene::GetObject(std::string p_name) {
+    std::shared_ptr<WE::RenderItem> item = Scene::GetItem(p_name);
+
+    auto object = std::static_pointer_cast<Object>(item->ptr);
+    if (!object) {
+        Logger::Warn("[Scene::GetObject] OBJECT: " + p_name + " IS NOT TYPE: OBJECT");
+        return nullptr;
+    }
+
+    return object;
+}
+
 //=============================
 // LIGHTS
 //=============================

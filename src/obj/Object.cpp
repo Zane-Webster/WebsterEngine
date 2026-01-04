@@ -21,6 +21,17 @@ void Object::Destroy() {
 }
 
 //=============================
+// MOVEMENT
+//=============================
+
+void Object::Translate(glm::vec3 translation) {
+    *position += translation;
+    *model_matrix = glm::translate(*model_matrix, translation);
+
+    Object::_CalculateAABB();
+}
+
+//=============================
 // RAYCASTING
 //=============================
 

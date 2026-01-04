@@ -1,7 +1,10 @@
 #include "obj/Object.h"
 
-Object::Object(std::string p_name, WE::Material p_material, std::vector<std::unique_ptr<Triangle>>&& p_triangles) : name(p_name), triangles(std::move(p_triangles)), material(p_material) {
-    Object::_CalculateAABB();
+Object::Object(std::string p_name, WE::Material p_material, std::vector<std::unique_ptr<Triangle>>&& p_triangles, glm::vec3 p_origin) : name(p_name), triangles(std::move(p_triangles)), material(p_material) {
+    *origin = p_origin;
+    *position = *origin;
+    *origin_model_matrix = glm::translate(*origin_model_matrix, *origin);
+    Object::_UpdateModelMatrix();
 }
 
 //=============================
@@ -24,11 +27,19 @@ void Object::Destroy() {
 // MOVEMENT
 //=============================
 
+void Object::SetPosition(glm::vec3 p_position) {
+    *position = p_position;
+    Object::_UpdateModelMatrix();
+}
+
 void Object::Translate(glm::vec3 translation) {
     *position += translation;
-    *model_matrix = glm::translate(*model_matrix, translation);
+    Object::_UpdateModelMatrix();
+}
 
-    Object::_CalculateAABB();
+void Object::ResetToOrigin() {
+    *position = *origin;
+    *model_matrix = *origin_model_matrix;
 }
 
 //=============================
@@ -126,4 +137,10 @@ void Object::_CalculateAABB() {
         aabb.max = glm::max(aabb.max, tri->v1);
         aabb.max = glm::max(aabb.max, tri->v2);
     }
+}
+
+void Object::_UpdateModelMatrix() {
+    *model_matrix = glm::mat4(1.0f);
+    *model_matrix = glm::translate(*model_matrix, *position);
+    Object::_CalculateAABB();
 }

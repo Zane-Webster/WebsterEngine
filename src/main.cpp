@@ -90,6 +90,8 @@ int main(int, char**) {
                     case SDL_EVENT_KEY_DOWN:
                         camera.StartKey(e.key.scancode);
 
+                        if (e.key.scancode == SDL_SCANCODE_0) test_scene->GetObject("ball")->ResetToOrigin();
+
                         if (e.key.scancode == SDL_SCANCODE_DELETE) state_handler.SetState(WE::STATE::EXIT);
 
                         break;

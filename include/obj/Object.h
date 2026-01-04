@@ -25,7 +25,7 @@ public:
 
     // ======== POSITION ========
     void SetPosition(glm::vec3 position);
-    void Translate(glm::vec3 translation);
+    virtual void Translate(glm::vec3 translation);
 
     void ResetToOrigin();
 

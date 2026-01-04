@@ -20,6 +20,8 @@
 #define WE_EMPTY_VECTOR {}
 #define WE_EMPTY_MAP {}
 
+#define WE_GRAVITY -9.0f
+
 namespace WE {
     inline const std::string WINDOW_TITLE = "WebsterEngine | " + std::to_string(WE_VERSION_MAJOR) + "." + std::to_string(WE_VERSION_MINOR) + "." + std::to_string(WE_VERSION_PATCH);
 
@@ -53,6 +55,8 @@ namespace WE {
 
     enum class RENDERITEM_TYPE {
         OBJECT,
+        STATIC_OBJECT,
+        DYNAMIC_OBJECT,
         SKYBOX,
         TEXT,
         TEXTURE

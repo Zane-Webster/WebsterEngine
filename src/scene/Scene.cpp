@@ -71,15 +71,13 @@ std::shared_ptr<WE::RenderItem> Scene::GetItem(std::string p_name) {
 std::shared_ptr<Object> Scene::GetObject(std::string p_name) {
     std::shared_ptr<WE::RenderItem> item = Scene::GetItem(p_name);
 
-    auto object = std::static_pointer_cast<Object>(item->ptr);
-    if (!object) {
-        Logger::Warn("[Scene::GetObject] OBJECT: " + p_name + " IS NOT TYPE: OBJECT");
+    if (item->type != WE::RENDERITEM_TYPE::OBJECT && item->type != WE::RENDERITEM_TYPE::STATIC_OBJECT && item->type != WE::RENDERITEM_TYPE::DYNAMIC_OBJECT) {
+        Logger::Warn("[Scene::GetObject] ITEM: " + p_name + " IS TYPE: " + Utils::WETypeToString(item->type));
         return nullptr;
     }
 
-    return object;
+    return std::static_pointer_cast<Object>(item->ptr);
 }
-
 //=============================
 // LIGHTS
 //=============================
@@ -113,7 +111,7 @@ bool Scene::Raycast(WE::Ray ray, WE::RayHit& out_hit) {
     for (const auto& item : items) {
         if (!item || !item->raycastable) continue;
 
-        if (item->type != WE::RENDERITEM_TYPE::OBJECT) continue;
+        if (item->type != WE::RENDERITEM_TYPE::OBJECT && item->type != WE::RENDERITEM_TYPE::STATIC_OBJECT && item->type != WE::RENDERITEM_TYPE::DYNAMIC_OBJECT) continue;
 
         auto object = static_cast<Object*>(item->ptr.get());
         if (!object) continue;

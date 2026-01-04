@@ -30,6 +30,32 @@ glm::vec3 Utils::MovementFromScancode(WE::KEYSET keyset, SDL_Scancode scancode) 
     return glm::vec3(0.0f);
 }
 
+std::string Utils::WETypeToString(WE::RENDERITEM_TYPE type) {
+    switch (type) {
+        case WE::RENDERITEM_TYPE::OBJECT:
+            return "WE::RENDERITEM_TYPE::OBJECT";
+            break;
+        case WE::RENDERITEM_TYPE::STATIC_OBJECT:
+            return "WE::RENDERITEM_TYPE::STATIC_OBJECT";
+            break;
+        case WE::RENDERITEM_TYPE::DYNAMIC_OBJECT:
+            return "WE::RENDERITEM_TYPE::DYNAMIC_OBJECT";
+            break;
+        case WE::RENDERITEM_TYPE::SKYBOX:
+            return "WE::RENDERITEM_TYPE::SKYBOX";
+            break;
+        case WE::RENDERITEM_TYPE::TEXTURE:
+            return "WE::RENDERITEM_TYPE::TEXTURE";
+            break;
+        case WE::RENDERITEM_TYPE::TEXT:
+            return "WE::RENDERITEM_TYPE::TEXT";
+            break;
+        default:
+            return "UNKNOWN";
+            break;
+    }
+}
+
 bool Utils::RayIntersectsAABB(WE::Ray ray, WE::AABB box, float& t) {
     float tmin = 0.0f;
     float tmax = FLT_MAX;

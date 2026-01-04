@@ -193,3 +193,10 @@ void Camera::_UpdateVectors() {
     right = glm::normalize(glm::cross(front, true_up));
     up = glm::normalize(glm::cross(right, front));
 }
+
+//=============================
+// RAYCASTING
+//=============================
+WE::Ray Camera::GetForwardRay() {
+    return {*position, glm::normalize(front)};
+}

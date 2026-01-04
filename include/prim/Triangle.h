@@ -20,6 +20,9 @@ public:
 
     //////// BASIC ATTRIBUTES
     std::shared_ptr<WE::TRIANGLE_VERTICES> vertices = std::make_shared<WE::TRIANGLE_VERTICES>();
+    glm::vec3 v0 = glm::vec3(0.0f);
+    glm::vec3 v1 = glm::vec3(0.0f);
+    glm::vec3 v2 = glm::vec3(0.0f);
 
     //////// BASIC FUNCTIONS
     // verifys vertex_array and vertex_buffer is valid (non-zero)

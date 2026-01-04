@@ -55,7 +55,10 @@ int main(int, char**) {
 
     state_handler.SetState(WE_LAUNCH_STATE);
 
-    std::shared_ptr<Object> ball = model_loader.Load("ball", "assets/objs/ball.obj");
+    std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
+    WE::Material basic_material = {0.1f, 0.5f, 32.0f};
+
+    std::shared_ptr<Object> ball = model_loader.Load("ball", "assets/objs/ball.obj", basic_material);
 
     shader_handler.AddShader("basic", "assets/shaders/basic/frag/triangle.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("basic", "assets/shaders/basic/vert/triangle.vert", GL_VERTEX_SHADER);
@@ -63,6 +66,7 @@ int main(int, char**) {
 
     std::shared_ptr<Scene> test_scene = std::make_shared<Scene>("test_scene");
     test_scene->AddItem(std::make_shared<WE::RenderItem>("ball", WE::RENDERITEM_TYPE::OBJECT, shader_handler.GetProgram("basic"), ball));
+    test_scene->AddLight(sun_light);
 
     while (state_handler.GetState() != WE::STATE::EXIT) {
         window.UpdateDeltaTime();
@@ -72,6 +76,7 @@ int main(int, char**) {
         // ===============================
         if (state_handler.GetState() == WE::STATE::EDITOR) {
             if (state_handler.Load()) {
+                renderer.Clear();
                 renderer.AddScene(test_scene);
                 renderer.Build();
             }
@@ -94,13 +99,19 @@ int main(int, char**) {
                     case SDL_EVENT_MOUSE_MOTION:
                         if (camera.ProcessMouse(static_cast<float>(e.motion.xrel), static_cast<float>(e.motion.yrel))) window.NeedRender();
                         break;
+                    case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                        WE::RayHit hit;
+                        if (test_scene->Raycast(camera.GetForwardRay(), hit)) {
+                            Logger::Debug(hit.item->name);
+                        }
+                        break;
                 };
             }
 
             if (camera.ProcessKey()) window.NeedRender();
 
             if (window.StartRender()) {
-                renderer.RenderAll(camera.GetViewProjectionMatrix());
+                renderer.RenderAll(camera.GetViewProjectionMatrix(), camera.GetPosition());
 
                 window.EndRender();
             }
@@ -112,7 +123,8 @@ int main(int, char**) {
     // ===============================
 
     renderer.Clear();
-    test_scene->Clear();
+    
+    test_scene->Destroy();
 
     shader_handler.Destroy();
     ball->Destroy();

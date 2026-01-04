@@ -20,7 +20,7 @@ class ModelLoader {
 public:
     ModelLoader();
 
-    std::shared_ptr<Object> Load(std::string name, std::string path);
+    std::shared_ptr<Object> Load(std::string name, std::string path, WE::Material material);
 
 private:
     glm::vec3 default_color = glm::vec3(0.50f);

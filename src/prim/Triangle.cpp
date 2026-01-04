@@ -103,10 +103,14 @@ void Triangle::UpdateFullVertices() {
         int v_idx = i * v_stride;
         int f_idx = i * f_stride;
 
+        float x = (*vertices)[v_idx + 0];
+        float y = (*vertices)[v_idx + 1];
+        float z = (*vertices)[v_idx + 2];
+
         // Position
-        (*full_vertices)[f_idx + 0] = (*vertices)[v_idx + 0];
-        (*full_vertices)[f_idx + 1] = (*vertices)[v_idx + 1];
-        (*full_vertices)[f_idx + 2] = (*vertices)[v_idx + 2];
+        (*full_vertices)[f_idx + 0] = x;
+        (*full_vertices)[f_idx + 1] = y;
+        (*full_vertices)[f_idx + 2] = z;
 
         // Color
         (*full_vertices)[f_idx + 3] = (*vertices)[v_idx + 3];
@@ -117,6 +121,11 @@ void Triangle::UpdateFullVertices() {
         (*full_vertices)[f_idx + 6] = normal.x;
         (*full_vertices)[f_idx + 7] = normal.y;
         (*full_vertices)[f_idx + 8] = normal.z;
+
+        // v0, v1, v2
+        if (i == 0) v0 = glm::vec3(x, y, z);
+        else if (i == 1) v1 = glm::vec3(x, y, z);
+        else v2 = glm::vec3(x, y, z);
     }
 }
 //=============================

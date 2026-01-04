@@ -64,7 +64,7 @@ namespace WE {
     };
 
     struct RenderItem {
-        RenderItem(std::string p_name, WE::RENDERITEM_TYPE p_type, GLuint p_shader_program, std::shared_ptr<void> p_ptr = nullptr, WE::UINT8 p_layer = 0, bool p_active = true, glm::vec2 p_origin = glm::vec2(0.0f)) : name(p_name), type(p_type), shader_program(p_shader_program), ptr(p_ptr), layer(p_layer), active(p_active), origin(p_origin) {
+        RenderItem(std::string p_name, WE::RENDERITEM_TYPE p_type, GLuint p_shader_program, std::shared_ptr<void> p_ptr = nullptr, WE::UINT8 p_layer = 0, bool p_active = true, glm::vec2 p_origin = glm::vec2(0.0f), bool p_raycastable = true) : name(p_name), type(p_type), shader_program(p_shader_program), ptr(p_ptr), layer(p_layer), active(p_active), origin(p_origin), raycastable(p_raycastable) {
             ;
         }
         std::string name = WE_EMPTY_STRING;
@@ -75,6 +75,8 @@ namespace WE {
         WE::UINT8 layer = 0;
         bool active = true;
         glm::vec2 origin = glm::vec2(0.0f);
+
+        bool raycastable = true;
 
         std::shared_ptr<void> ptr = nullptr;
 
@@ -90,6 +92,23 @@ namespace WE {
         GLuint program = 0;
         std::vector<std::shared_ptr<WE::RenderItem>> items = WE_EMPTY_VECTOR;
         WE::ShaderUniforms uniforms = {};
+    };
+
+    struct Ray {
+        glm::vec3 origin = glm::vec3(0.0f);
+        glm::vec3 direction = glm::vec3(0.0f);
+    };
+
+    struct RayHit {
+        float distance = std::numeric_limits<float>::infinity();
+        glm::vec3 position = glm::vec3(0.0f);
+        glm::vec3 normal = glm::vec3(0.0f);
+        WE::RenderItem* item = nullptr;
+    };
+    
+    struct AABB {
+        glm::vec3 min = glm::vec3(0.0f);
+        glm::vec3 max = glm::vec3(0.0f);
     };
 }
 

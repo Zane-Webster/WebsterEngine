@@ -9,6 +9,8 @@
 #include "core/WebsterEngine.h"
 #include "core/Logger.h"
 
+#include "obj/Object.h"
+
 class Scene {
 public:
     Scene(std::string name);
@@ -20,6 +22,8 @@ public:
     void RemoveItems(std::vector<std::string> names);
 
     void Clear();
+
+    bool Raycast(WE::Ray ray, WE::RayHit& out_hit);
     
     std::string name = WE_EMPTY_STRING;
 

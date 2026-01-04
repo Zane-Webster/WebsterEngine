@@ -35,8 +35,10 @@ public:
 
     // ======== MOUSE ========
     void LookAt(glm::vec3 target);
-
     bool ProcessMouse(float x, float y);
+    
+    // ======== RAYCASTING ========
+    WE::Ray GetForwardRay();
 
 private:
     WE::KEYSET keyset = WE::KEYSET::WASD;

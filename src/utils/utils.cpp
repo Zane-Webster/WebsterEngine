@@ -29,3 +29,50 @@ glm::vec3 Utils::MovementFromScancode(WE::KEYSET keyset, SDL_Scancode scancode) 
 
     return glm::vec3(0.0f);
 }
+
+bool Utils::RayIntersectsAABB(WE::Ray ray, WE::AABB box, float& t) {
+    float tmin = 0.0f;
+    float tmax = FLT_MAX;
+
+    for (int i = 0; i < 3; i++) {
+        float invD = 1.0f / ray.direction[i];
+        float t0 = (box.min[i] - ray.origin[i]) * invD;
+        float t1 = (box.max[i] - ray.origin[i]) * invD;
+
+        if (invD < 0.0f) std::swap(t0, t1);
+
+        tmin = std::max(tmin, t0);
+        tmax = std::min(tmax, t1);
+
+        if (tmax <= tmin) return false;
+    }
+
+    t = tmin;
+    return true;
+}
+
+bool Utils::RayIntersectsTriangle(WE::Ray ray, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float& t) {
+    constexpr float EPS = 1e-7f;
+
+    glm::vec3 e1 = v1 - v0;
+    glm::vec3 e2 = v2 - v0;
+
+    glm::vec3 h = glm::cross(ray.direction, e2);
+    float a = glm::dot(e1, h);
+
+    if (fabs(a) < EPS) return false;
+
+    float f = 1.0f / a;
+    glm::vec3 s = ray.origin - v0;
+    float u = f * glm::dot(s, h);
+
+    if (u < 0.0f || u > 1.0f) return false;
+
+    glm::vec3 q = glm::cross(s, e1);
+    float v = f * glm::dot(ray.direction, q);
+    
+    if (v < 0.0f || u + v > 1.0f) return false;
+
+    t = f * glm::dot(e2, q);
+    return t > EPS;
+}

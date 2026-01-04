@@ -94,6 +94,12 @@ int main(int, char**) {
                     case SDL_EVENT_MOUSE_MOTION:
                         if (camera.ProcessMouse(static_cast<float>(e.motion.xrel), static_cast<float>(e.motion.yrel))) window.NeedRender();
                         break;
+                    case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                        WE::RayHit hit;
+                        if (test_scene->Raycast(camera.GetForwardRay(), hit)) {
+                            Logger::Debug(hit.item->name);
+                        }
+                        break;
                 };
             }
 

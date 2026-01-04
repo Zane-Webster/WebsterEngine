@@ -84,6 +84,8 @@ int main(int, char**) {
                 renderer.Clear();
                 renderer.AddScene(test_scene);
                 renderer.Build();
+
+                window.NeedRender();
             }
 
             SDL_Event e;

@@ -4,7 +4,34 @@ ModelLoader::ModelLoader() {
     ;
 }
 
-std::shared_ptr<Object> ModelLoader::Load(std::string name, std::string path, WE::Material material) {
+std::shared_ptr<Object> ModelLoader::LoadObject(std::string name, std::string path, WE::Material material) {
+    std::vector<std::unique_ptr<Triangle>> triangles = ModelLoader::_LoadTriangles(path);
+
+    if (triangles.empty()) return nullptr;
+
+    Logger::Info("MODEL: [" + name + "] SUCESSFULLY LOADED");
+    return std::make_shared<Object>(name, material, std::move(triangles));
+}
+
+std::shared_ptr<StaticObject> ModelLoader::LoadStaticObject(std::string name, std::string path, WE::Material material) {
+    std::vector<std::unique_ptr<Triangle>> triangles = ModelLoader::_LoadTriangles(path);
+
+    if (triangles.empty()) return nullptr;
+
+    Logger::Info("MODEL: [" + name + "] SUCESSFULLY LOADED");
+    return std::make_shared<StaticObject>(name, material, std::move(triangles));
+}
+
+std::shared_ptr<DynamicObject> ModelLoader::LoadDynamicObject(std::string name, std::string path, WE::Material material) {
+    std::vector<std::unique_ptr<Triangle>> triangles = ModelLoader::_LoadTriangles(path);
+
+    if (triangles.empty()) return nullptr;
+
+    Logger::Info("MODEL: [" + name + "] SUCESSFULLY LOADED");
+    return std::make_shared<DynamicObject>(name, material, std::move(triangles));
+}
+
+std::vector<std::unique_ptr<Triangle>> ModelLoader::_LoadTriangles(std::string path) {
     std::vector<std::unique_ptr<Triangle>> triangles = {};
 
     Assimp::Importer importer;
@@ -19,7 +46,7 @@ std::shared_ptr<Object> ModelLoader::Load(std::string name, std::string path, WE
 
     if (!scene || !scene->mRootNode) {
         Logger::Error("[ModelLoader] Failed to load: " + path);
-        return nullptr;
+        return {};
     }
 
     for (unsigned int m = 0; m < scene->mNumMeshes; m++) {
@@ -50,7 +77,5 @@ std::shared_ptr<Object> ModelLoader::Load(std::string name, std::string path, WE
             triangles.push_back(std::make_unique<Triangle>(verts));
         }
     }
-
-    Logger::Info("MODEL: [" + name + "] SUCESSFULLY LOADED");
-    return std::make_shared<Object>(name, material, std::move(triangles));
+    return triangles;
 }

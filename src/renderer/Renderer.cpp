@@ -38,7 +38,9 @@ void Renderer::RenderAll(glm::mat4 view_projection_matrix, glm::vec3 camera_pos)
             if (!item->active) continue;
 
             switch (item->type) {
-                case WE::RENDERITEM_TYPE::OBJECT: {
+                case WE::RENDERITEM_TYPE::OBJECT:
+                case WE::RENDERITEM_TYPE::STATIC_OBJECT:
+                case WE::RENDERITEM_TYPE::DYNAMIC_OBJECT:
                     auto object = std::static_pointer_cast<Object>(item->ptr);
                     glUniformMatrix4fv(batch.uniforms.model, 1, GL_FALSE, glm::value_ptr(object->GetModelMatrix()));
 
@@ -48,7 +50,6 @@ void Renderer::RenderAll(glm::mat4 view_projection_matrix, glm::vec3 camera_pos)
 
                     object->Render();
                     break;
-                }
             }
         }
     }

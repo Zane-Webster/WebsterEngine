@@ -8,8 +8,11 @@
 
 #include "core/WebsterEngine.h"
 #include "core/Logger.h"
+#include "utils/utils.h"
 
 #include "obj/Object.h"
+#include "obj/StaticObject.h"
+#include "obj/DynamicObject.h"
 
 class Scene {
 public:

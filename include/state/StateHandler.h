@@ -14,6 +14,7 @@ public:
     ~StateHandler();
 
     bool Load();
+    void Reload();
 
     void SetState(WE::STATE state);
 

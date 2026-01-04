@@ -24,8 +24,13 @@
 #include "core/Window.h"
 #include "core/Logger.h"
 
-// ===== RENDERER =====
+// ===== LOAD =====
 #include "load/ModelLoader.h"
+
+// ===== OBJ =====
+#include "obj/Object.h"
+#include "obj/StaticObject.h"
+#include "obj/DynamicObject.h"
 
 // ===== PRIM =====
 #include "prim/Triangle.h"
@@ -58,14 +63,14 @@ int main(int, char**) {
     std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
     WE::Material basic_material = {0.15f, 0.5f, 32.0f};
 
-    std::shared_ptr<Object> ball = model_loader.Load("ball", "assets/objs/ball.obj", basic_material);
+    std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/objs/ball.obj", basic_material);
 
     shader_handler.AddShader("basic", "assets/shaders/basic/frag/basic.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("basic", "assets/shaders/basic/vert/basic.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("basic");
 
     std::shared_ptr<Scene> test_scene = std::make_shared<Scene>("test_scene");
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("ball", WE::RENDERITEM_TYPE::OBJECT, shader_handler.GetProgram("basic"), ball));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("ball", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), ball));
     test_scene->AddLight(sun_light);
 
     while (state_handler.GetState() != WE::STATE::EXIT) {
@@ -90,6 +95,12 @@ int main(int, char**) {
                     case SDL_EVENT_KEY_DOWN:
                         camera.StartKey(e.key.scancode);
 
+                        if (e.key.scancode == SDL_SCANCODE_1) test_scene->GetObject("ball")->ResetToOrigin();
+                        if (e.key.scancode == SDL_SCANCODE_2) {
+                            test_scene->RemoveItem("ball");
+                            state_handler.Reload();
+                        }
+
                         if (e.key.scancode == SDL_SCANCODE_DELETE) state_handler.SetState(WE::STATE::EXIT);
 
                         break;
@@ -102,7 +113,6 @@ int main(int, char**) {
                     case SDL_EVENT_MOUSE_BUTTON_DOWN:
                         WE::RayHit hit;
                         if (test_scene->Raycast(camera.GetForwardRay(), hit)) {
-                            Logger::Debug(hit.item->name);
                             test_scene->GetObject("ball")->Translate(glm::vec3(0.0f, 0.1f, 0.0f));
                             window.NeedRender();
                         }

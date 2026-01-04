@@ -83,9 +83,33 @@ namespace WE {
         RenderItem() = default;
     };
 
+    struct Light {
+        Light(std::string p_name, glm::vec3 p_direction, glm::vec3 p_color = glm::vec3(1.0f)) : name(p_name), direction(p_direction), color(p_color) {};
+        std::string name = WE_EMPTY_STRING;
+        glm::vec3 direction = glm::vec3(0.0f);
+        glm::vec3 color = glm::vec3(1.0f);
+
+        Light() = default;
+    };
+
+    struct Material {
+        Material(float p_ambient_strength, float p_specular_strength, float p_shininess) : ambient_strength(p_ambient_strength), specular_strength(p_specular_strength), shininess(p_shininess) {};
+        float ambient_strength = 0.1f;
+        float specular_strength = 0.5f;
+        float shininess = 32.0f;
+        
+        Material() = default;
+    };
+
     struct ShaderUniforms {
         GLint model = -1;
         GLint view_projection = -1;
+        GLint camera_pos = -1;
+        GLint light_dir = -1;
+        GLint light_color = -1;
+        GLint ambient_strength = -1;
+        GLint specular_strength = -1;
+        GLint shininess = -1;
     };
 
     struct RenderBatch {

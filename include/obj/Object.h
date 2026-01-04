@@ -16,17 +16,21 @@
 
 class Object {
 public:
-    Object(std::string name, std::vector<std::unique_ptr<Triangle>>&& triangles = WE_EMPTY_VECTOR);
+    Object(std::string name, WE::Material material, std::vector<std::unique_ptr<Triangle>>&& triangles = WE_EMPTY_VECTOR);
+
+    // ======== BASIC ========
+    void Render();
     void Destroy();
 
-    void Render();
-
+    // ======== RAYCASTING ========
     bool Raycast(WE::Ray ray, WE::RayHit& hit);
 
+    // ======== GETTERS ========
     glm::mat4 GetModelMatrix() { return *model_matrix; };
     WE::AABB GetAABB();
 
     std::string name = WE_EMPTY_STRING;
+    WE::Material material;
 
 private:
     std::shared_ptr<glm::mat4> model_matrix = std::make_shared<glm::mat4>(1.0f);

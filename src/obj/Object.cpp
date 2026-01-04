@@ -1,7 +1,17 @@
 #include "obj/Object.h"
 
-Object::Object(std::string p_name, std::vector<std::unique_ptr<Triangle>>&& p_triangles) : name(p_name), triangles(std::move(p_triangles)) {
+Object::Object(std::string p_name, WE::Material p_material, std::vector<std::unique_ptr<Triangle>>&& p_triangles) : name(p_name), triangles(std::move(p_triangles)), material(p_material) {
     Object::_CalculateAABB();
+}
+
+//=============================
+// BASIC
+//=============================
+
+void Object::Render() {
+    for (auto& triangle : triangles) {
+        triangle->Render();
+    }
 }
 
 void Object::Destroy() {
@@ -10,11 +20,9 @@ void Object::Destroy() {
     }
 }
 
-void Object::Render() {
-    for (auto& triangle : triangles) {
-        triangle->Render();
-    }
-}
+//=============================
+// RAYCASTING
+//=============================
 
 bool Object::Raycast(WE::Ray ray, WE::RayHit& hit) {
     // transform ray into local space
@@ -59,6 +67,10 @@ bool Object::Raycast(WE::Ray ray, WE::RayHit& hit) {
     return hit_any;
 }
 
+//=============================
+// GETTERS
+//=============================
+
 WE::AABB Object::GetAABB() {
     glm::vec3 corners[8] = {
         {aabb.min.x, aabb.min.y, aabb.min.z},
@@ -85,6 +97,10 @@ WE::AABB Object::GetAABB() {
 
     return world;
 }
+
+//=============================
+// PRIVATE
+//=============================
 
 void Object::_CalculateAABB() {
     aabb.min = glm::vec3(std::numeric_limits<float>::infinity());

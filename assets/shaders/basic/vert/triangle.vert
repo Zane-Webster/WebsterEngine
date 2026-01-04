@@ -9,9 +9,12 @@ uniform mat4 view_projection;
 
 out vec3 vColor;
 out vec3 vNormal;
+out vec3 vWorldPos;
 
-void main()
-{
+void main() {
+    vec4 worldPos = model * vec4(aPos, 1.0);
+    vWorldPos = worldPos.xyz;
+
     vColor = aColor;
     vNormal = transpose(inverse(mat3(model))) * aNormal;
 

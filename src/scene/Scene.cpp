@@ -4,6 +4,31 @@ Scene::Scene(std::string p_name) : name(p_name) {
     ;
 }
 
+//=============================
+// BASIC
+//=============================
+
+void Scene::Clear() {
+    items.clear();
+    lights.clear();
+}
+
+void Scene::Destroy() {
+    for (auto& item : items) {
+        switch (item->type) {
+            case WE::RENDERITEM_TYPE::OBJECT:
+                auto object = std::static_pointer_cast<Object>(item->ptr);
+                object->Destroy();
+                break;
+        }
+    }
+    Scene::Clear();
+}
+
+//=============================
+// ITEMS
+//=============================
+
 void Scene::AddItem(std::shared_ptr<WE::RenderItem> item) {
     items.push_back(item);
 }
@@ -34,9 +59,31 @@ void Scene::RemoveItems(std::vector<std::string> names) {
     }
 }
 
-void Scene::Clear() {
-    items.clear();
+//=============================
+// LIGHTS
+//=============================
+
+void Scene::AddLight(std::shared_ptr<WE::Light> light) {
+    lights.push_back(light);
 }
+
+void Scene::RemoveLight(std::string p_name) {
+    size_t pre_size = lights.size();
+
+    lights.erase(
+        std::remove_if(lights.begin(), lights.end(),
+            [&](const std::shared_ptr<WE::Light>& light) {
+                return light && light->name == p_name;
+            }),
+        lights.end()
+    );
+
+    if (pre_size == lights.size()) Logger::Warn("[Scene::RemoveLight] LIGHT: " + p_name + " COULD NOT BE FOUND");
+}
+
+//=============================
+// RAYCASTING
+//=============================
 
 bool Scene::Raycast(WE::Ray ray, WE::RayHit& out_hit) {
     bool hit_any = false;

@@ -20,27 +20,33 @@ class Renderer {
 public:
     Renderer();
 
+    // ======== BASIC ========
     void Build();
+    void RenderAll(glm::mat4 view_projection_matrix, glm::vec3 camera_pos);
+    void Clear();
 
+    // ======== SCENES ========
     void AddScene(std::shared_ptr<Scene> scene);
     void RemoveScene(std::string name);
 
+    // ======== ITEMS ========
     void AddItem(std::shared_ptr<WE::RenderItem> item);
     void AddItems(std::vector<std::shared_ptr<WE::RenderItem>> items);
 
     void RemoveItem(std::string name);
     void RemoveItems(std::vector<std::string> names);
 
-    void Clear();
-
-    void RenderAll(glm::mat4 view_projection_matrix);
+    // ======== LIGHTS ========
+    void AddLight(std::shared_ptr<WE::Light> light);
+    void RemoveLight(std::string name);
     
 private:
     std::vector<std::shared_ptr<WE::RenderItem>> unbatched_items = WE_EMPTY_VECTOR;
     std::vector<WE::RenderBatch> items = WE_EMPTY_VECTOR;
     std::unordered_map<std::string, std::shared_ptr<Scene>> scenes = WE_EMPTY_MAP;
+    std::unordered_map<GLuint, WE::ShaderUniforms> uniforms = WE_EMPTY_MAP;\
+    std::vector<std::shared_ptr<WE::Light>> lights = WE_EMPTY_VECTOR;
 
-    std::unordered_map<GLuint, WE::ShaderUniforms> uniforms = WE_EMPTY_MAP;
 
     void _MakeBatches();
 };

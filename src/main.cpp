@@ -62,15 +62,18 @@ int main(int, char**) {
 
     std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
     WE::Material basic_material = {0.15f, 0.5f, 32.0f};
+    WE::Material matte = {0.15f, 0.0f, 0.0f};
 
-    std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/objs/ball.obj", basic_material, WE::COLLIDER_TYPE::SPHERE);
+    std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/obj/ball/ball.obj", basic_material, WE::COLLIDER_TYPE::SPHERE);
+    std::shared_ptr<StaticObject> floor = model_loader.LoadStaticObject("floor", "assets/obj/floor/floor.obj", matte);
 
-    shader_handler.AddShader("basic", "assets/shaders/basic/frag/basic.frag", GL_FRAGMENT_SHADER);
-    shader_handler.AddShader("basic", "assets/shaders/basic/vert/basic.vert", GL_VERTEX_SHADER);
+    shader_handler.AddShader("basic", "assets/shader/basic/frag/basic.frag", GL_FRAGMENT_SHADER);
+    shader_handler.AddShader("basic", "assets/shader/basic/vert/basic.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("basic");
 
     std::shared_ptr<Scene> test_scene = std::make_shared<Scene>("test_scene");
     test_scene->AddItem(std::make_shared<WE::RenderItem>("ball", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), ball));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("floor", WE::RENDERITEM_TYPE::STATIC_OBJECT, shader_handler.GetProgram("basic"), floor));
     test_scene->AddLight(sun_light);
 
     while (state_handler.GetState() != WE::STATE::EXIT) {

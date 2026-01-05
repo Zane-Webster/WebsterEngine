@@ -10,7 +10,7 @@ Window::Window(WE::WINDOW_RESOLUTION p_resolution, std::string p_title) : resolu
     // convert resolution enum to size vec2
     Window::_ResolutionToSize();
 
-    window = SDL_CreateWindow(title.c_str(), size.x, size.y, SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+    window = SDL_CreateWindow(title.c_str(), static_cast<int>(size.x), static_cast<int>(size.y), SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY);
     if (!window) Logger::Error("FAILED TO CREATE WINDOW");
 
     context = SDL_GL_CreateContext(window);

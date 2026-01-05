@@ -78,6 +78,7 @@ std::shared_ptr<Object> Scene::GetObject(std::string p_name) {
 
     return std::static_pointer_cast<Object>(item->ptr);
 }
+
 //=============================
 // LIGHTS
 //=============================

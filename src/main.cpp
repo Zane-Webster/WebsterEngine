@@ -127,6 +127,11 @@ int main(int, char**) {
 
             if (camera.ProcessKey()) window.NeedRender();
 
+            if (ball->moving) {
+                ball->ProcessPhysics();
+                window.NeedRender();
+            }
+
             if (window.StartRender()) {
                 renderer.RenderAll(camera.GetViewProjectionMatrix(), camera.GetPosition());
 

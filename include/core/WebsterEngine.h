@@ -67,6 +67,13 @@ namespace WE {
         ARROWS
     };
 
+    enum class COLLIDER_TYPE {
+        UNDECLARED,
+        AABB,
+        SPHERE,
+        CAPSULE
+    };
+
     struct RenderItem {
         RenderItem(std::string p_name, WE::RENDERITEM_TYPE p_type, GLuint p_shader_program, std::shared_ptr<void> p_ptr = nullptr, WE::UINT8 p_layer = 0, bool p_active = true, glm::vec2 p_origin = glm::vec2(0.0f), bool p_raycastable = true) : name(p_name), type(p_type), shader_program(p_shader_program), ptr(p_ptr), layer(p_layer), active(p_active), origin(p_origin), raycastable(p_raycastable) {
             ;
@@ -137,6 +144,33 @@ namespace WE {
     struct AABB {
         glm::vec3 min = glm::vec3(0.0f);
         glm::vec3 max = glm::vec3(0.0f);
+    };
+
+    struct ColliderShape {
+        ColliderShape(WE::COLLIDER_TYPE p_type) : type(p_type) {}
+        virtual ~ColliderShape() = default;
+
+        WE::COLLIDER_TYPE type;
+        ColliderShape() = default;
+    };
+
+    struct AABBShape final : ColliderShape {
+        AABBShape(WE::AABB p_local_box) : ColliderShape(WE::COLLIDER_TYPE::AABB), local_box(p_local_box) {}
+        
+        WE::AABB local_box;
+    };
+
+    struct SphereShape final : ColliderShape {
+        SphereShape(float p_radius) : ColliderShape(WE::COLLIDER_TYPE::SPHERE), radius(p_radius) {}
+
+        float radius = 0.0f;
+    };
+
+    struct CapsuleShape final : ColliderShape {
+        CapsuleShape(float p_radius, float p_height) : ColliderShape(WE::COLLIDER_TYPE::CAPSULE), radius(p_radius), height(p_height) {}
+
+        float radius = 0.0f;
+        float height = 0.0f;
     };
 }
 

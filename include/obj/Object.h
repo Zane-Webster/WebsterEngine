@@ -17,7 +17,7 @@
 
 class Object {
 public:
-    Object(std::string name, WE::Material material, std::vector<std::unique_ptr<Triangle>>&& triangles, glm::vec3 origin = glm::vec3(0.0f));
+    Object(std::string name, WE::Material material, std::vector<std::unique_ptr<Triangle>>&& triangles, WE::COLLIDER_TYPE collider_type = WE::COLLIDER_TYPE::UNDECLARED, glm::vec3 origin = glm::vec3(0.0f));
 
     // ======== BASIC ========
     void Render();
@@ -30,6 +30,9 @@ public:
     void ResetToOrigin();
 
     glm::vec3 GetPosition() { return *position; };
+
+    // ======== COLLISION ========
+
 
     // ======== RAYCASTING ========
     bool Raycast(WE::Ray ray, WE::RayHit& hit);
@@ -44,15 +47,23 @@ public:
 private:
     std::shared_ptr<glm::vec3> position = std::make_shared<glm::vec3>(0.0f);
     std::shared_ptr<glm::vec3> origin = std::make_shared<glm::vec3>(0.0f);
+
+    std::unique_ptr<glm::vec3> size = std::make_unique<glm::vec3>(0.0f);
+    std::unique_ptr<glm::vec3> center = std::make_unique<glm::vec3>(0.0f);
+
     std::shared_ptr<glm::mat4> model_matrix = std::make_shared<glm::mat4>(1.0f);
     std::shared_ptr<glm::mat4> origin_model_matrix = std::make_shared<glm::mat4>(1.0f);
 
     std::vector<std::unique_ptr<Triangle>> triangles = WE_EMPTY_VECTOR;
 
+    std::unique_ptr<WE::ColliderShape> collider = std::make_unique<WE::ColliderShape>(WE::COLLIDER_TYPE::AABB);
+
     WE::AABB aabb = {};
 
     void _CalculateAABB();
     void _UpdateModelMatrix();
+    
+    void _BuildCollider(WE::COLLIDER_TYPE type);
 };
 
 #endif // WE_OBJ_OBJECT_H_

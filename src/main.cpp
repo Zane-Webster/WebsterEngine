@@ -63,7 +63,7 @@ int main(int, char**) {
     std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
     WE::Material basic_material = {0.15f, 0.5f, 32.0f};
 
-    std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/objs/ball.obj", basic_material);
+    std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/objs/ball.obj", basic_material, WE::COLLIDER_TYPE::SPHERE);
 
     shader_handler.AddShader("basic", "assets/shaders/basic/frag/basic.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("basic", "assets/shaders/basic/vert/basic.vert", GL_VERTEX_SHADER);

@@ -4,31 +4,31 @@ ModelLoader::ModelLoader() {
     ;
 }
 
-std::shared_ptr<Object> ModelLoader::LoadObject(std::string name, std::string path, WE::Material material) {
+std::shared_ptr<Object> ModelLoader::LoadObject(std::string name, std::string path, WE::Material material, WE::COLLIDER_TYPE collider_type, glm::vec3 origin) {
     std::vector<std::unique_ptr<Triangle>> triangles = ModelLoader::_LoadTriangles(path);
 
     if (triangles.empty()) return nullptr;
 
     Logger::Info("MODEL: [" + name + "] SUCESSFULLY LOADED");
-    return std::make_shared<Object>(name, material, std::move(triangles));
+    return std::make_shared<Object>(name, material, std::move(triangles), collider_type, origin);
 }
 
-std::shared_ptr<StaticObject> ModelLoader::LoadStaticObject(std::string name, std::string path, WE::Material material) {
+std::shared_ptr<StaticObject> ModelLoader::LoadStaticObject(std::string name, std::string path, WE::Material material, WE::COLLIDER_TYPE collider_type, glm::vec3 origin) {
     std::vector<std::unique_ptr<Triangle>> triangles = ModelLoader::_LoadTriangles(path);
 
     if (triangles.empty()) return nullptr;
 
     Logger::Info("MODEL: [" + name + "] SUCESSFULLY LOADED");
-    return std::make_shared<StaticObject>(name, material, std::move(triangles));
+    return std::make_shared<StaticObject>(name, material, std::move(triangles), collider_type, origin);
 }
 
-std::shared_ptr<DynamicObject> ModelLoader::LoadDynamicObject(std::string name, std::string path, WE::Material material) {
+std::shared_ptr<DynamicObject> ModelLoader::LoadDynamicObject(std::string name, std::string path, WE::Material material, WE::COLLIDER_TYPE collider_type, glm::vec3 origin) {
     std::vector<std::unique_ptr<Triangle>> triangles = ModelLoader::_LoadTriangles(path);
 
     if (triangles.empty()) return nullptr;
 
     Logger::Info("MODEL: [" + name + "] SUCESSFULLY LOADED");
-    return std::make_shared<DynamicObject>(name, material, std::move(triangles));
+    return std::make_shared<DynamicObject>(name, material, std::move(triangles), collider_type, origin);
 }
 
 std::vector<std::unique_ptr<Triangle>> ModelLoader::_LoadTriangles(std::string path) {

@@ -19,9 +19,9 @@ public:
 
 private:
     glm::vec3 velocity = glm::vec3(0.0f);
+    glm::vec3 acceleration = glm::vec3(0.0f);
     glm::vec3 resting_velocity = glm::vec3(0.0f, WE_GRAVITY, 0.0f);
     float max_speed = 5.0f;
-    float acceleration = 3.5f;
 
     float mass = 1.0f;
 

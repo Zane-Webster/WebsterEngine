@@ -20,7 +20,7 @@
 #define WE_EMPTY_VECTOR {}
 #define WE_EMPTY_MAP {}
 
-#define WE_GRAVITY -0.005f
+#define WE_GRAVITY -4.0f
 
 namespace WE {
     inline const std::string WINDOW_TITLE = "WebsterEngine | " + std::to_string(WE_VERSION_MAJOR) + "." + std::to_string(WE_VERSION_MINOR) + "." + std::to_string(WE_VERSION_PATCH);

@@ -100,7 +100,10 @@ int main(int, char**) {
                     case SDL_EVENT_KEY_DOWN:
                         camera.StartKey(e.key.scancode);
 
-                        if (e.key.scancode == SDL_SCANCODE_1) test_scene->GetObject("ball")->ResetToOrigin();
+                        if (e.key.scancode == SDL_SCANCODE_1) {
+                            ball->ResetToOrigin();
+                            ball->ResetPhysics();
+                        }
                         if (e.key.scancode == SDL_SCANCODE_2) {
                             test_scene->RemoveItem("ball");
                             state_handler.Reload();
@@ -118,17 +121,17 @@ int main(int, char**) {
                     case SDL_EVENT_MOUSE_BUTTON_DOWN:
                         WE::RayHit hit;
                         if (test_scene->Raycast(camera.GetForwardRay(), hit)) {
-                            test_scene->GetObject("ball")->Translate(glm::vec3(0.0f, 0.1f, 0.0f));
+                            ball->ApplyImpulse(glm::vec3(0.0f, 10.0f, 0.0f));
                             window.NeedRender();
                         }
                         break;
-                };
+                }
             }
 
             if (camera.ProcessKey()) window.NeedRender();
 
-            if (ball->moving) {
-                ball->ProcessPhysics();
+            if (ball->IsMoving() || !ball->grounded) {
+                ball->ProcessPhysics(*window.delta_time);
                 window.NeedRender();
             }
 

@@ -24,6 +24,8 @@ public:
     static bool RayIntersectsAABB(WE::Ray ray, WE::AABB box, float& t);
     static bool RayIntersectsTriangle(WE::Ray ray, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float& t);
 
+    static bool AABBIntersects(WE::AABB aabb1, WE::AABB aabb2);
+
 private:
     static const std::unordered_map<SDL_Scancode, glm::vec3> wasd_keyset_map;
     static const std::unordered_map<SDL_Scancode, glm::vec3> arrows_keyset_map;

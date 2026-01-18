@@ -132,6 +132,11 @@ int main(int, char**) {
 
             if (ball->IsMoving() || !ball->grounded) {
                 ball->ProcessPhysics(*window.delta_time);
+
+                test_scene->ItemIntersectsAABB("ball");
+
+                ball->ApplyPhysics(*window.delta_time);
+                
                 window.NeedRender();
             }
 

@@ -24,8 +24,17 @@ void DynamicObject::ProcessPhysics(double delta_time) {
 
     if (glm::length(velocity) > max_speed) velocity = glm::normalize(velocity) * max_speed;
 
-    DynamicObject::Translate(velocity * dt);
+    glm::vec3 desired_move = velocity * dt;
+
+    predicted_aabb = GetAABB();
+    predicted_aabb.min += desired_move;
+    predicted_aabb.max += desired_move;
+}
+
+void DynamicObject::ApplyPhysics(double delta_time) {
+    float dt = static_cast<float>(delta_time);
     
+    DynamicObject::Translate(velocity * dt);
     accumulated_force = glm::vec3(0.0f);
 }
 

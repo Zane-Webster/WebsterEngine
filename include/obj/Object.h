@@ -44,7 +44,9 @@ public:
     std::string name = WE_EMPTY_STRING;
     WE::Material material;
 
-private:
+    WE::AABB aabb = {};
+
+protected:
     std::shared_ptr<glm::vec3> position = std::make_shared<glm::vec3>(0.0f);
     std::shared_ptr<glm::vec3> origin = std::make_shared<glm::vec3>(0.0f);
 
@@ -57,8 +59,6 @@ private:
     std::vector<std::unique_ptr<Triangle>> triangles = WE_EMPTY_VECTOR;
 
     std::unique_ptr<WE::ColliderShape> collider = std::make_unique<WE::ColliderShape>(WE::COLLIDER_TYPE::AABB);
-
-    WE::AABB aabb = {};
 
     void _CalculateAABB();
     void _UpdateModelMatrix();

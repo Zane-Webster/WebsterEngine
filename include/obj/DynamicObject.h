@@ -19,9 +19,12 @@ public:
     void SetVelocity(glm::vec3 velocity);
 
     void ProcessPhysics(double delta_time);
+    void ApplyPhysics(double delta_time);
     void ResetPhysics();
     
     bool IsMoving();
+
+    WE::AABB predicted_aabb = {};
 
     bool grounded = false;
     bool use_gravity = true;

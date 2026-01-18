@@ -38,6 +38,9 @@ public:
 
     // ======== RAYCASTING ========
     bool Raycast(WE::Ray ray, WE::RayHit& out_hit);
+
+    // ======== PHYSICS ========
+    bool ItemIntersectsAABB(std::string name);
     
     std::string name = WE_EMPTY_STRING;
 

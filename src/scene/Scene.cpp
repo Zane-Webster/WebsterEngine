@@ -130,3 +130,30 @@ bool Scene::Raycast(WE::Ray ray, WE::RayHit& out_hit) {
 
     return hit_any;
 }
+
+//=============================
+// PHYSICS
+//=============================
+
+bool Scene::ItemIntersectsAABB(std::string p_name) {
+    auto active_item = GetItem(p_name);
+
+    auto active_object = static_cast<DynamicObject*>(active_item->ptr.get());
+
+    if (!active_object) return false;
+
+    for (auto& item : items) {
+        if (item == active_item) continue;
+
+        auto collidable = static_cast<Object*>(item->ptr.get());
+
+        if (!collidable) continue;
+
+        if (Utils::AABBIntersects(active_object->predicted_aabb, collidable->GetAABB())) {
+            Logger::Debug(item->name);
+            return true;
+        }
+    }
+
+    return false;
+}

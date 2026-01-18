@@ -102,3 +102,10 @@ bool Utils::RayIntersectsTriangle(WE::Ray ray, glm::vec3 v0, glm::vec3 v1, glm::
     t = f * glm::dot(e2, q);
     return t > EPS;
 }
+
+bool Utils::AABBIntersects(WE::AABB a, WE::AABB b) {
+    return
+        a.min.x <= b.max.x && a.max.x >= b.min.x &&
+        a.min.y <= b.max.y && a.max.y >= b.min.y &&
+        a.min.z <= b.max.z && a.max.z >= b.min.z;
+}

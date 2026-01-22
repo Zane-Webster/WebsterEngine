@@ -21,6 +21,8 @@ public:
     bool ProcessPhysics(double delta_time);
     void ApplyPhysics(double delta_time);
     void ResetPhysics();
+
+    void ProcessManifold(WE::CollisionManifold manifold);
     
     bool IsMoving();
 
@@ -30,6 +32,8 @@ public:
     bool use_gravity = true;
 
 private:
+    glm::vec3 predicted_position = glm::vec3(0.0f);
+
     glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 accumulated_force = glm::vec3(0.0f);
     glm::vec3 acceleration = glm::vec3(0.0f);

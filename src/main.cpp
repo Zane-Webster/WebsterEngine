@@ -67,7 +67,7 @@ int main(int, char**) {
     WE::Material matte = {0.15f, 0.0f, 0.0f};
 
     std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/obj/ball/ball.obj", basic_material, WE::COLLIDER_TYPE::SPHERE);
-    std::shared_ptr<StaticObject> floor = model_loader.LoadStaticObject("floor", "assets/obj/floor/floor.obj", matte, WE::COLLIDER_TYPE::AABB);
+    std::shared_ptr<StaticObject> floor = model_loader.LoadStaticObject("floor", "assets/obj/floor/floor.obj", matte, WE::COLLIDER_TYPE::AABB, glm::vec3(0.0f, -4.0f, 0.0f));
 
     shader_handler.AddShader("basic", "assets/shader/basic/frag/basic.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("basic", "assets/shader/basic/vert/basic.vert", GL_VERTEX_SHADER);

@@ -181,13 +181,12 @@ void Scene::ApplyPhysics(double delta_time) {
 
 void Scene::ProcessCollisions(double delta_time) {
     for (DynamicObject* dyn : dynamic_objects) {
+        dyn->grounded = false;
         for (StaticObject* sta : static_objects) {
             // AABB check
             if (CollisionUtils::AABBIntersects(dyn->predicted_aabb, sta->GetAABB())) {
                 // full collider check
-                if (CollisionUtils::CollidersIntersect(*dyn->GetCollider(), *sta->GetCollider())) {
-                    Logger::Debug(sta->name);
-                }
+                dyn->ProcessManifold(CollisionUtils::CollidersManifold(*dyn->GetCollider(), *sta->GetCollider()));
             }
         }
     }

@@ -4,6 +4,7 @@ Object::Object(std::string p_name, WE::Material p_material, std::vector<std::uni
     *origin = p_origin;
     *position = *origin;
     *origin_model_matrix = glm::translate(*origin_model_matrix, *origin);
+    Object::_CalculateAABB();
     Object::_BuildCollider(collider_type);
     Object::_UpdateModelMatrix();
 }
@@ -146,8 +147,8 @@ void Object::_CalculateAABB() {
 void Object::_UpdateModelMatrix() {
     *model_matrix = glm::mat4(1.0f);
     *model_matrix = glm::translate(*model_matrix, *position);
+    
     Object::_UpdateCollider();
-    Object::_CalculateAABB();
 }
 
 void Object::_BuildCollider(WE::COLLIDER_TYPE type) {
@@ -172,12 +173,14 @@ void Object::_BuildCollider(WE::COLLIDER_TYPE type) {
 }
 
 void Object::_UpdateCollider() {
-    glm::vec3 pos = GetPosition();
+    glm::vec3 pos = Object::GetPosition();
+    collider->center = pos;
 
     switch (collider->type) {
         case WE::COLLIDER_TYPE::SPHERE: {
-            auto* sphere = static_cast<WE::SphereShape*>(collider.get());
-            sphere->center = pos;
+            // just needs center updated
+            //auto* sphere = static_cast<WE::SphereShape*>(collider.get());
+
             break;
         }
 
@@ -194,8 +197,8 @@ void Object::_UpdateCollider() {
         case WE::COLLIDER_TYPE::AABB: {
             auto* box = static_cast<WE::AABBShape*>(collider.get());
 
-            box->world_box.min = box->local_box.min + pos;
-            box->world_box.max = box->local_box.max + pos;
+            box->world_box = Object::GetAABB();
+
             break;
         }
     }

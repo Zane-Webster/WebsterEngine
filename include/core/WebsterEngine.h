@@ -21,6 +21,8 @@
 #define WE_EMPTY_MAP {}
 
 #define WE_GRAVITY -4.0f
+#define WE_PENETRATION_SLOP 0.01f
+#define WE_CORRECTION_PERCENT 0.8f
 
 namespace WE {
     inline const std::string WINDOW_TITLE = "WebsterEngine | " + std::to_string(WE_VERSION_MAJOR) + "." + std::to_string(WE_VERSION_MINOR) + "." + std::to_string(WE_VERSION_PATCH);
@@ -152,6 +154,8 @@ namespace WE {
         ColliderShape(WE::COLLIDER_TYPE p_type) : type(p_type) {}
         virtual ~ColliderShape() = default;
 
+        glm::vec3 center = glm::vec3(0.0f);
+
         WE::COLLIDER_TYPE type;
         ColliderShape() = default;
     };
@@ -166,7 +170,6 @@ namespace WE {
     struct SphereShape final : ColliderShape {
         SphereShape(float p_radius) : ColliderShape(WE::COLLIDER_TYPE::SPHERE), radius(p_radius) {}
 
-        glm::vec3 center = glm::vec3(0.0f);
         float radius = 0.0f;
     };
 

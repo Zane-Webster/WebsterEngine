@@ -130,13 +130,9 @@ int main(int, char**) {
 
             if (camera.ProcessKey()) window.NeedRender();
 
-            if (ball->IsMoving() || !ball->grounded) {
-                ball->ProcessPhysics(*window.delta_time);
-
-                test_scene->ItemIntersectsAABB("ball");
-
-                ball->ApplyPhysics(*window.delta_time);
-                
+            if (test_scene->ProcessPhysics(*window.delta_time)) {
+                test_scene->ProcessCollisions(*window.delta_time);
+                test_scene->ApplyPhysics(*window.delta_time);
                 window.NeedRender();
             }
 

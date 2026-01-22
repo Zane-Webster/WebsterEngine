@@ -12,23 +12,13 @@ void DynamicObject::SetVelocity(glm::vec3 p_velocity) {
     velocity = p_velocity;
 }
 
-void DynamicObject::ProcessPhysics(double delta_time) {
-    DynamicObject::_ApplyGravity();
-
+bool DynamicObject::ProcessPhysics(double delta_time) {
     float dt = static_cast<float>(delta_time);
 
-    acceleration = accumulated_force / mass;
+    DynamicObject::_ApplyGravity();
+    DynamicObject::_ProcessMovement(dt);
 
-    velocity += acceleration * dt;
-    velocity *= linear_damping;
-
-    if (glm::length(velocity) > max_speed) velocity = glm::normalize(velocity) * max_speed;
-
-    glm::vec3 desired_move = velocity * dt;
-
-    predicted_aabb = GetAABB();
-    predicted_aabb.min += desired_move;
-    predicted_aabb.max += desired_move;
+    return DynamicObject::IsMoving();
 }
 
 void DynamicObject::ApplyPhysics(double delta_time) {
@@ -50,4 +40,19 @@ bool DynamicObject::IsMoving() {
 
 void DynamicObject::_ApplyGravity() {
     if (use_gravity && !grounded) DynamicObject::ApplyForce(glm::vec3(0.0f, WE_GRAVITY * mass, 0.0f));
+}
+
+void DynamicObject::_ProcessMovement(float dt) {
+    acceleration = accumulated_force / mass;
+
+    velocity += acceleration * dt;
+    velocity *= linear_damping;
+
+    if (glm::length(velocity) > max_speed) velocity = glm::normalize(velocity) * max_speed;
+
+    glm::vec3 desired_move = velocity * dt;
+
+    predicted_aabb = GetAABB();
+    predicted_aabb.min += desired_move;
+    predicted_aabb.max += desired_move;
 }

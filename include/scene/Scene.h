@@ -40,12 +40,19 @@ public:
     bool Raycast(WE::Ray ray, WE::RayHit& out_hit);
 
     // ======== PHYSICS ========
+    bool ProcessPhysics(double delta_time);
+    void ApplyPhysics(double delta_time);
+    void ProcessCollisions(double delta_time);
+
     bool ItemIntersectsAABB(std::string name);
     
     std::string name = WE_EMPTY_STRING;
 
     std::vector<std::shared_ptr<WE::RenderItem>> items = WE_EMPTY_VECTOR;
     std::vector<std::shared_ptr<WE::Light>> lights = WE_EMPTY_VECTOR;
+
+    std::vector<DynamicObject*> dynamic_objects = WE_EMPTY_VECTOR;
+    std::vector<StaticObject*> static_objects = WE_EMPTY_VECTOR;
 
 private:
 

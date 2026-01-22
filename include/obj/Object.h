@@ -32,7 +32,8 @@ public:
     glm::vec3 GetPosition() { return *position; };
 
     // ======== COLLISION ========
-
+    WE::COLLIDER_TYPE GetColliderType() { return collider->type; };
+    std::shared_ptr<WE::ColliderShape> GetCollider() { return collider; };
 
     // ======== RAYCASTING ========
     bool Raycast(WE::Ray ray, WE::RayHit& hit);
@@ -58,12 +59,13 @@ protected:
 
     std::vector<std::unique_ptr<Triangle>> triangles = WE_EMPTY_VECTOR;
 
-    std::unique_ptr<WE::ColliderShape> collider = std::make_unique<WE::ColliderShape>(WE::COLLIDER_TYPE::AABB);
+    std::shared_ptr<WE::ColliderShape> collider = std::make_unique<WE::ColliderShape>(WE::COLLIDER_TYPE::AABB);
 
     void _CalculateAABB();
     void _UpdateModelMatrix();
     
     void _BuildCollider(WE::COLLIDER_TYPE type);
+    void _UpdateCollider();
 };
 
 #endif // WE_OBJ_OBJECT_H_

@@ -18,7 +18,7 @@ public:
 
     void SetVelocity(glm::vec3 velocity);
 
-    void ProcessPhysics(double delta_time);
+    bool ProcessPhysics(double delta_time);
     void ApplyPhysics(double delta_time);
     void ResetPhysics();
     
@@ -40,6 +40,7 @@ private:
     float mass = 1.0f;
 
     void _ApplyGravity();
+    void _ProcessMovement(float dt);
 };
 
 #endif // WE_OBJ_DYNAMICOBJECT_H_

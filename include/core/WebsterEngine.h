@@ -158,11 +158,13 @@ namespace WE {
         AABBShape(WE::AABB p_local_box) : ColliderShape(WE::COLLIDER_TYPE::AABB), local_box(p_local_box) {}
         
         WE::AABB local_box;
+        WE::AABB world_box;
     };
 
     struct SphereShape final : ColliderShape {
         SphereShape(float p_radius) : ColliderShape(WE::COLLIDER_TYPE::SPHERE), radius(p_radius) {}
 
+        glm::vec3 center = glm::vec3(0.0f);
         float radius = 0.0f;
     };
 
@@ -171,6 +173,9 @@ namespace WE {
 
         float radius = 0.0f;
         float height = 0.0f;
+
+        glm::vec3 base = glm::vec3(0.0f);
+        glm::vec3 tip = glm::vec3(0.0f);
     };
 }
 

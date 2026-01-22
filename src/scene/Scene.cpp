@@ -183,9 +183,9 @@ void Scene::ProcessCollisions(double delta_time) {
     for (DynamicObject* dyn : dynamic_objects) {
         for (StaticObject* sta : static_objects) {
             // AABB check
-            if (Utils::AABBIntersects(dyn->predicted_aabb, sta->GetAABB())) {
+            if (CollisionUtils::AABBIntersects(dyn->predicted_aabb, sta->GetAABB())) {
                 // full collider check
-                if (Utils::CollidersIntersect(*dyn->GetCollider(), *sta->GetCollider())) {
+                if (CollisionUtils::CollidersIntersect(*dyn->GetCollider(), *sta->GetCollider())) {
                     Logger::Debug(sta->name);
                 }
             }
@@ -207,7 +207,7 @@ bool Scene::ItemIntersectsAABB(std::string p_name) {
 
         if (!collidable) continue;
 
-        if (Utils::AABBIntersects(active_object->predicted_aabb, collidable->GetAABB())) {
+        if (CollisionUtils::AABBIntersects(active_object->predicted_aabb, collidable->GetAABB())) {
             Logger::Debug(item->name);
             return true;
         }

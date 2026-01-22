@@ -140,6 +140,8 @@ namespace WE {
         glm::vec3 normal = glm::vec3(0.0f);
         WE::RenderItem* item = nullptr;
     };
+
+    // ======== COLLISION ========
     
     struct AABB {
         glm::vec3 min = glm::vec3(0.0f);
@@ -176,6 +178,12 @@ namespace WE {
 
         glm::vec3 base = glm::vec3(0.0f);
         glm::vec3 tip = glm::vec3(0.0f);
+    };
+
+    struct CollisionManifold {
+        bool hit = false;
+        glm::vec3 normal = glm::vec3(0.0f);
+        float penetration = 0.0f;
     };
 }
 

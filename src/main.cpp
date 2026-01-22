@@ -47,6 +47,8 @@
 
 // ===== UTILS =====
 #include "utils/Utils.h"
+#include "utils/GLMStream.h"
+#include "utils/CollisionUtils.h"
 
 int main(int, char**) {
     WE::KEYSET keyset = WE::KEYSET::WASD;

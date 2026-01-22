@@ -9,6 +9,7 @@
 #include "core/WebsterEngine.h"
 #include "core/Logger.h"
 #include "utils/utils.h"
+#include "utils/CollisionUtils.h"
 
 #include "obj/Object.h"
 #include "obj/StaticObject.h"

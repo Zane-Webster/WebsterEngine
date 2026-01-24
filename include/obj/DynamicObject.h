@@ -41,7 +41,9 @@ private:
     float max_speed = 4.0f;
     float linear_damping = 0.98f;
 
-    float mass = 1.0f;
+    float restitution = 0.2f;
+
+    float mass = 2.0f;
 
     void _ApplyGravity();
     void _ProcessMovement(float dt);

@@ -21,8 +21,8 @@
 #define WE_EMPTY_MAP {}
 
 #define WE_GRAVITY -4.0f
-#define WE_PENETRATION_SLOP 0.01f
-#define WE_CORRECTION_PERCENT 0.8f
+#define WE_PENETRATION_SLOP 0.03f
+#define WE_CORRECTION_PERCENT 0.6f
 
 namespace WE {
     inline const std::string WINDOW_TITLE = "WebsterEngine | " + std::to_string(WE_VERSION_MAJOR) + "." + std::to_string(WE_VERSION_MINOR) + "." + std::to_string(WE_VERSION_PATCH);

@@ -66,7 +66,7 @@ int main(int, char**) {
     WE::Material basic_material = {0.15f, 0.5f, 32.0f};
     WE::Material matte = {0.15f, 0.0f, 0.0f};
 
-    std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/obj/ball/ball.obj", basic_material, WE::COLLIDER_TYPE::SPHERE);
+    std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/obj/ball/ball.obj", basic_material, WE::COLLIDER_TYPE::SPHERE, glm::vec3(0.0f, 2.0f, 0.0f));
     std::shared_ptr<StaticObject> floor = model_loader.LoadStaticObject("floor", "assets/obj/floor/floor.obj", matte, WE::COLLIDER_TYPE::AABB, glm::vec3(0.0f, -4.0f, 0.0f));
 
     shader_handler.AddShader("basic", "assets/shader/basic/frag/basic.frag", GL_FRAGMENT_SHADER);
@@ -110,6 +110,10 @@ int main(int, char**) {
                             test_scene->RemoveItem("ball");
                             state_handler.Reload();
                         }
+                        if (e.key.scancode == SDL_SCANCODE_LEFT) ball->ApplyImpulse(glm::vec3(-50.0f, 0.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_RIGHT) ball->ApplyImpulse(glm::vec3(50.0f, 0.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_UP) ball->ApplyImpulse(glm::vec3(0.0f, 50.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_DOWN) ball->ApplyImpulse(glm::vec3(0.0f, -50.0f, 0.0f));
 
                         if (e.key.scancode == SDL_SCANCODE_DELETE) state_handler.SetState(WE::STATE::EXIT);
 

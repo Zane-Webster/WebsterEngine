@@ -38,38 +38,45 @@ void DynamicObject::ResetPhysics() {
 void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
     if (!manifold.hit) return;
 
-    Logger::Debug(manifold.normal);
-    Logger::Debug(manifold.penetration);
-
-    if (manifold.normal.y > 0.7f) {
+    if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < 0.75f) {
         grounded = true;
-        velocity.y = 0.0f;
 
-        // exact ground snap
-        predicted_position += manifold.normal * manifold.penetration;
-    } else {
-        // side collisions still use slop
-        float correction = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f);
-        predicted_position += manifold.normal * correction * WE_CORRECTION_PERCENT;
+        float snap = std::min(manifold.penetration, 0.05f);
+        predicted_position += manifold.normal * snap;
+
+        velocity.y = 0.0f;
+        return;
     }
+
+    if (manifold.normal.y > 0.7f) grounded = true;
+
+    float correction = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f);
+
+    correction *= WE_CORRECTION_PERCENT;
+    correction = std::min(correction, 0.06f);
+
+    predicted_position += manifold.normal * correction;
 
     float velocity_normal = glm::dot(velocity, manifold.normal);
 
-    if (velocity_normal < 0.0f) velocity -= manifold.normal * velocity_normal;
+    if (velocity_normal > 0.0f) return;
 
-    if (manifold.normal.y > 0.7f) grounded = true;
+    float j = -(1.0f + restitution) * velocity_normal;
+
+    glm::vec3 impulse = j * manifold.normal;
+
+    ApplyImpulse(impulse);
 }
+
 
 bool DynamicObject::IsMoving() {
     return glm::length(velocity) > 0.001f;
 }
 
 void DynamicObject::_ApplyGravity() {
-    if (!use_gravity) return;
+    if (!use_gravity || grounded) return;
 
-    float gravityScale = grounded ? 0.2f : 1.0f;
-
-    DynamicObject::ApplyForce(glm::vec3(0.0f, WE_GRAVITY * mass * gravityScale, 0.0f));
+    DynamicObject::ApplyForce(glm::vec3(0.0f, WE_GRAVITY * mass, 0.0f));
 }
 
 void DynamicObject::_ProcessMovement(float dt) {

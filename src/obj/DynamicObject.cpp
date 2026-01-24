@@ -35,7 +35,7 @@ void DynamicObject::ResetPhysics() {
     grounded = false;
 }
 
-void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
+void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {    
     if (!manifold.hit) return;
 
     if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < (0.7f * (1.0f + restitution))) {

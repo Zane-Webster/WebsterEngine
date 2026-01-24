@@ -244,9 +244,8 @@ WE::CollisionManifold CollisionUtils::AABBAABBManifold(const WE::AABB& a, const 
     float yOverlap = std::min(a.max.y, b.max.y) - std::max(a.min.y, b.min.y);
     float zOverlap = std::min(a.max.z, b.max.z) - std::max(a.min.z, b.min.z);
 
-    if (xOverlap <= 0 || yOverlap <= 0 || zOverlap <= 0)
-        return m;
-
+    if (xOverlap < -WE_CONTACT_EPSILON || yOverlap < -WE_CONTACT_EPSILON || zOverlap < -WE_CONTACT_EPSILON) return m;
+    
     glm::vec3 centerA = (a.min + a.max) * 0.5f;
     glm::vec3 centerB = (b.min + b.max) * 0.5f;
 

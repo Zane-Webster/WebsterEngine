@@ -5,7 +5,7 @@ void DynamicObject::ApplyForce(glm::vec3 force) {
 }
 
 void DynamicObject::ApplyImpulse(glm::vec3 impulse) {
-    velocity = impulse / mass;
+    velocity += impulse / mass;
 }
 
 void DynamicObject::SetVelocity(glm::vec3 p_velocity) {
@@ -21,9 +21,7 @@ bool DynamicObject::ProcessPhysics(double delta_time) {
     return DynamicObject::IsMoving();
 }
 
-void DynamicObject::ApplyPhysics(double delta_time) {
-    float dt = static_cast<float>(delta_time);
-    
+void DynamicObject::ApplyPhysics() {
     DynamicObject::SetPosition(predicted_position);
     accumulated_force = glm::vec3(0.0f);
 }
@@ -40,6 +38,7 @@ void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
 
     if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < (0.7f * (1.0f + restitution))) {
         grounded = true;
+        ground_normal = manifold.normal;
 
         float snap = std::min(manifold.penetration, 0.015f);
         predicted_position += manifold.normal * snap;
@@ -48,7 +47,10 @@ void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
         return;
     }
 
-    if (manifold.normal.y > 0.7f) grounded = true;
+    if (manifold.normal.y > 0.7f) {
+        grounded = true;
+        ground_normal = manifold.normal;
+    }
 
     float correction = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f);
 
@@ -61,7 +63,7 @@ void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
 
     if (velocity_normal > 0.0f) return;
 
-    float j = -(1.0f + restitution) * velocity_normal;
+    float j = -(1.0f + restitution) * velocity_normal * mass;
 
     glm::vec3 impulse = j * manifold.normal;
 
@@ -85,11 +87,11 @@ void DynamicObject::_ProcessMovement(float dt) {
     velocity += acceleration * dt;
     velocity *= linear_damping;
 
+    if (glm::length(velocity) < WE_VELOCITY_EPSILON) velocity = glm::vec3(0.0f);
+
     if (glm::length(velocity) > max_speed) velocity = glm::normalize(velocity) * max_speed;
 
     glm::vec3 desired_move = velocity * dt;
-
-    if (desired_move.y < -0.1f) desired_move.y = -0.1f;
 
     predicted_position = DynamicObject::GetPosition() + desired_move;
 

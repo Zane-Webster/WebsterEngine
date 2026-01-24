@@ -22,8 +22,9 @@
 
 #define WE_GRAVITY -4.0f
 #define WE_PENETRATION_SLOP 0.03f
-#define WE_CORRECTION_PERCENT 0.6
+#define WE_CORRECTION_PERCENT 0.6f
 #define WE_CONTACT_EPSILON 0.01f
+#define WE_VELOCITY_EPSILON 0.01f
 
 namespace WE {
     inline const std::string WINDOW_TITLE = "WebsterEngine | " + std::to_string(WE_VERSION_MAJOR) + "." + std::to_string(WE_VERSION_MINOR) + "." + std::to_string(WE_VERSION_PATCH);

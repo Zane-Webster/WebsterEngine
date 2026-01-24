@@ -42,7 +42,7 @@ public:
 
     // ======== PHYSICS ========
     bool ProcessPhysics(double delta_time);
-    void ApplyPhysics(double delta_time);
+    void ApplyPhysics();
     void ProcessCollisions(double delta_time);
 
     bool ItemIntersectsAABB(std::string name);

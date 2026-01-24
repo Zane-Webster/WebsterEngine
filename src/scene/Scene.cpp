@@ -173,15 +173,16 @@ bool Scene::ProcessPhysics(double delta_time) {
     return any_moving;
 }
 
-void Scene::ApplyPhysics(double delta_time) {
+void Scene::ApplyPhysics() {
     for (DynamicObject* dyn : dynamic_objects) {
-        dyn->ApplyPhysics(delta_time);
+        dyn->ApplyPhysics();
     }
 }
 
 void Scene::ProcessCollisions(double delta_time) {
     for (DynamicObject* dyn : dynamic_objects) {
         dyn->grounded = false;
+
         for (StaticObject* sta : static_objects) {
             // AABB check
             if (CollisionUtils::AABBIntersects(dyn->predicted_aabb, sta->GetAABB())) {

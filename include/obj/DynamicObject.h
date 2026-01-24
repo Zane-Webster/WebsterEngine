@@ -19,7 +19,7 @@ public:
     void SetVelocity(glm::vec3 velocity);
 
     bool ProcessPhysics(double delta_time);
-    void ApplyPhysics(double delta_time);
+    void ApplyPhysics();
     void ResetPhysics();
 
     void ProcessManifold(WE::CollisionManifold manifold);
@@ -41,7 +41,9 @@ private:
     float max_speed = 4.0f;
     float linear_damping = 0.98f;
 
-    float restitution = 0.8f;
+    float restitution = 0.7f;
+    float friction = 0.7f;
+    glm::vec3 ground_normal = glm::vec3(0.0f);
 
     float mass = 2.0f;
 

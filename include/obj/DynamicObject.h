@@ -23,6 +23,7 @@ public:
     void ResetPhysics();
 
     void ProcessManifold(WE::CollisionManifold manifold);
+    void ProcessDynamicCollision(DynamicObject& other, WE::CollisionManifold manifold);
     
     bool IsMoving();
 
@@ -31,7 +32,6 @@ public:
     bool grounded = false;
     bool use_gravity = true;
 
-private:
     glm::vec3 predicted_position = glm::vec3(0.0f);
 
     glm::vec3 velocity = glm::vec3(0.0f);
@@ -46,6 +46,8 @@ private:
     glm::vec3 ground_normal = glm::vec3(0.0f);
 
     float mass = 2.0f;
+
+private:
 
     void _ApplyGravity();
     void _ProcessMovement(float dt);

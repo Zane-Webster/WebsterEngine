@@ -38,9 +38,13 @@ public:
     // ======== RAYCASTING ========
     bool Raycast(WE::Ray ray, WE::RayHit& hit);
 
+    // ======== COLOR ========
+    void SetColor(glm::vec3 color);
+
     // ======== GETTERS ========
     glm::mat4 GetModelMatrix() { return *model_matrix; };
     WE::AABB GetAABB();
+    glm::vec3 GetColor();
 
     std::string name = WE_EMPTY_STRING;
     WE::Material material;
@@ -58,6 +62,8 @@ protected:
     std::shared_ptr<glm::mat4> origin_model_matrix = std::make_shared<glm::mat4>(1.0f);
 
     std::vector<std::unique_ptr<Triangle>> triangles = WE_EMPTY_VECTOR;
+
+    glm::vec3 color = glm::vec3(0.25f);
 
     std::shared_ptr<WE::ColliderShape> collider = std::make_unique<WE::ColliderShape>(WE::COLLIDER_TYPE::AABB);
 

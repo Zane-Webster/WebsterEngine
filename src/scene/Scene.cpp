@@ -179,14 +179,30 @@ void Scene::ApplyPhysics() {
     }
 }
 
-void Scene::ProcessCollisions(double delta_time) {
+void Scene::ProcessCollisions(double delta_time)
+{
+    // reset grounded ONCE per frame
     for (DynamicObject* dyn : dynamic_objects) {
         dyn->grounded = false;
+    }
 
+    // dynamic vs dynamic
+    for (size_t i = 0; i < dynamic_objects.size(); i++) {
+        DynamicObject* a = dynamic_objects[i];
+
+        for (size_t j = i + 1; j < dynamic_objects.size(); j++) {
+            DynamicObject* b = dynamic_objects[j];
+
+            if (CollisionUtils::AABBIntersects(a->predicted_aabb, b->predicted_aabb)) {
+                a->ProcessDynamicCollision(*b, CollisionUtils::CollidersManifold(*a->GetCollider(), *b->GetCollider()));
+            }
+        }
+    }
+
+    // dynamic vs static
+    for (DynamicObject* dyn : dynamic_objects) {
         for (StaticObject* sta : static_objects) {
-            // AABB check
             if (CollisionUtils::AABBIntersects(dyn->predicted_aabb, sta->GetAABB())) {
-                // full collider check
                 dyn->ProcessManifold(CollisionUtils::CollidersManifold(*dyn->GetCollider(), *sta->GetCollider()));
             }
         }

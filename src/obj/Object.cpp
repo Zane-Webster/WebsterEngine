@@ -92,6 +92,16 @@ bool Object::Raycast(WE::Ray ray, WE::RayHit& hit) {
 }
 
 //=============================
+// COLOR
+//=============================
+
+void Object::SetColor(glm::vec3 p_color) {
+    for (auto& tri : triangles) {
+        tri->SetColor(p_color);
+    }
+}
+
+//=============================
 // GETTERS
 //=============================
 

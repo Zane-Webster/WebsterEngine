@@ -70,6 +70,53 @@ void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
     ApplyImpulse(impulse);
 }
 
+void DynamicObject::ProcessDynamicCollision(
+    DynamicObject& other,
+    WE::CollisionManifold manifold)
+{
+    if (!manifold.hit) return;
+
+    glm::vec3 n = manifold.normal;
+
+    // FORCE normal from this -> other
+    glm::vec3 delta = other.GetPosition() - GetPosition();
+    if (glm::dot(delta, n) < 0.0f)
+        n = -n;
+
+    glm::vec3 rv = other.velocity - velocity;
+    float velAlongNormal = glm::dot(rv, n);
+
+    if (velAlongNormal > 0.0f)
+        return;
+
+    float e = std::min(restitution, other.restitution);
+
+    float invMassA = 1.0f / mass;
+    float invMassB = 1.0f / other.mass;
+
+    float j = -(1.0f + e) * velAlongNormal;
+    j /= invMassA + invMassB;
+
+    glm::vec3 impulse = j * n;
+
+    velocity        -= impulse * invMassA;
+    other.velocity  += impulse * invMassB;
+
+    // positional correction
+    const float percent = 0.8f;
+    const float slop = 0.01f;
+
+    glm::vec3 correction =
+        std::max(manifold.penetration - slop, 0.0f)
+        / (invMassA + invMassB)
+        * percent
+        * n;
+
+    predicted_position        -= correction * invMassA;
+    other.predicted_position += correction * invMassB;
+}
+
+
 
 bool DynamicObject::IsMoving() {
     return glm::length(velocity) > 0.001f;

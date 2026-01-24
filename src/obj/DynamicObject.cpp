@@ -38,10 +38,10 @@ void DynamicObject::ResetPhysics() {
 void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
     if (!manifold.hit) return;
 
-    if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < 0.75f) {
+    if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < (0.7f * (1.0f + restitution))) {
         grounded = true;
 
-        float snap = std::min(manifold.penetration, 0.05f);
+        float snap = std::min(manifold.penetration, 0.015f);
         predicted_position += manifold.normal * snap;
 
         velocity.y = 0.0f;

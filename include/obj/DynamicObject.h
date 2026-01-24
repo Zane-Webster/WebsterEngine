@@ -41,7 +41,7 @@ private:
     float max_speed = 4.0f;
     float linear_damping = 0.98f;
 
-    float restitution = 0.2f;
+    float restitution = 0.8f;
 
     float mass = 2.0f;
 

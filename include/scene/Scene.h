@@ -22,6 +22,7 @@ public:
     // ======== BASIC ========
     void Clear();
     void Destroy();
+    void Reload();
 
     // ======== ITEMS ========
     void AddItem(std::shared_ptr<WE::RenderItem> item);

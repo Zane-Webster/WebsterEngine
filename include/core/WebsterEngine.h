@@ -20,6 +20,8 @@
 #define WE_EMPTY_VECTOR {}
 #define WE_EMPTY_MAP {}
 
+#define WE_MAX_DELTA_TIME 0.1 // about 10fps
+
 #define WE_GRAVITY -4.0f
 #define WE_PENETRATION_SLOP 0.03f
 #define WE_CORRECTION_PERCENT 0.6f

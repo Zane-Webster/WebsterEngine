@@ -39,6 +39,24 @@ void Scene::Destroy() {
     Scene::Clear();
 }
 
+void Scene::Reload() {
+    for (auto& item : items) {
+        if (item->type == WE::RENDERITEM_TYPE::OBJECT) {
+            auto obj = std::static_pointer_cast<Object>(item->ptr);
+            obj->ResetToOrigin();
+        }
+    }
+
+    for (auto& dyn : dynamic_objects) {
+        dyn->ResetToOrigin();
+        dyn->ResetPhysics();
+    }
+
+    for (auto& sta : static_objects) {
+        sta->ResetToOrigin();
+    }
+}
+
 //=============================
 // ITEMS
 //=============================
@@ -191,7 +209,9 @@ void Scene::ProcessCollisions(double delta_time) {
         for (DynamicObject* dyn : dynamic_objects) {
             for (StaticObject* sta : static_objects) {
                 if (CollisionUtils::AABBIntersects(dyn->predicted_aabb, sta->GetAABB())) {
-                    dyn->ProcessManifold(CollisionUtils::CollidersManifold(*dyn->GetCollider(), *sta->GetCollider()));
+                    WE::CollisionManifold manifold = CollisionUtils::CollidersManifold(*dyn->GetCollider(), *sta->GetCollider());
+                    dyn->ProcessGrounded(manifold);
+                    dyn->ProcessManifold(manifold);
                 }
             }
         }
@@ -204,7 +224,10 @@ void Scene::ProcessCollisions(double delta_time) {
                 DynamicObject* b = dynamic_objects[j];
 
                 if (CollisionUtils::AABBIntersects(a->predicted_aabb, b->predicted_aabb)) {
-                    a->ProcessDynamicCollision(*b, CollisionUtils::CollidersManifold(*a->GetCollider(), *b->GetCollider()));
+                    WE::CollisionManifold manifold = CollisionUtils::CollidersManifold(*a->GetCollider(), *b->GetCollider());
+                    a->ProcessGrounded(manifold);
+                    b->ProcessGrounded(manifold);
+                    a->ProcessDynamicCollision(*b, manifold);
                 }
             }
         }

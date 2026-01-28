@@ -92,7 +92,7 @@ void Window::UpdateDeltaTime() {
         }
     }
 
-    *delta_time = frame_time;
+    *delta_time = std::min(frame_time, WE_MAX_DELTA_TIME);
     last_counter = now;
 }
 

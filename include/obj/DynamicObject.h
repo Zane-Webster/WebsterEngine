@@ -24,6 +24,8 @@ public:
     void ApplyPhysics();
     void ResetPhysics();
 
+    void ProcessGrounded(WE::CollisionManifold manifold);
+
     void ProcessManifold(WE::CollisionManifold manifold);
     void ProcessDynamicCollision(DynamicObject& other, WE::CollisionManifold manifold);
 

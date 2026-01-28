@@ -25,6 +25,7 @@ bool DynamicObject::ProcessPhysics(double delta_time) {
     float dt = static_cast<float>(delta_time);
 
     DynamicObject::_ApplyGravity();
+    
     DynamicObject::_ProcessMovement(dt);
 
     return DynamicObject::IsMoving();
@@ -46,12 +47,12 @@ void DynamicObject::ResetPhysics() {
 
 void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {    
     if (!manifold.hit) return;
-
-    if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < (0.7f * (1.0f + restitution))) {
+    
+    if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < (1.0f * (1.0f + restitution))) {
         grounded = true;
         ground_normal = manifold.normal;
 
-        float snap = std::min(manifold.penetration, 0.015f);
+        float snap = std::min(manifold.penetration, 0.01f);
         predicted_position += manifold.normal * snap;
         DynamicObject::UpdatePredictedAABB();
 
@@ -94,14 +95,11 @@ void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionM
         grounded = true;
         ground_normal = normal;
 
-        // snap out of penetration gently
-        float snap = std::min(manifold.penetration, 0.015f);
+        float snap = std::min(manifold.penetration, 0.01f);
         predicted_position += normal * snap;
         DynamicObject::UpdatePredictedAABB();
 
-        // kill downward velocity
         velocity.y = 0.0f;
-
         return;
     }
 
@@ -123,12 +121,14 @@ void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionM
     DynamicObject::ApplyImpulse(-impulse);
     other.ApplyImpulse(impulse);
 
+    /*
     float correction_magnitude = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f) / (inv_mass + other.inv_mass) * WE_CORRECTION_PERCENT;
 
     glm::vec3 correction = correction_magnitude * normal;
 
     predicted_position -= correction * inv_mass;
     other.predicted_position += correction * other.inv_mass;
+    */
 
     DynamicObject::UpdatePredictedAABB();
     other.UpdatePredictedAABB();

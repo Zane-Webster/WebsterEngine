@@ -186,7 +186,7 @@ void Scene::ProcessCollisions(double delta_time) {
         dyn->grounded = false;
     }
 
-    for (int i = 0; i < WE_PHYSICS_PASSES; i++) {
+    for (int n = 0; n < WE_PHYSICS_PASSES; n++) {
         // dynamic vs static
         for (DynamicObject* dyn : dynamic_objects) {
             for (StaticObject* sta : static_objects) {

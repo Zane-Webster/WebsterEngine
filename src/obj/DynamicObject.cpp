@@ -1,11 +1,20 @@
 #include "obj/DynamicObject.h"
 
+void DynamicObject::SetDynamicProperties(float p_mass, float p_max_speed, float p_restitution, float p_linear_damping, bool p_use_gravity) {
+    mass = p_mass;
+    inv_mass = 1.0f / mass;
+    max_speed = p_max_speed;
+    restitution = p_restitution;
+    linear_damping = p_linear_damping;
+    use_gravity = p_use_gravity;
+}
+
 void DynamicObject::ApplyForce(glm::vec3 force) {
     accumulated_force += force;
 }
 
 void DynamicObject::ApplyImpulse(glm::vec3 impulse) {
-    velocity += impulse / mass;
+    velocity += impulse * inv_mass;
 }
 
 void DynamicObject::SetVelocity(glm::vec3 p_velocity) {
@@ -30,6 +39,8 @@ void DynamicObject::ResetPhysics() {
     velocity = glm::vec3(0.0f);
     acceleration = glm::vec3(0.0f);
     accumulated_force = glm::vec3(0.0f);
+    predicted_position = DynamicObject::GetPosition();
+    predicted_aabb = DynamicObject::GetAABB();
     grounded = false;
 }
 
@@ -42,9 +53,10 @@ void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
 
         float snap = std::min(manifold.penetration, 0.015f);
         predicted_position += manifold.normal * snap;
+        DynamicObject::UpdatePredictedAABB();
 
         velocity.y = 0.0f;
-        return;
+        return; 
     }
 
     if (manifold.normal.y > 0.7f) {
@@ -58,6 +70,7 @@ void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
     correction = std::min(correction, 0.06f);
 
     predicted_position += manifold.normal * correction;
+    DynamicObject::UpdatePredictedAABB();
 
     float velocity_normal = glm::dot(velocity, manifold.normal);
 
@@ -70,53 +83,64 @@ void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
     ApplyImpulse(impulse);
 }
 
-void DynamicObject::ProcessDynamicCollision(
-    DynamicObject& other,
-    WE::CollisionManifold manifold)
-{
+void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionManifold manifold) {
     if (!manifold.hit) return;
 
-    glm::vec3 n = manifold.normal;
+    glm::vec3 normal = manifold.normal;
 
-    // FORCE normal from this -> other
-    glm::vec3 delta = other.GetPosition() - GetPosition();
-    if (glm::dot(delta, n) < 0.0f)
-        n = -n;
+    glm::vec3 delta = other.predicted_position - predicted_position;
 
-    glm::vec3 rv = other.velocity - velocity;
-    float velAlongNormal = glm::dot(rv, n);
+    if (normal.y < -0.7f && std::abs(velocity.y) < (0.7f * (1.0f + restitution)) && velocity.y <= 0.0f) {
+        grounded = true;
+        ground_normal = normal;
 
-    if (velAlongNormal > 0.0f)
+        // snap out of penetration gently
+        float snap = std::min(manifold.penetration, 0.015f);
+        predicted_position += normal * snap;
+        DynamicObject::UpdatePredictedAABB();
+
+        // kill downward velocity
+        velocity.y = 0.0f;
+
         return;
+    }
 
-    float e = std::min(restitution, other.restitution);
+    // flip normal if < 0
+    if (glm::dot(delta, normal) < 0.0f) normal = -normal;
 
-    float invMassA = 1.0f / mass;
-    float invMassB = 1.0f / other.mass;
+    glm::vec3 relative_velocity = other.velocity - velocity;
+    float vel_along_normal = glm::dot(relative_velocity, normal);
 
-    float j = -(1.0f + e) * velAlongNormal;
-    j /= invMassA + invMassB;
+    if (vel_along_normal > 0.0f) return;
 
-    glm::vec3 impulse = j * n;
+    float effective_restitution = std::min(restitution, other.restitution);
 
-    velocity        -= impulse * invMassA;
-    other.velocity  += impulse * invMassB;
+    float impulse_magnitude = -(1.0f + effective_restitution) * vel_along_normal;
+    impulse_magnitude /= inv_mass + other.inv_mass;
 
-    // positional correction
-    const float percent = 0.8f;
-    const float slop = 0.01f;
+    glm::vec3 impulse = impulse_magnitude * normal;
 
-    glm::vec3 correction =
-        std::max(manifold.penetration - slop, 0.0f)
-        / (invMassA + invMassB)
-        * percent
-        * n;
+    DynamicObject::ApplyImpulse(-impulse);
+    other.ApplyImpulse(impulse);
 
-    predicted_position        -= correction * invMassA;
-    other.predicted_position += correction * invMassB;
+    float correction_magnitude = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f) / (inv_mass + other.inv_mass) * WE_CORRECTION_PERCENT;
+
+    glm::vec3 correction = correction_magnitude * normal;
+
+    predicted_position -= correction * inv_mass;
+    other.predicted_position += correction * other.inv_mass;
+
+    DynamicObject::UpdatePredictedAABB();
+    other.UpdatePredictedAABB();
 }
 
+void DynamicObject::UpdatePredictedAABB() {
+    predicted_aabb = DynamicObject::GetAABB();
 
+    glm::vec3 offset = predicted_position - DynamicObject::GetPosition();
+    predicted_aabb.min += offset;
+    predicted_aabb.max += offset;
+}
 
 bool DynamicObject::IsMoving() {
     return glm::length(velocity) > 0.001f;
@@ -129,7 +153,7 @@ void DynamicObject::_ApplyGravity() {
 }
 
 void DynamicObject::_ProcessMovement(float dt) {
-    acceleration = accumulated_force / mass;
+    acceleration = accumulated_force * inv_mass;
 
     velocity += acceleration * dt;
     velocity *= linear_damping;

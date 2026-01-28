@@ -78,12 +78,12 @@ int main(int, char**) {
     std::shared_ptr<StaticObject> floor = model_loader.LoadStaticObject("floor", "assets/obj/floor/floor.obj", matte, WE::COLLIDER_TYPE::AABB, glm::vec3(0.0f, -4.0f, 0.0f));
     std::shared_ptr<StaticObject> wall = model_loader.LoadStaticObject("wall", "assets/obj/wall/wall.obj", matte, WE::COLLIDER_TYPE::AABB, glm::vec3(-7.0f, 0.0f, 0.0f));
 
-    box1->SetDynamicProperties(25.0f, 6.0f, 0.3f);
-    box2->SetDynamicProperties(25.0f, 6.0f, 0.3f);
-    box3->SetDynamicProperties(25.0f, 6.0f, 0.3f);
-    box4->SetDynamicProperties(25.0f, 6.0f, 0.3f);
-    box5->SetDynamicProperties(25.0f, 6.0f, 0.3f);
-    box6->SetDynamicProperties(25.0f, 6.0f, 0.3f);
+    box1->SetDynamicProperties(1.0f, 6.0f, 0.3f);
+    box2->SetDynamicProperties(1.0f, 6.0f, 0.3f);
+    box3->SetDynamicProperties(1.0f, 6.0f, 0.3f);
+    box4->SetDynamicProperties(1.0f, 6.0f, 0.3f);
+    box5->SetDynamicProperties(1.0f, 6.0f, 0.3f);
+    box6->SetDynamicProperties(1.0f, 6.0f, 0.3f);
 
     wall->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
 

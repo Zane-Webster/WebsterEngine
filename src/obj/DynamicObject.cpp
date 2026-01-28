@@ -51,7 +51,7 @@ void DynamicObject::ProcessGrounded(WE::CollisionManifold manifold) {
     // Calculate if object is on the ground (if manifold normal is almost flat and velocity is low)
     // ==============================
     
-    if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < (1.0f * (1.0f + restitution))) {
+    if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < (0.3f * (1.0f + restitution))) {
         grounded = true;
         ground_normal = manifold.normal;
 
@@ -78,9 +78,9 @@ void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
     float correction = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f);
 
     correction *= WE_CORRECTION_PERCENT;
-    correction = std::min(correction, 0.06f);
+    correction = std::min(correction, 0.02f);
 
-    predicted_position += manifold.normal * correction;
+    if (!grounded) predicted_position += manifold.normal * correction;
     DynamicObject::UpdatePredictedAABB();
 
     // ==============================
@@ -91,6 +91,7 @@ void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
     if (velocity_normal > 0.0f) return;
 
     float impulse_magnitude = -(1.0f + restitution) * velocity_normal * mass;
+
     glm::vec3 impulse = impulse_magnitude * manifold.normal;
 
     ApplyImpulse(impulse);
@@ -131,23 +132,6 @@ void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionM
     float effective_restitution = std::min(restitution, other.restitution);
 
     // ==============================
-    // Calculate correction
-    // ==============================
-
-    float correction_magnitude = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f) / (inv_mass + other.inv_mass) * WE_CORRECTION_PERCENT;
-    glm::vec3 correction = correction_magnitude * -normal * 0.65f;
-    glm::vec3 other_correction = -correction;
-
-    if (grounded && correction.y < 0.0f) correction.y = 0.0f;
-    if (other.grounded && other_correction.y < 0.0f) other_correction.y = 0.0f;
-
-    predicted_position += correction * inv_mass;
-    other.predicted_position += other_correction * other.inv_mass;
-
-    DynamicObject::UpdatePredictedAABB();
-    other.UpdatePredictedAABB();
-
-    // ==============================
     // Calculate impulse
     // ==============================
 
@@ -158,6 +142,23 @@ void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionM
 
     DynamicObject::ApplyImpulse(-impulse);
     other.ApplyImpulse(impulse);
+
+    // ==============================
+    // Calculate correction
+    // ==============================
+
+    float correction_magnitude = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f) / (inv_mass + other.inv_mass) * WE_CORRECTION_PERCENT;
+    glm::vec3 correction = correction_magnitude * -normal;
+    glm::vec3 other_correction = -correction;
+
+    if (grounded && correction.y < 0.0f) correction.y = 0.0f;
+    if (other.grounded && other_correction.y < 0.0f) other_correction.y = 0.0f;
+
+    predicted_position += correction * inv_mass;
+    other.predicted_position += other_correction * other.inv_mass;
+
+    DynamicObject::UpdatePredictedAABB();
+    other.UpdatePredictedAABB();
 }
 
 void DynamicObject::UpdatePredictedAABB() {

@@ -85,6 +85,8 @@ int main(int, char**) {
     box5->SetDynamicProperties(1.0f, 6.0f, 0.3f);
     box6->SetDynamicProperties(1.0f, 6.0f, 0.3f);
 
+    ball->SetDynamicProperties(0.5f, 10.0f, 1.0f);
+
     wall->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
 
     box1->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
@@ -102,12 +104,14 @@ int main(int, char**) {
 
     std::shared_ptr<Scene> test_scene = std::make_shared<Scene>("test_scene");
     test_scene->AddItem(std::make_shared<WE::RenderItem>("ball", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), ball));
+    /*
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box1", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box1));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box2", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box2));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box3", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box3));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box4", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box4));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box5", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box5));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box6", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box6));
+    */
     test_scene->AddItem(std::make_shared<WE::RenderItem>("floor", WE::RENDERITEM_TYPE::STATIC_OBJECT, shader_handler.GetProgram("basic"), floor));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("wall", WE::RENDERITEM_TYPE::STATIC_OBJECT, shader_handler.GetProgram("basic"), wall));
     test_scene->AddLight(sun_light);
@@ -164,7 +168,7 @@ int main(int, char**) {
                     case SDL_EVENT_MOUSE_BUTTON_DOWN:
                         WE::RayHit hit;
                         if (test_scene->Raycast(camera.GetForwardRay(), hit)) {
-                            ball->ApplyImpulse(glm::vec3(0.0f, 10.0f, 0.0f));
+                            ball->ApplyImpulse(-hit.normal*25.0f);
                             window.NeedRender();
                         }
                         break;

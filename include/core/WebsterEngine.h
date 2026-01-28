@@ -28,7 +28,7 @@
 #define WE_CONTACT_EPSILON 0.01f
 #define WE_VELOCITY_EPSILON 0.01f
 
-#define WE_PHYSICS_PASSES 6
+#define WE_PHYSICS_PASSES 4
 
 namespace WE {
     inline const std::string WINDOW_TITLE = "WebsterEngine | " + std::to_string(WE_VERSION_MAJOR) + "." + std::to_string(WE_VERSION_MINOR) + "." + std::to_string(WE_VERSION_PATCH);

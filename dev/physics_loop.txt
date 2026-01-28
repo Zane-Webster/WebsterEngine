@@ -1,0 +1,19 @@
+MAIN LOOP:
+    ProcessPhysics
+        ApplyGravity
+        ProcessMovement
+            - Sets acceleration, velocity, predicted_position and predicted_aabb
+
+    ProcessCollisions
+        ProcessStaticDynamic
+            CheckAABB
+                ProcessManifold
+                    - Sets predicted_position, predicted_aabb if collision occurs
+                    - Applies impulse to counteract collision penetration
+        ProcessDynamicDynamic
+            CheckAABB
+                ProcessDynamicCollision
+                    - Sets predicted_position's, predicted_aabb's if collision occurs
+    
+    ApplyPhysics
+        - Sets object position and resets accumlated_force

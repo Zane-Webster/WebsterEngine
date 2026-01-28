@@ -19,7 +19,7 @@ public:
 
     static glm::vec3 MovementFromScancode(WE::KEYSET keyset, SDL_Scancode scancode);
 
-    static std::string WETypeToString(WE::RENDERITEM_TYPE);
+    static std::string WETypeToString(WE::RENDERITEM_TYPE type);
 
     static bool RayIntersectsAABB(WE::Ray ray, WE::AABB box, float& t);
     static bool RayIntersectsTriangle(WE::Ray ray, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float& t);

@@ -11,18 +11,50 @@ Scene::Scene(std::string p_name) : name(p_name) {
 void Scene::Clear() {
     items.clear();
     lights.clear();
+    dynamic_objects.clear();
+    static_objects.clear();
 }
 
 void Scene::Destroy() {
     for (auto& item : items) {
         switch (item->type) {
-            case WE::RENDERITEM_TYPE::OBJECT:
+            case WE::RENDERITEM_TYPE::OBJECT: {
                 auto object = std::static_pointer_cast<Object>(item->ptr);
                 object->Destroy();
                 break;
+            }
+            case WE::RENDERITEM_TYPE::DYNAMIC_OBJECT: {
+                auto object = std::static_pointer_cast<DynamicObject>(item->ptr);
+                object->Destroy();
+                break;
+            }
+            case WE::RENDERITEM_TYPE::STATIC_OBJECT: {
+                auto object = std::static_pointer_cast<StaticObject>(item->ptr);
+                object->Destroy();
+                break;
+            }
         }
     }
+
     Scene::Clear();
+}
+
+void Scene::Reload() {
+    for (auto& item : items) {
+        if (item->type == WE::RENDERITEM_TYPE::OBJECT) {
+            auto obj = std::static_pointer_cast<Object>(item->ptr);
+            obj->ResetToOrigin();
+        }
+    }
+
+    for (auto& dyn : dynamic_objects) {
+        dyn->ResetToOrigin();
+        dyn->ResetPhysics();
+    }
+
+    for (auto& sta : static_objects) {
+        sta->ResetToOrigin();
+    }
 }
 
 //=============================
@@ -31,6 +63,8 @@ void Scene::Destroy() {
 
 void Scene::AddItem(std::shared_ptr<WE::RenderItem> item) {
     items.push_back(item);
+    if (item->type == WE::RENDERITEM_TYPE::DYNAMIC_OBJECT) dynamic_objects.push_back(static_cast<DynamicObject*>(item->ptr.get()));
+    else if (item->type == WE::RENDERITEM_TYPE::STATIC_OBJECT) static_objects.push_back(static_cast<StaticObject*>(item->ptr.get()));
 }
 
 void Scene::AddItems(std::vector<std::shared_ptr<WE::RenderItem>> p_items) {
@@ -40,7 +74,7 @@ void Scene::AddItems(std::vector<std::shared_ptr<WE::RenderItem>> p_items) {
 }
 
 void Scene::RemoveItem(std::string p_name) {
-    size_t pre_size = items.size();
+    const size_t pre_size = items.size();
 
     items.erase(
         std::remove_if(items.begin(), items.end(),
@@ -50,8 +84,22 @@ void Scene::RemoveItem(std::string p_name) {
         items.end()
     );
 
-    if (pre_size == items.size()) Logger::Warn("[Scene::RemoveItem] ITEM: " + p_name + " COULD NOT BE FOUND");
+    auto removeRaw = [&](auto& vec) {
+        vec.erase(
+            std::remove_if(vec.begin(), vec.end(),
+                [&](auto* ptr) {
+                    return ptr && ptr->name == p_name;
+                }),
+            vec.end()
+        );
+    };
+
+    removeRaw(dynamic_objects);
+    removeRaw(static_objects);
+
+    if (items.size() == pre_size) Logger::Warn("[Scene::RemoveItem] ITEM: " + p_name + " COULD NOT BE FOUND");
 }
+
 
 void Scene::RemoveItems(std::vector<std::string> names) {
     for (const auto& i_name : names) {
@@ -78,6 +126,7 @@ std::shared_ptr<Object> Scene::GetObject(std::string p_name) {
 
     return std::static_pointer_cast<Object>(item->ptr);
 }
+
 //=============================
 // LIGHTS
 //=============================
@@ -128,4 +177,82 @@ bool Scene::Raycast(WE::Ray ray, WE::RayHit& out_hit) {
     }
 
     return hit_any;
+}
+
+//=============================
+// PHYSICS
+//=============================
+
+bool Scene::ProcessPhysics(double delta_time) {
+    bool any_moving = false;
+    for (DynamicObject* dyn : dynamic_objects) {
+        any_moving |= dyn->ProcessPhysics(delta_time); // (|=) bitwise or ; (a | b) = a ; once any_moving = true, will always return true 
+    }
+    return any_moving;
+}
+
+void Scene::ApplyPhysics() {
+    for (DynamicObject* dyn : dynamic_objects) {
+        dyn->ApplyPhysics();
+    }
+}
+
+
+void Scene::ProcessCollisions(double delta_time) {
+    // reset grounded ONCE per frame
+    for (DynamicObject* dyn : dynamic_objects) {
+        dyn->grounded = false;
+    }
+
+    for (int n = 0; n < WE_PHYSICS_PASSES; n++) {
+        // dynamic vs static
+        for (DynamicObject* dyn : dynamic_objects) {
+            for (StaticObject* sta : static_objects) {
+                if (CollisionUtils::AABBIntersects(dyn->predicted_aabb, sta->GetAABB())) {
+                    WE::CollisionManifold manifold = CollisionUtils::CollidersManifold(*dyn->GetCollider(), *sta->GetCollider());
+                    dyn->ProcessGrounded(manifold);
+                    dyn->ProcessManifold(manifold);
+                }
+            }
+        }
+
+        // dynamic vs dynamic
+        for (size_t i = 0; i < dynamic_objects.size(); i++) {
+            DynamicObject* a = dynamic_objects[i];
+
+            for (size_t j = i + 1; j < dynamic_objects.size(); j++) {
+                DynamicObject* b = dynamic_objects[j];
+
+                if (CollisionUtils::AABBIntersects(a->predicted_aabb, b->predicted_aabb)) {
+                    WE::CollisionManifold manifold = CollisionUtils::CollidersManifold(*a->GetCollider(), *b->GetCollider());
+                    a->ProcessGrounded(manifold);
+                    b->ProcessGrounded(manifold);
+                    a->ProcessDynamicCollision(*b, manifold);
+                }
+            }
+        }
+    }
+}
+
+bool Scene::ItemIntersectsAABB(std::string p_name) {
+    auto active_item = GetItem(p_name);
+
+    auto active_object = static_cast<DynamicObject*>(active_item->ptr.get());
+
+    if (!active_object) return false;
+
+    for (auto& item : items) {
+        if (item == active_item) continue;
+
+        auto collidable = static_cast<Object*>(item->ptr.get());
+
+        if (!collidable) continue;
+
+        if (CollisionUtils::AABBIntersects(active_object->predicted_aabb, collidable->GetAABB())) {
+            Logger::Debug(item->name);
+            return true;
+        }
+    }
+
+    return false;
 }

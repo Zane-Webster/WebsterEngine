@@ -20,7 +20,15 @@
 #define WE_EMPTY_VECTOR {}
 #define WE_EMPTY_MAP {}
 
-#define WE_GRAVITY -9.0f
+#define WE_MAX_DELTA_TIME 0.1 // about 10fps
+
+#define WE_GRAVITY -4.0f
+#define WE_PENETRATION_SLOP 0.03f
+#define WE_CORRECTION_PERCENT 0.05f
+#define WE_CONTACT_EPSILON 0.01f
+#define WE_VELOCITY_EPSILON 0.01f
+
+#define WE_PHYSICS_PASSES 4
 
 namespace WE {
     inline const std::string WINDOW_TITLE = "WebsterEngine | " + std::to_string(WE_VERSION_MAJOR) + "." + std::to_string(WE_VERSION_MINOR) + "." + std::to_string(WE_VERSION_PATCH);
@@ -65,6 +73,13 @@ namespace WE {
     enum class KEYSET {
         WASD,
         ARROWS
+    };
+
+    enum class COLLIDER_TYPE {
+        UNDECLARED,
+        AABB,
+        SPHERE,
+        CAPSULE
     };
 
     struct RenderItem {
@@ -133,10 +148,51 @@ namespace WE {
         glm::vec3 normal = glm::vec3(0.0f);
         WE::RenderItem* item = nullptr;
     };
+
+    // ======== COLLISION ========
     
     struct AABB {
         glm::vec3 min = glm::vec3(0.0f);
         glm::vec3 max = glm::vec3(0.0f);
+    };
+
+    struct ColliderShape {
+        ColliderShape(WE::COLLIDER_TYPE p_type) : type(p_type) {}
+        virtual ~ColliderShape() = default;
+
+        glm::vec3 center = glm::vec3(0.0f);
+
+        WE::COLLIDER_TYPE type;
+        ColliderShape() = default;
+    };
+
+    struct AABBShape final : ColliderShape {
+        AABBShape(WE::AABB p_local_box) : ColliderShape(WE::COLLIDER_TYPE::AABB), local_box(p_local_box) {}
+        
+        WE::AABB local_box;
+        WE::AABB world_box;
+    };
+
+    struct SphereShape final : ColliderShape {
+        SphereShape(float p_radius) : ColliderShape(WE::COLLIDER_TYPE::SPHERE), radius(p_radius) {}
+
+        float radius = 0.0f;
+    };
+
+    struct CapsuleShape final : ColliderShape {
+        CapsuleShape(float p_radius, float p_height) : ColliderShape(WE::COLLIDER_TYPE::CAPSULE), radius(p_radius), height(p_height) {}
+
+        float radius = 0.0f;
+        float height = 0.0f;
+
+        glm::vec3 base = glm::vec3(0.0f);
+        glm::vec3 tip = glm::vec3(0.0f);
+    };
+
+    struct CollisionManifold {
+        bool hit = false;
+        glm::vec3 normal = glm::vec3(0.0f);
+        float penetration = 0.0f;
     };
 }
 

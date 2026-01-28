@@ -1,9 +1,11 @@
 #include "obj/Object.h"
 
-Object::Object(std::string p_name, WE::Material p_material, std::vector<std::unique_ptr<Triangle>>&& p_triangles, glm::vec3 p_origin) : name(p_name), triangles(std::move(p_triangles)), material(p_material) {
+Object::Object(std::string p_name, WE::Material p_material, std::vector<std::unique_ptr<Triangle>>&& p_triangles, WE::COLLIDER_TYPE collider_type, glm::vec3 p_origin) : name(p_name), triangles(std::move(p_triangles)), material(p_material) {
     *origin = p_origin;
     *position = *origin;
     *origin_model_matrix = glm::translate(*origin_model_matrix, *origin);
+    Object::_CalculateAABB();
+    Object::_BuildCollider(collider_type);
     Object::_UpdateModelMatrix();
 }
 
@@ -90,6 +92,16 @@ bool Object::Raycast(WE::Ray ray, WE::RayHit& hit) {
 }
 
 //=============================
+// COLOR
+//=============================
+
+void Object::SetColor(glm::vec3 p_color) {
+    for (auto& tri : triangles) {
+        tri->SetColor(p_color);
+    }
+}
+
+//=============================
 // GETTERS
 //=============================
 
@@ -137,10 +149,67 @@ void Object::_CalculateAABB() {
         aabb.max = glm::max(aabb.max, tri->v1);
         aabb.max = glm::max(aabb.max, tri->v2);
     }
+
+    *size = aabb.max - aabb.min;
+    *center = (aabb.min + aabb.max) * 0.5f;
 }
 
 void Object::_UpdateModelMatrix() {
     *model_matrix = glm::mat4(1.0f);
     *model_matrix = glm::translate(*model_matrix, *position);
-    Object::_CalculateAABB();
+    
+    Object::_UpdateCollider();
+}
+
+void Object::_BuildCollider(WE::COLLIDER_TYPE type) {
+    switch (type) {
+        case WE::COLLIDER_TYPE::UNDECLARED:
+        case WE::COLLIDER_TYPE::AABB:
+            collider = std::make_unique<WE::AABBShape>(aabb);
+            break;
+        case WE::COLLIDER_TYPE::SPHERE: {
+            float radius = 0.5f * glm::length(*size);
+            collider =  std::make_unique<WE::SphereShape>(radius);
+            break;
+        }
+
+        case WE::COLLIDER_TYPE::CAPSULE: {
+            float radius = 0.5f * glm::max(size->x, size->z);
+            float height = glm::max(size->y - 2.0f * radius, 0.0f);
+            collider =  std::make_unique<WE::CapsuleShape>(radius, height);
+            break;
+        }
+    }
+}
+
+void Object::_UpdateCollider() {
+    glm::vec3 pos = Object::GetPosition();
+    collider->center = pos;
+
+    switch (collider->type) {
+        case WE::COLLIDER_TYPE::SPHERE: {
+            // just needs center updated
+            //auto* sphere = static_cast<WE::SphereShape*>(collider.get());
+
+            break;
+        }
+
+        case WE::COLLIDER_TYPE::CAPSULE: {
+            auto* cap = static_cast<WE::CapsuleShape*>(collider.get());
+
+            float half = cap->height * 0.5f;
+
+            cap->base = pos - glm::vec3(0.0f, half, 0.0f);
+            cap->tip  = pos + glm::vec3(0.0f, half, 0.0f);
+            break;
+        }
+
+        case WE::COLLIDER_TYPE::AABB: {
+            auto* box = static_cast<WE::AABBShape*>(collider.get());
+
+            box->world_box = Object::GetAABB();
+
+            break;
+        }
+    }
 }

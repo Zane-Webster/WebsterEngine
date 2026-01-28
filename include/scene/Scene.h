@@ -9,6 +9,7 @@
 #include "core/WebsterEngine.h"
 #include "core/Logger.h"
 #include "utils/utils.h"
+#include "utils/CollisionUtils.h"
 
 #include "obj/Object.h"
 #include "obj/StaticObject.h"
@@ -21,6 +22,7 @@ public:
     // ======== BASIC ========
     void Clear();
     void Destroy();
+    void Reload();
 
     // ======== ITEMS ========
     void AddItem(std::shared_ptr<WE::RenderItem> item);
@@ -38,11 +40,21 @@ public:
 
     // ======== RAYCASTING ========
     bool Raycast(WE::Ray ray, WE::RayHit& out_hit);
+
+    // ======== PHYSICS ========
+    bool ProcessPhysics(double delta_time);
+    void ApplyPhysics();
+    void ProcessCollisions(double delta_time);
+
+    bool ItemIntersectsAABB(std::string name);
     
     std::string name = WE_EMPTY_STRING;
 
     std::vector<std::shared_ptr<WE::RenderItem>> items = WE_EMPTY_VECTOR;
     std::vector<std::shared_ptr<WE::Light>> lights = WE_EMPTY_VECTOR;
+
+    std::vector<DynamicObject*> dynamic_objects = WE_EMPTY_VECTOR;
+    std::vector<StaticObject*> static_objects = WE_EMPTY_VECTOR;
 
 private:
 

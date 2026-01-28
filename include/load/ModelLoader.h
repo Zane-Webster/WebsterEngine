@@ -22,9 +22,9 @@ class ModelLoader {
 public:
     ModelLoader();
 
-    std::shared_ptr<Object> LoadObject(std::string name, std::string path, WE::Material material);
-    std::shared_ptr<StaticObject> LoadStaticObject(std::string name, std::string path, WE::Material material);
-    std::shared_ptr<DynamicObject> LoadDynamicObject(std::string name, std::string path, WE::Material material);
+    std::shared_ptr<Object> LoadObject(std::string name, std::string path, WE::Material material, WE::COLLIDER_TYPE collider_type = WE::COLLIDER_TYPE::UNDECLARED, glm::vec3 origin = glm::vec3(0.0f));
+    std::shared_ptr<StaticObject> LoadStaticObject(std::string name, std::string path, WE::Material material, WE::COLLIDER_TYPE collider_type = WE::COLLIDER_TYPE::UNDECLARED, glm::vec3 origin = glm::vec3(0.0f));
+    std::shared_ptr<DynamicObject> LoadDynamicObject(std::string name, std::string path, WE::Material material, WE::COLLIDER_TYPE collider_type = WE::COLLIDER_TYPE::UNDECLARED, glm::vec3 origin = glm::vec3(0.0f));
 
 private:
     glm::vec3 default_color = glm::vec3(0.50f);

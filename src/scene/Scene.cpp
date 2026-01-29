@@ -33,6 +33,11 @@ void Scene::Destroy() {
                 object->Destroy();
                 break;
             }
+            case WE::RENDERITEM_TYPE::SKYBOX: {
+                auto sky = std::static_pointer_cast<Skybox>(item->ptr);
+                sky->Destroy();
+                break;
+            }
         }
     }
 
@@ -196,7 +201,6 @@ void Scene::ApplyPhysics() {
         dyn->ApplyPhysics();
     }
 }
-
 
 void Scene::ProcessCollisions(double delta_time) {
     // reset grounded ONCE per frame

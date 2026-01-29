@@ -26,6 +26,8 @@ Window::Window(WE::WINDOW_RESOLUTION p_resolution, std::string p_title) : resolu
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
     SDL_GL_MakeCurrent(window, context);
 
     SDL_SetWindowRelativeMouseMode(window, true);

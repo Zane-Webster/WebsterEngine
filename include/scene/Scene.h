@@ -14,6 +14,7 @@
 #include "obj/Object.h"
 #include "obj/StaticObject.h"
 #include "obj/DynamicObject.h"
+#include "sky/Skybox.h"
 
 class Scene {
 public:

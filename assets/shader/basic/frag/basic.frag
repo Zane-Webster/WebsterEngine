@@ -3,6 +3,7 @@
 in vec3 vColor;
 in vec3 vNormal;
 in vec3 vWorldPos;
+in vec2 vTexCoord;
 
 out vec4 FragColor;
 
@@ -10,13 +11,16 @@ out vec4 FragColor;
 uniform vec3 camera_pos;
 
 // ===== Directional Light =====
-uniform vec3 light_dir;   // normalized, pointing *from* light
+uniform vec3 light_dir;
 uniform vec3 light_color;
 
 // ===== Material =====
 uniform float ambient_strength;
 uniform float specular_strength;
 uniform float shininess;
+
+// ===== Diffuse Texture =====
+uniform sampler2D u_Diffuse;
 
 void main()
 {
@@ -36,7 +40,12 @@ void main()
     vec3 specular = specular_strength * spec * light_color;
 
     vec3 lighting = ambient + diffuse + specular;
-    vec3 finalColor = lighting * vColor;
+
+    // ===== texture sampling =====
+    vec3 texColor = texture(u_Diffuse, vTexCoord).rgb;
+
+    // combine everything
+    vec3 finalColor = lighting * vColor * texColor;
 
     FragColor = vec4(finalColor, 1.0);
 }

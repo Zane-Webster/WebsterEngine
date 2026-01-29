@@ -30,14 +30,16 @@
 
 #define WE_PHYSICS_PASSES 4
 
+class Texture; // forward declaration for Material
+
 namespace WE {
     inline const std::string WINDOW_TITLE = "WebsterEngine | " + std::to_string(WE_VERSION_MAJOR) + "." + std::to_string(WE_VERSION_MINOR) + "." + std::to_string(WE_VERSION_PATCH);
 
     using UINT8 = std::uint8_t;
     using UINT16 = std::uint16_t;
 
-    using TRIANGLE_VERTICES = std::array<GLfloat, 18>;
-    using TRIANGLE_VERTICES_NORMAL = std::array<GLfloat, 27>;
+    using TRIANGLE_VERTICES = std::array<GLfloat, 24>;
+    using TRIANGLE_VERTICES_NORMAL = std::array<GLfloat, 33>;
 
     enum class WINDOW_RESOLUTION {
         HD,
@@ -117,6 +119,8 @@ namespace WE {
         float specular_strength = 0.5f;
         float shininess = 32.0f;
         
+        std::shared_ptr<Texture> diffuse = nullptr;
+
         Material() = default;
     };
 
@@ -129,6 +133,7 @@ namespace WE {
         GLint ambient_strength = -1;
         GLint specular_strength = -1;
         GLint shininess = -1;
+        GLint diffuse = -1;
     };
 
     struct RenderBatch {

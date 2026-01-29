@@ -27,6 +27,7 @@ void Renderer::RenderAll(glm::mat4 view_projection_matrix, glm::vec3 camera_pos)
         glUseProgram(batch.program);
         
         glUniformMatrix4fv(batch.uniforms.view_projection, 1, GL_FALSE, glm::value_ptr(view_projection_matrix));
+        glUniform1i(batch.uniforms.diffuse, 0);
 
         for (auto& light : lights) {
             glUniform3fv(batch.uniforms.camera_pos, 1, glm::value_ptr(camera_pos));
@@ -40,7 +41,7 @@ void Renderer::RenderAll(glm::mat4 view_projection_matrix, glm::vec3 camera_pos)
             switch (item->type) {
                 case WE::RENDERITEM_TYPE::OBJECT:
                 case WE::RENDERITEM_TYPE::STATIC_OBJECT:
-                case WE::RENDERITEM_TYPE::DYNAMIC_OBJECT:
+                case WE::RENDERITEM_TYPE::DYNAMIC_OBJECT: {
                     auto object = std::static_pointer_cast<Object>(item->ptr);
                     glUniformMatrix4fv(batch.uniforms.model, 1, GL_FALSE, glm::value_ptr(object->GetModelMatrix()));
 
@@ -48,8 +49,18 @@ void Renderer::RenderAll(glm::mat4 view_projection_matrix, glm::vec3 camera_pos)
                     glUniform1f(batch.uniforms.specular_strength, object->material.specular_strength);
                     glUniform1f(batch.uniforms.shininess, object->material.shininess);
 
+                    if (object->material.diffuse) object->material.diffuse->Bind(0);
+                    else basic_texture->Bind(0);
+
                     object->Render();
                     break;
+                }
+                case WE::RENDERITEM_TYPE::SKYBOX: {
+                    auto sky = std::static_pointer_cast<Skybox>(item->ptr);
+
+                    sky->Render();
+                    break;
+                }
             }
         }
     }
@@ -189,6 +200,7 @@ void Renderer::_MakeBatches() {
             batch.uniforms.ambient_strength = glGetUniformLocation(shader, "ambient_strength");
             batch.uniforms.specular_strength = glGetUniformLocation(shader, "specular_strength");
             batch.uniforms.shininess = glGetUniformLocation(shader, "shininess");
+            batch.uniforms.diffuse = glGetUniformLocation(shader, "u_Diffuse");
 
             items.push_back(std::move(batch));
         }

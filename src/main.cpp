@@ -42,8 +42,15 @@
 #include "shader/Shader.h"
 #include "shader/ShaderHandler.h"
 
+// ===== SKYBOX =====
+#include "sky/Skybox.h"
+
 // ===== STATE =====
 #include "state/StateHandler.h"
+
+// ===== TEXTURES =====
+#include "tex/Texture.h"
+#include "tex/TextureHandler.h"
 
 // ===== UTILS =====
 #include "utils/Utils.h"
@@ -59,12 +66,32 @@ int main(int, char**) {
     ShaderHandler shader_handler;
     ModelLoader model_loader;
     Camera camera(window.GetAspectRatio(), keyset, window.delta_time);
+    TextureHandler texture_handler;
+
+    texture_handler.LoadTexture("basic", "assets/tex/basic.png");
+    renderer.basic_texture = texture_handler.GetTexture("basic");
 
     state_handler.SetState(WE_LAUNCH_STATE);
 
     std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
     WE::Material basic_material = {0.15f, 0.5f, 32.0f};
     WE::Material matte = {0.15f, 0.0f, 0.0f};
+    
+    texture_handler.LoadTexture("brick", "assets/tex/brick.jpg");
+    matte.diffuse = texture_handler.GetTexture("brick");
+
+    texture_handler.LoadTexture("sky_side1", "assets/tex/sky/side1.png");
+    texture_handler.LoadTexture("sky_side2", "assets/tex/sky/side2.png");
+
+    WE::SKYBOX_TEXTURES skybox_textures = { texture_handler.GetTexture("sky_side1"), 
+                                            texture_handler.GetTexture("sky_side1"), 
+                                            texture_handler.LoadTexture("sky_top", "assets/tex/sky/top.png"), 
+                                            texture_handler.LoadTexture("sky_bottom", "assets/tex/sky/bottom.png"), 
+                                            texture_handler.GetTexture("sky_side2"), 
+                                            texture_handler.GetTexture("sky_side2")
+                                          };
+
+    std::shared_ptr<Skybox> skybox = std::make_shared<Skybox>(skybox_textures);
 
     std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/obj/ball/ball.obj", basic_material, WE::COLLIDER_TYPE::SPHERE, glm::vec3(0.0f, 2.0f, 0.0f));
 
@@ -102,16 +129,21 @@ int main(int, char**) {
     shader_handler.AddShader("basic", "assets/shader/basic/vert/basic.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("basic");
 
+    shader_handler.AddShader("sky", "assets/shader/sky/frag/sky.frag", GL_FRAGMENT_SHADER);
+    shader_handler.AddShader("sky", "assets/shader/sky/vert/sky.vert", GL_VERTEX_SHADER);
+    shader_handler.CompileProgram("sky");
+
     std::shared_ptr<Scene> test_scene = std::make_shared<Scene>("test_scene");
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("ball", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), ball));
-    /*
+
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box1", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box1));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box2", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box2));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box3", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box3));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box4", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box4));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box5", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box5));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box6", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box6));
-    */
+    
     test_scene->AddItem(std::make_shared<WE::RenderItem>("floor", WE::RENDERITEM_TYPE::STATIC_OBJECT, shader_handler.GetProgram("basic"), floor));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("wall", WE::RENDERITEM_TYPE::STATIC_OBJECT, shader_handler.GetProgram("basic"), wall));
     test_scene->AddLight(sun_light);
@@ -184,22 +216,22 @@ int main(int, char**) {
             }
 
             if (window.StartRender()) {
-                renderer.RenderAll(camera.GetViewProjectionMatrix(), camera.GetPosition());
+                renderer.RenderAll(camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetViewProjectionMatrix(), camera.GetPosition());
                 window.EndRender();
             }
         }
     }
 
     // ===============================
-    // EXIT
+    // EXIT + CLEAN UP
     // ===============================
 
     renderer.Clear();
 
     test_scene->Destroy();
 
+    texture_handler.Destroy();
     shader_handler.Destroy();
-    ball->Destroy();
 
     SDL_Quit();
 

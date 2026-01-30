@@ -13,6 +13,11 @@
 #include "core/Logger.h"
 
 #include "obj/Object.h"
+#include "obj/StaticObject.h"
+#include "obj/DynamicObject.h"
+#include "sky/Skybox.h"
+
+#include "tex/Texture.h"
 
 #include "scene/Scene.h"
 
@@ -22,7 +27,7 @@ public:
 
     // ======== BASIC ========
     void Build();
-    void RenderAll(glm::mat4 view_projection_matrix, glm::vec3 camera_pos);
+    void RenderAll(glm::mat4 view_matrix, glm::mat4 projection_matrix, glm::mat4 view_projection_matrix, glm::vec3 camera_pos);
     void Clear();
 
     // ======== SCENES ========
@@ -39,6 +44,8 @@ public:
     // ======== LIGHTS ========
     void AddLight(std::shared_ptr<WE::Light> light);
     void RemoveLight(std::string name);
+
+    std::shared_ptr<Texture> basic_texture = nullptr;
     
 private:
     std::vector<std::shared_ptr<WE::RenderItem>> unbatched_items = WE_EMPTY_VECTOR;

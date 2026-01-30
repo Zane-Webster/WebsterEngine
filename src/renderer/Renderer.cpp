@@ -22,11 +22,11 @@ void Renderer::Build() {
     Renderer::_MakeBatches();
 }
 
-void Renderer::RenderAll(glm::mat4 view_projection_matrix, glm::vec3 camera_pos) {
+void Renderer::RenderAll(glm::mat4 view_matrix, glm::mat4 projection_matrix, glm::mat4 view_projection_matrix, glm::vec3 camera_pos) {
     for (auto& batch : items) {
         glUseProgram(batch.program);
         
-        glUniformMatrix4fv(batch.uniforms.view_projection, 1, GL_FALSE, glm::value_ptr(view_projection_matrix));
+        glUniform1i(batch.uniforms.diffuse, 0);
 
         for (auto& light : lights) {
             glUniform3fv(batch.uniforms.camera_pos, 1, glm::value_ptr(camera_pos));
@@ -40,16 +40,36 @@ void Renderer::RenderAll(glm::mat4 view_projection_matrix, glm::vec3 camera_pos)
             switch (item->type) {
                 case WE::RENDERITEM_TYPE::OBJECT:
                 case WE::RENDERITEM_TYPE::STATIC_OBJECT:
-                case WE::RENDERITEM_TYPE::DYNAMIC_OBJECT:
+                case WE::RENDERITEM_TYPE::DYNAMIC_OBJECT: {
                     auto object = std::static_pointer_cast<Object>(item->ptr);
+
+                    glUniformMatrix4fv(batch.uniforms.view_projection, 1, GL_FALSE, glm::value_ptr(view_projection_matrix));
                     glUniformMatrix4fv(batch.uniforms.model, 1, GL_FALSE, glm::value_ptr(object->GetModelMatrix()));
 
                     glUniform1f(batch.uniforms.ambient_strength, object->material.ambient_strength);
                     glUniform1f(batch.uniforms.specular_strength, object->material.specular_strength);
                     glUniform1f(batch.uniforms.shininess, object->material.shininess);
 
+                    if (object->material.diffuse) object->material.diffuse->Bind(0);
+                    else basic_texture->Bind(0);
+
                     object->Render();
                     break;
+                }
+                case WE::RENDERITEM_TYPE::SKYBOX: {
+                    auto sky = std::static_pointer_cast<Skybox>(item->ptr);
+
+                    glm::mat4 sky_view = glm::mat4(glm::mat3(view_matrix));
+                    glm::mat4 sky_vp = projection_matrix * sky_view;
+
+                    glUniformMatrix4fv(batch.uniforms.view_projection, 1, GL_FALSE, glm::value_ptr(sky_vp) );
+
+                    glDepthFunc(GL_LEQUAL);
+                    sky->Render();
+                    glDepthFunc(GL_LESS);
+                    break;
+                }
+
             }
         }
     }
@@ -189,6 +209,7 @@ void Renderer::_MakeBatches() {
             batch.uniforms.ambient_strength = glGetUniformLocation(shader, "ambient_strength");
             batch.uniforms.specular_strength = glGetUniformLocation(shader, "specular_strength");
             batch.uniforms.shininess = glGetUniformLocation(shader, "shininess");
+            batch.uniforms.diffuse = glGetUniformLocation(shader, "u_Diffuse");
 
             items.push_back(std::move(batch));
         }

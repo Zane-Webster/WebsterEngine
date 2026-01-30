@@ -60,8 +60,13 @@ std::vector<std::unique_ptr<Triangle>> ModelLoader::_LoadTriangles(std::string p
             for (int i = 0; i < 3; i++) {
                 unsigned int idx = face.mIndices[i];
 
-                aiVector3D pos = mesh->mVertices[idx];
+                aiVector3D pos  = mesh->mVertices[idx];
                 aiVector3D norm = mesh->mNormals[idx];
+
+                aiVector3D uv(0.0f, 0.0f, 0.0f);
+                if (mesh->HasTextureCoords(0)) {
+                    uv = mesh->mTextureCoords[0][idx];
+                }
 
                 // position
                 verts.push_back(pos.x);
@@ -72,6 +77,10 @@ std::vector<std::unique_ptr<Triangle>> ModelLoader::_LoadTriangles(std::string p
                 verts.push_back(default_color.r);
                 verts.push_back(default_color.g);
                 verts.push_back(default_color.b);
+
+                // uv
+                verts.push_back(uv.x);
+                verts.push_back(uv.y);
             }
 
             triangles.push_back(std::make_unique<Triangle>(verts));

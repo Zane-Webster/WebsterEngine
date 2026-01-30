@@ -26,7 +26,7 @@ void Triangle::LoadVertices(std::vector<GLfloat> p_vertices) {
     full_vertices = std::make_shared<WE::TRIANGLE_VERTICES_NORMAL>();
     normal = glm::vec3(0.0f);
 
-    if (p_vertices.size() == 18) {
+    if (p_vertices.size() == 24) {
         std::copy(p_vertices.begin(), p_vertices.end(), vertices->begin());
         Triangle::UpdateFullVertices();
     }
@@ -45,7 +45,7 @@ void Triangle::Build() {
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, full_vertices->size() * sizeof(GLfloat), full_vertices->data(), GL_STATIC_DRAW);
 
-    GLsizei stride = 9 * sizeof(GLfloat);
+    GLsizei stride = 11 * sizeof(GLfloat);
 
     // Position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)(0));
@@ -58,6 +58,10 @@ void Triangle::Build() {
     // Normal
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)(6 * sizeof(GLfloat)));
     glEnableVertexAttribArray(2);
+
+    // TexCoord
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)(9 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(3);
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -87,17 +91,17 @@ glm::vec3 Triangle::GetNormal() {
 }
 
 void Triangle::UpdateNormal() {
-    glm::vec3 point_1 = glm::vec3((*vertices)[0], (*vertices)[1], (*vertices)[2]);
-    glm::vec3 point_2 = glm::vec3((*vertices)[6], (*vertices)[7], (*vertices)[8]);
-    glm::vec3 point_3 = glm::vec3((*vertices)[12], (*vertices)[13], (*vertices)[14]);
+    glm::vec3 point_1 = glm::vec3((*vertices)[0],  (*vertices)[1],  (*vertices)[2]);
+    glm::vec3 point_2 = glm::vec3((*vertices)[8],  (*vertices)[9],  (*vertices)[10]);
+    glm::vec3 point_3 = glm::vec3((*vertices)[16], (*vertices)[17], (*vertices)[18]);
     normal = glm::normalize(glm::cross(point_2 - point_1, point_3 - point_1));
 }
 
 void Triangle::UpdateFullVertices() {
     Triangle::UpdateNormal();
 
-    int v_stride = 6; // vertices/true_vertices stride
-    int f_stride = 9; // full_vertices stride
+    int v_stride = 8; // vertices/true_vertices stride
+    int f_stride = 11; // full_vertices stride
 
     for (int i = 0; i < 3; i++) {
         int v_idx = i * v_stride;
@@ -122,6 +126,10 @@ void Triangle::UpdateFullVertices() {
         (*full_vertices)[f_idx + 7] = normal.y;
         (*full_vertices)[f_idx + 8] = normal.z;
 
+        // Texcoords
+        (*full_vertices)[f_idx + 9]  = (*vertices)[v_idx + 6];
+        (*full_vertices)[f_idx + 10] = (*vertices)[v_idx + 7];
+
         // v0, v1, v2
         if (i == 0) v0 = glm::vec3(x, y, z);
         else if (i == 1) v1 = glm::vec3(x, y, z);
@@ -133,7 +141,7 @@ void Triangle::UpdateFullVertices() {
 //=============================
 
 void Triangle::SetColor(glm::vec3 color) {
-    int stride = 6;
+    int stride = 8;
     for (int i = 0; i < 3; i++) {
         int index = i * stride + 3; // +3 skips past x,y,z to get to r,g,b
         

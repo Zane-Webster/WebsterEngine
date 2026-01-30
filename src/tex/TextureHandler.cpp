@@ -11,12 +11,14 @@ void TextureHandler::Destroy() {
     textures.clear();
 }
 
-void TextureHandler::LoadTexture(std::string name, std::string path) {
+std::shared_ptr<Texture> TextureHandler::LoadTexture(std::string name, std::string path) {
     if (textures.count(name) > 0) {
         Logger::Error("TEXTURE NAMED: " + name + " ALREADY EXISTS");
-        return;
+        return nullptr;
     }
     textures[name] = std::make_shared<Texture>(name, path);
+
+    return textures[name];
 }
 
 std::shared_ptr<Texture> TextureHandler::GetTexture(std::string name) {

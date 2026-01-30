@@ -15,7 +15,7 @@ public:
 
     void Destroy();
 
-    void LoadTexture(std::string name, std::string path);
+    std::shared_ptr<Texture> LoadTexture(std::string name, std::string path);
     std::shared_ptr<Texture> GetTexture(std::string name);
     
 private:

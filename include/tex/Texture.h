@@ -19,12 +19,15 @@ public:
     std::string name = WE_EMPTY_STRING;
     int width = 0;
     int height = 0;
+    int channels = 0;
+    GLenum format = 0;
+    GLenum internal_format = 0;
+    unsigned char* pixels = nullptr;
 
     GLuint texture = 0;
 
 private:
     SDL_Surface* surface = nullptr;
-    GLenum format = 0;
     std::string path = WE_EMPTY_STRING;
 
     void _LoadImage();

@@ -27,7 +27,7 @@ public:
 
     // ======== BASIC ========
     void Build();
-    void RenderAll(glm::mat4 view_projection_matrix, glm::vec3 camera_pos);
+    void RenderAll(glm::mat4 view_matrix, glm::mat4 projection_matrix, glm::mat4 view_projection_matrix, glm::vec3 camera_pos);
     void Clear();
 
     // ======== SCENES ========

@@ -41,6 +41,14 @@ namespace WE {
     using TRIANGLE_VERTICES = std::array<GLfloat, 24>;
     using TRIANGLE_VERTICES_NORMAL = std::array<GLfloat, 33>;
 
+    using SKYBOX_TEXTURES = std::array<std::shared_ptr<Texture>, 6>;
+    // 0 right
+    // 1 left
+    // 2 top
+    // 3 bottom
+    // 4 front
+    // 5 back
+
     enum class WINDOW_RESOLUTION {
         HD,
         FHD,

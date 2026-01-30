@@ -96,6 +96,10 @@ WE::CollisionManifold CollisionUtils::CollidersManifold(const WE::ColliderShape&
                     const auto& capsule = static_cast<const WE::CapsuleShape&>(b);
                     return CollisionUtils::CapsuleAABBManifold(capsule, boxA.world_box);
                 }
+                case T::OBB: {
+                    const auto& obbB = static_cast<const WE::OBBShape&>(b);
+                    return CollisionUtils::OBBAABBManifold(obbB, boxA.world_box);
+                }
             }
             break;
         }
@@ -113,6 +117,10 @@ WE::CollisionManifold CollisionUtils::CollidersManifold(const WE::ColliderShape&
                     const auto& capsule = static_cast<const WE::CapsuleShape&>(b);
                     return CollisionUtils::SphereCapsuleManifold(sphereA, capsule);
                 }
+                case T::OBB: {
+                    const auto& obbB = static_cast<const WE::OBBShape&>(b);
+                    return CollisionUtils::SphereOBBManifold(sphereA, obbB);
+                }
             }
             break;
         }
@@ -120,16 +128,54 @@ WE::CollisionManifold CollisionUtils::CollidersManifold(const WE::ColliderShape&
         case T::CAPSULE: {
             const auto& capA = static_cast<const WE::CapsuleShape&>(a);
 
-            if (b.type == T::CAPSULE) {
-                const auto& capB = static_cast<const WE::CapsuleShape&>(b);
-                return CollisionUtils::CapsuleCapsuleManifold(capA, capB);
+            switch (b.type) {
+                case T::CAPSULE: {
+                    const auto& capB = static_cast<const WE::CapsuleShape&>(b);
+                    return CollisionUtils::CapsuleCapsuleManifold(capA, capB);
+                }
+                case T::OBB: {
+                    const auto& obbB = static_cast<const WE::OBBShape&>(b);
+                    return CollisionUtils::CapsuleOBBManifold(capA, obbB);
+                }
             }
+
+            break;
+        }
+
+        case T::OBB: {
+            const auto& obbA = static_cast<const WE::OBBShape&>(a);
+
+            if (b.type == T::OBB) {
+                const auto& obbB = static_cast<const WE::OBBShape&>(b);
+                return CollisionUtils::OBBOBBManifold(obbA, obbB);
+            }
+
             break;
         }
     }
 
     return {};
 }
+
+float CollisionUtils::ProjectAABB(const WE::AABB& aabb, const glm::vec3& axis) {
+    glm::vec3 extents = (aabb.max - aabb.min) * 0.5f;
+
+    return
+        extents.x * std::abs(axis.x) +
+        extents.y * std::abs(axis.y) +
+        extents.z * std::abs(axis.z);
+}
+
+float CollisionUtils::ProjectOBB(const WE::OBBShape& obb, const glm::vec3& axis) {
+    return
+        obb.half_extents.x * std::abs(glm::dot(axis, obb.axis[0])) +
+        obb.half_extents.y * std::abs(glm::dot(axis, obb.axis[1])) +
+        obb.half_extents.z * std::abs(glm::dot(axis, obb.axis[2]));
+}
+
+// ==================================
+// INTERSECTS
+// ==================================
 
 bool CollisionUtils::SphereAABBIntersect(const WE::SphereShape& sphere, const WE::AABB& box) {
     glm::vec3 closest;
@@ -237,6 +283,10 @@ bool CollisionUtils::CapsuleCapsuleIntersect(const WE::CapsuleShape& a, const WE
     return glm::dot(delta, delta) <= rsum * rsum;
 }
 
+// ==================================
+// AABB MANIFOLD
+// ==================================
+
 WE::CollisionManifold CollisionUtils::AABBAABBManifold(const WE::AABB& a, const WE::AABB& b) {
     WE::CollisionManifold m;
 
@@ -269,30 +319,6 @@ WE::CollisionManifold CollisionUtils::AABBAABBManifold(const WE::AABB& a, const 
             ? glm::vec3(0, 0, -1)
             : glm::vec3(0, 0,  1);
     }
-
-    return m;
-}
-
-WE::CollisionManifold CollisionUtils::SphereSphereManifold(const WE::SphereShape& a, const WE::SphereShape& b) {
-    WE::CollisionManifold m;
-
-    glm::vec3 delta = b.center - a.center;
-    float dist2 = glm::dot(delta, delta);
-    float r = a.radius + b.radius;
-
-    if (dist2 >= r * r)
-        return m;
-
-    float dist = std::sqrt(dist2);
-
-    m.hit = true;
-
-    if (dist > 0.0001f)
-        m.normal = delta / dist;
-    else
-        m.normal = glm::vec3(0, 1, 0);
-
-    m.penetration = r - dist;
 
     return m;
 }
@@ -367,6 +393,38 @@ WE::CollisionManifold CollisionUtils::CapsuleAABBManifold(const WE::CapsuleShape
     return m;
 }
 
+WE::CollisionManifold CollisionUtils::OBBAABBManifold(const WE::OBBShape& obb, const WE::AABB& aabb) {
+    return {};
+}
+
+// ==================================
+// SPHERE MANIFOLD
+// ==================================
+
+WE::CollisionManifold CollisionUtils::SphereSphereManifold(const WE::SphereShape& a, const WE::SphereShape& b) {
+    WE::CollisionManifold m;
+
+    glm::vec3 delta = b.center - a.center;
+    float dist2 = glm::dot(delta, delta);
+    float r = a.radius + b.radius;
+
+    if (dist2 >= r * r)
+        return m;
+
+    float dist = std::sqrt(dist2);
+
+    m.hit = true;
+
+    if (dist > 0.0001f)
+        m.normal = delta / dist;
+    else
+        m.normal = glm::vec3(0, 1, 0);
+
+    m.penetration = r - dist;
+
+    return m;
+}
+
 WE::CollisionManifold CollisionUtils::SphereCapsuleManifold(const WE::SphereShape& sphere, const WE::CapsuleShape& capsule) {
     WE::CollisionManifold m;
 
@@ -400,6 +458,14 @@ WE::CollisionManifold CollisionUtils::SphereCapsuleManifold(const WE::SphereShap
 
     return m;
 }
+
+WE::CollisionManifold CollisionUtils::SphereOBBManifold(const WE::SphereShape& sphere, const WE::OBBShape& obb) {
+    return {};
+}
+
+// ==================================
+// CAPSULE MANIFOLD
+// ==================================
 
 WE::CollisionManifold CollisionUtils::CapsuleCapsuleManifold(const WE::CapsuleShape& a, const WE::CapsuleShape& b) {
     WE::CollisionManifold m;
@@ -468,4 +534,15 @@ WE::CollisionManifold CollisionUtils::CapsuleCapsuleManifold(const WE::CapsuleSh
     m.penetration = rsum - dist;
 
     return m;
+}
+
+WE::CollisionManifold CollisionUtils::CapsuleOBBManifold(const WE::CapsuleShape& capsule, const WE::OBBShape& obb) {
+    return {};
+}
+
+// ==================================
+// OBB MANIFOLD
+// ==================================
+WE::CollisionManifold CollisionUtils::OBBOBBManifold(const WE::OBBShape& a, const WE::OBBShape& b) {
+    return {};
 }

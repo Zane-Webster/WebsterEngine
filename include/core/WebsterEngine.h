@@ -89,7 +89,8 @@ namespace WE {
         UNDECLARED,
         AABB,
         SPHERE,
-        CAPSULE
+        CAPSULE,
+        OBB
     };
 
     struct RenderItem {
@@ -200,6 +201,19 @@ namespace WE {
 
         glm::vec3 base = glm::vec3(0.0f);
         glm::vec3 tip = glm::vec3(0.0f);
+    };
+
+    struct OBBShape final : ColliderShape {
+        OBBShape(glm::vec3 p_half_extents) : ColliderShape(WE::COLLIDER_TYPE::OBB), half_extents(p_half_extents) {}
+        
+        glm::vec3 half_extents = glm::vec3(0.5f);
+
+        // world space orthonormal axes
+        glm::vec3 axis[3] = {
+            glm::vec3(1, 0, 0),
+            glm::vec3(0, 1, 0),
+            glm::vec3(0, 0, 1)
+        };
     };
 
     struct CollisionManifold {

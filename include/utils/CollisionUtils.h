@@ -27,6 +27,9 @@ private:
 
     static bool CapsuleCapsuleIntersect(const WE::CapsuleShape&, const WE::CapsuleShape&);
 
+    static glm::vec3 SupportPointOBB(const WE::OBBShape&, const glm::vec3&);
+    static glm::vec3 SupportFaceCenterOBB(const WE::OBBShape&, const glm::vec3&);
+
     static WE::CollisionManifold AABBAABBManifold(const WE::AABB&, const WE::AABB&);
     static WE::CollisionManifold SphereAABBManifold(const WE::SphereShape&, const WE::AABB&);
     static WE::CollisionManifold CapsuleAABBManifold(const WE::CapsuleShape&, const WE::AABB&);

@@ -7,6 +7,7 @@ void DynamicObject::SetDynamicProperties(float p_mass, float p_max_speed, float 
     restitution = p_restitution;
     linear_damping = p_linear_damping;
     use_gravity = p_use_gravity;
+    DynamicObject::_ComputeBoxInertia();
 }
 
 void DynamicObject::ApplyForce(glm::vec3 force) {
@@ -15,6 +16,21 @@ void DynamicObject::ApplyForce(glm::vec3 force) {
 
 void DynamicObject::ApplyImpulse(glm::vec3 impulse) {
     velocity += impulse * inv_mass;
+}
+
+void DynamicObject::ApplyAngularImpulse(glm::vec3 impulse, glm::vec3 manifold_contact_point) {
+    _UpdateInvInertiaWorld();
+
+    // world center of mass = position + rotated local center
+    glm::vec3 com = *position;
+
+    if (collider && collider->type == WE::COLLIDER_TYPE::OBB) {
+        glm::mat3 R = glm::mat3_cast(orientation);
+        com = *position + (R * (*center));   // <-- uses Object::center (local)
+    }
+
+    glm::vec3 r = manifold_contact_point - com;
+    angular_velocity += inv_inertia_world * glm::cross(r, impulse);
 }
 
 void DynamicObject::SetVelocity(glm::vec3 p_velocity) {
@@ -26,12 +42,14 @@ bool DynamicObject::ProcessPhysics(double delta_time) {
 
     DynamicObject::_ApplyGravity();
     DynamicObject::_ProcessMovement(dt);
+    if (collider->type == WE::COLLIDER_TYPE::OBB) DynamicObject::Integrate(dt);
 
     return DynamicObject::IsMoving();
 }
 
 void DynamicObject::ApplyPhysics() {
     DynamicObject::SetPosition(predicted_position);
+    DynamicObject::_UpdateModelMatrix();
     accumulated_force = glm::vec3(0.0f);
 }
 
@@ -90,11 +108,13 @@ void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
     float velocity_normal = glm::dot(velocity, manifold.normal);
     if (velocity_normal > 0.0f) return;
 
-    float impulse_magnitude = -(1.0f + restitution) * velocity_normal * mass;
+    float impulse_magnitude = -(1.0f + restitution) * velocity_normal;
+    impulse_magnitude /= inv_mass;
 
     glm::vec3 impulse = impulse_magnitude * manifold.normal;
 
     ApplyImpulse(impulse);
+    if (collider->type == WE::COLLIDER_TYPE::OBB) ApplyAngularImpulse(impulse, manifold.contact_point);
 }
 
 void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionManifold manifold) {
@@ -141,7 +161,9 @@ void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionM
     glm::vec3 impulse = impulse_magnitude * normal;
 
     DynamicObject::ApplyImpulse(-impulse);
+    if (collider->type == WE::COLLIDER_TYPE::OBB) ApplyAngularImpulse(-impulse, manifold.contact_point);
     other.ApplyImpulse(impulse);
+    if (other.collider->type == WE::COLLIDER_TYPE::OBB) other.ApplyAngularImpulse(impulse, manifold.contact_point);
 
     // ==============================
     // Calculate correction
@@ -169,9 +191,40 @@ void DynamicObject::UpdatePredictedAABB() {
     predicted_aabb.max += offset;
 }
 
+void DynamicObject::Integrate(float dt) {
+    // angular acceleration
+    DynamicObject::_UpdateInvInertiaWorld();
+
+    glm::vec3 angular_accel = inv_inertia_world * torque_accum;
+    angular_velocity += angular_accel * dt;
+
+    // integrate quaternion
+    glm::quat wq(0.0f, angular_velocity.x, angular_velocity.y, angular_velocity.z);
+
+    orientation += 0.5f * wq * orientation * dt;
+    orientation = glm::normalize(orientation);
+
+    torque_accum = glm::vec3(0.0f);
+
+    angular_velocity *= angular_damping;
+}
+
+
 bool DynamicObject::IsMoving() {
     return glm::length(velocity) > 0.001f;
 }
+
+void DynamicObject::_UpdateModelMatrix() {
+    *model_matrix = glm::mat4(1.0f);
+    *model_matrix = glm::translate(*model_matrix, *position);
+
+    if (collider && collider->type == WE::COLLIDER_TYPE::OBB) {
+        *model_matrix *= glm::mat4_cast(orientation);
+    }
+
+    _UpdateCollider();
+}
+
 
 void DynamicObject::_ApplyGravity() {
     if (!use_gravity || grounded) return;
@@ -196,4 +249,29 @@ void DynamicObject::_ProcessMovement(float dt) {
     predicted_aabb = GetAABB();
     predicted_aabb.min += desired_move;
     predicted_aabb.max += desired_move;
+}
+
+void DynamicObject::_ComputeBoxInertia() {
+    float w = half_extents.x * 2.0f;    
+    float h = half_extents.y * 2.0f;
+    float d = half_extents.z * 2.0f;
+
+    float ix = (1.0f / 12.0f) * mass * (h*h + d*d);
+    float iy = (1.0f / 12.0f) * mass * (w*w + d*d);
+    float iz = (1.0f / 12.0f) * mass * (w*w + h*h);
+
+    inertia_body = glm::mat3(0.0f);
+    inertia_body[0][0] = ix;
+    inertia_body[1][1] = iy;
+    inertia_body[2][2] = iz;
+
+    inv_inertia_body = glm::mat3(0.0f);
+    inv_inertia_body[0][0] = 1.0f / ix;
+    inv_inertia_body[1][1] = 1.0f / iy;
+    inv_inertia_body[2][2] = 1.0f / iz;
+}
+
+void DynamicObject::_UpdateInvInertiaWorld() {
+    glm::mat3 R = glm::mat3_cast(orientation);
+    inv_inertia_world = R * inv_inertia_body * glm::transpose(R);
 }

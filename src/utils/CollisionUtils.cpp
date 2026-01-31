@@ -160,17 +160,11 @@ WE::CollisionManifold CollisionUtils::CollidersManifold(const WE::ColliderShape&
 float CollisionUtils::ProjectAABB(const WE::AABB& aabb, const glm::vec3& axis) {
     glm::vec3 extents = (aabb.max - aabb.min) * 0.5f;
 
-    return
-        extents.x * std::abs(axis.x) +
-        extents.y * std::abs(axis.y) +
-        extents.z * std::abs(axis.z);
+    return extents.x * std::abs(axis.x) + extents.y * std::abs(axis.y) + extents.z * std::abs(axis.z);
 }
 
 float CollisionUtils::ProjectOBB(const WE::OBBShape& obb, const glm::vec3& axis) {
-    return
-        obb.half_extents.x * std::abs(glm::dot(axis, obb.axis[0])) +
-        obb.half_extents.y * std::abs(glm::dot(axis, obb.axis[1])) +
-        obb.half_extents.z * std::abs(glm::dot(axis, obb.axis[2]));
+    return obb.half_extents.x * std::abs(glm::dot(axis, obb.axis[0])) + obb.half_extents.y * std::abs(glm::dot(axis, obb.axis[1])) + obb.half_extents.z * std::abs(glm::dot(axis, obb.axis[2]));
 }
 
 // ==================================
@@ -284,6 +278,36 @@ bool CollisionUtils::CapsuleCapsuleIntersect(const WE::CapsuleShape& a, const WE
 }
 
 // ==================================
+// OBB HELPER
+// ==================================
+
+glm::vec3 CollisionUtils::SupportPointOBB(const WE::OBBShape& obb, const glm::vec3& dir) {
+    glm::vec3 result = obb.center;
+
+    for (int i = 0; i < 3; i++) {
+        float sign = glm::dot(dir, obb.axis[i]) > 0.0f ? 1.0f : -1.0f;
+        result += obb.axis[i] * obb.half_extents[i] * sign;
+    }
+
+    return result;
+}
+
+glm::vec3 CollisionUtils::SupportFaceCenterOBB(const WE::OBBShape& obb, const glm::vec3& dir) {
+    // pick the OBB axis most aligned with dir
+    int best = 0;
+    float bestAbs = std::abs(glm::dot(dir, obb.axis[0]));
+
+    for (int i = 1; i < 3; i++) {
+        float a = std::abs(glm::dot(dir, obb.axis[i]));
+        if (a > bestAbs) { bestAbs = a; best = i; }
+    }
+
+    float s = (glm::dot(dir, obb.axis[best]) >= 0.0f) ? 1.0f : -1.0f;
+    return obb.center + obb.axis[best] * (obb.half_extents[best] * s);
+}
+
+
+// ==================================
 // AABB MANIFOLD
 // ==================================
 
@@ -394,8 +418,72 @@ WE::CollisionManifold CollisionUtils::CapsuleAABBManifold(const WE::CapsuleShape
 }
 
 WE::CollisionManifold CollisionUtils::OBBAABBManifold(const WE::OBBShape& obb, const WE::AABB& aabb) {
-    return {};
+    WE::CollisionManifold m;
+
+    glm::vec3 aabbCenter = (aabb.min + aabb.max) * 0.5f;
+    glm::vec3 d = aabbCenter - obb.center;
+
+    float minOverlap = FLT_MAX;
+    glm::vec3 bestAxis;
+
+    // --- OBB axes ---
+    for (int i = 0; i < 3; i++) {
+        glm::vec3 axis = obb.axis[i];
+
+        float dist = std::abs(glm::dot(d, axis));
+        float r1 = ProjectOBB(obb, axis);
+        float r2 = ProjectAABB(aabb, axis);
+
+        float overlap = r1 + r2 - dist;
+        if (overlap < 0) return m;
+
+        if (overlap < minOverlap) {
+            minOverlap = overlap;
+            bestAxis = axis;
+        }
+    }
+
+    // --- world axes ---
+    const glm::vec3 worldAxes[3] = {
+        {1,0,0}, {0,1,0}, {0,0,1}
+    };
+
+    for (int i = 0; i < 3; i++) {
+        glm::vec3 axis = worldAxes[i];
+
+        float dist = std::abs(glm::dot(d, axis));
+        float r1 = ProjectOBB(obb, axis);
+        float r2 = ProjectAABB(aabb, axis);
+
+        float overlap = r1 + r2 - dist;
+        if (overlap < 0) return m;
+
+        if (overlap < minOverlap) {
+            minOverlap = overlap;
+            bestAxis = axis;
+        }
+    }
+
+    m.hit = true;
+    m.penetration = minOverlap;
+    m.normal = glm::normalize(bestAxis);
+
+    if (glm::dot(m.normal, d) < 0.0f)
+        m.normal = -m.normal;
+
+    // 🔥 contact point
+    glm::vec3 pA = SupportFaceCenterOBB(obb, -m.normal);
+
+    glm::vec3 pB;
+    pB.x = glm::clamp(pA.x, aabb.min.x, aabb.max.x);
+    pB.y = glm::clamp(pA.y, aabb.min.y, aabb.max.y);
+    pB.z = glm::clamp(pA.z, aabb.min.z, aabb.max.z);
+
+    m.contact_point = 0.5f * (pA + pB);
+
+    return m;
 }
+
 
 // ==================================
 // SPHERE MANIFOLD
@@ -408,17 +496,14 @@ WE::CollisionManifold CollisionUtils::SphereSphereManifold(const WE::SphereShape
     float dist2 = glm::dot(delta, delta);
     float r = a.radius + b.radius;
 
-    if (dist2 >= r * r)
-        return m;
+    if (dist2 >= r * r) return m;
 
     float dist = std::sqrt(dist2);
 
     m.hit = true;
 
-    if (dist > 0.0001f)
-        m.normal = delta / dist;
-    else
-        m.normal = glm::vec3(0, 1, 0);
+    if (dist > 0.0001f) m.normal = delta / dist;
+    else m.normal = glm::vec3(0, 1, 0);
 
     m.penetration = r - dist;
 
@@ -432,8 +517,7 @@ WE::CollisionManifold CollisionUtils::SphereCapsuleManifold(const WE::SphereShap
     float len2 = glm::dot(axis, axis);
 
     float t = 0.0f;
-    if (len2 > 0.0f)
-        t = glm::clamp(glm::dot(sphere.center - capsule.base, axis) / len2, 0.0f, 1.0f);
+    if (len2 > 0.0f) t = glm::clamp(glm::dot(sphere.center - capsule.base, axis) / len2, 0.0f, 1.0f);
 
     glm::vec3 closest = capsule.base + axis * t;
 
@@ -442,17 +526,14 @@ WE::CollisionManifold CollisionUtils::SphereCapsuleManifold(const WE::SphereShap
 
     float r = sphere.radius + capsule.radius;
 
-    if (dist2 >= r * r)
-        return m;
+    if (dist2 >= r * r) return m;
 
     float dist = std::sqrt(dist2);
 
     m.hit = true;
 
-    if (dist > 0.0001f)
-        m.normal = glm::normalize(delta);
-    else
-        m.normal = glm::vec3(0, 1, 0);
+    if (dist > 0.0001f) m.normal = glm::normalize(delta);
+    else m.normal = glm::vec3(0, 1, 0);
 
     m.penetration = r - dist;
 
@@ -460,8 +541,40 @@ WE::CollisionManifold CollisionUtils::SphereCapsuleManifold(const WE::SphereShap
 }
 
 WE::CollisionManifold CollisionUtils::SphereOBBManifold(const WE::SphereShape& sphere, const WE::OBBShape& obb) {
-    return {};
+    WE::CollisionManifold m;
+
+    glm::vec3 d = sphere.center - obb.center;
+    glm::vec3 closest = obb.center;
+
+    for (int i = 0; i < 3; i++) {
+        float dist = glm::dot(d, obb.axis[i]);
+        dist = glm::clamp(dist, -obb.half_extents[i], obb.half_extents[i]);
+        closest += obb.axis[i] * dist;
+    }
+
+    glm::vec3 diff = sphere.center - closest;
+    float dist2 = glm::dot(diff, diff);
+
+    if (dist2 > sphere.radius * sphere.radius)
+        return m;
+
+    float distLen = std::sqrt(dist2);
+
+    m.hit = true;
+
+    if (distLen > 0.0001f)
+        m.normal = diff / distLen;
+    else
+        m.normal = glm::vec3(0,1,0);
+
+    m.penetration = sphere.radius - distLen;
+
+    // 🔥 contact point
+    m.contact_point = closest;
+
+    return m;
 }
+
 
 // ==================================
 // CAPSULE MANIFOLD
@@ -519,17 +632,14 @@ WE::CollisionManifold CollisionUtils::CapsuleCapsuleManifold(const WE::CapsuleSh
 
     float rsum = a.radius + b.radius;
 
-    if (dist2 >= rsum * rsum)
-        return m;
+    if (dist2 >= rsum * rsum) return m;
 
     float dist = std::sqrt(dist2);
 
     m.hit = true;
 
-    if (dist > 0.0001f)
-        m.normal = glm::normalize(delta);
-    else
-        m.normal = glm::vec3(0, 1, 0);
+    if (dist > 0.0001f) m.normal = glm::normalize(delta);
+    else m.normal = glm::vec3(0, 1, 0);
 
     m.penetration = rsum - dist;
 
@@ -537,12 +647,73 @@ WE::CollisionManifold CollisionUtils::CapsuleCapsuleManifold(const WE::CapsuleSh
 }
 
 WE::CollisionManifold CollisionUtils::CapsuleOBBManifold(const WE::CapsuleShape& capsule, const WE::OBBShape& obb) {
-    return {};
+    glm::vec3 ab = capsule.tip - capsule.base;
+    float t = glm::dot(obb.center - capsule.base, ab) / glm::dot(ab, ab);
+    t = glm::clamp(t, 0.0f, 1.0f);
+
+    WE::SphereShape s(capsule.radius);
+    s.center = capsule.base + ab * t;
+
+    WE::CollisionManifold m = SphereOBBManifold(s, obb);
+
+    if (m.hit)
+        m.contact_point = s.center - m.normal * capsule.radius;
+
+    return m;
 }
+
 
 // ==================================
 // OBB MANIFOLD
 // ==================================
 WE::CollisionManifold CollisionUtils::OBBOBBManifold(const WE::OBBShape& a, const WE::OBBShape& b) {
-    return {};
+    WE::CollisionManifold m;
+
+    glm::vec3 d = b.center - a.center;
+    float minOverlap = FLT_MAX;
+    glm::vec3 bestAxis;
+
+    auto testAxis = [&](const glm::vec3& axis) {
+        if (glm::length(axis) < 0.0001f) return true;
+
+        glm::vec3 n = glm::normalize(axis);
+
+        float dist = std::abs(glm::dot(d, n));
+        float ra = ProjectOBB(a, n);
+        float rb = ProjectOBB(b, n);
+
+        float overlap = ra + rb - dist;
+        if (overlap < 0) return false;
+
+        if (overlap < minOverlap) {
+            minOverlap = overlap;
+            bestAxis = n;
+        }
+        return true;
+    };
+
+    for (int i = 0; i < 3; i++) {
+        if (!testAxis(a.axis[i])) return m;
+        if (!testAxis(b.axis[i])) return m;
+    }
+
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            if (!testAxis(glm::cross(a.axis[i], b.axis[j])))
+                return m;
+
+    m.hit = true;
+    m.penetration = minOverlap;
+    m.normal = bestAxis;
+
+    if (glm::dot(m.normal, d) < 0)
+        m.normal = -m.normal;
+
+    // 🔥 contact point
+    glm::vec3 pA = SupportFaceCenterOBB(a, -m.normal);
+    glm::vec3 pB = SupportFaceCenterOBB(b,  m.normal);
+
+    m.contact_point = 0.5f * (pA + pB);
+
+    return m;
 }

@@ -220,6 +220,7 @@ namespace WE {
         bool hit = false;
         glm::vec3 normal = glm::vec3(0.0f);
         float penetration = 0.0f;
+        glm::vec3 contact_point = glm::vec3(0.0f);
     };
 }
 

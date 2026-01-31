@@ -54,12 +54,15 @@ public:
 protected:
     std::shared_ptr<glm::vec3> position = std::make_shared<glm::vec3>(0.0f);
     std::shared_ptr<glm::vec3> origin = std::make_shared<glm::vec3>(0.0f);
+    std::shared_ptr<glm::vec3> rotation = std::make_shared<glm::vec3>(0.0f);
 
     std::unique_ptr<glm::vec3> size = std::make_unique<glm::vec3>(0.0f);
     std::unique_ptr<glm::vec3> center = std::make_unique<glm::vec3>(0.0f);
 
     std::shared_ptr<glm::mat4> model_matrix = std::make_shared<glm::mat4>(1.0f);
     std::shared_ptr<glm::mat4> origin_model_matrix = std::make_shared<glm::mat4>(1.0f);
+
+    glm::vec3 half_extents = glm::vec3(0.0f);
 
     std::vector<std::unique_ptr<Triangle>> triangles = WE_EMPTY_VECTOR;
 
@@ -68,7 +71,7 @@ protected:
     std::shared_ptr<WE::ColliderShape> collider = std::make_unique<WE::ColliderShape>(WE::COLLIDER_TYPE::AABB);
 
     void _CalculateAABB();
-    void _UpdateModelMatrix();
+    virtual void _UpdateModelMatrix();
     
     void _BuildCollider(WE::COLLIDER_TYPE type);
     void _UpdateCollider();

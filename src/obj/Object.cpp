@@ -6,7 +6,7 @@ Object::Object(std::string p_name, WE::Material p_material, std::vector<std::uni
     *origin_model_matrix = glm::translate(*origin_model_matrix, *origin);
     Object::_CalculateAABB();
     Object::_BuildCollider(collider_type);
-    Object::_UpdateModelMatrix();
+    _UpdateModelMatrix();
 }
 
 //=============================
@@ -31,12 +31,12 @@ void Object::Destroy() {
 
 void Object::SetPosition(glm::vec3 p_position) {
     *position = p_position;
-    Object::_UpdateModelMatrix();
+    _UpdateModelMatrix();
 }
 
 void Object::Translate(glm::vec3 translation) {
     *position += translation;
-    Object::_UpdateModelMatrix();
+    _UpdateModelMatrix();
 }
 
 void Object::ResetToOrigin() {
@@ -152,6 +152,7 @@ void Object::_CalculateAABB() {
 
     *size = aabb.max - aabb.min;
     *center = (aabb.min + aabb.max) * 0.5f;
+    half_extents = (*size) * 0.5f;
 }
 
 void Object::_UpdateModelMatrix() {
@@ -172,11 +173,14 @@ void Object::_BuildCollider(WE::COLLIDER_TYPE type) {
             collider =  std::make_unique<WE::SphereShape>(radius);
             break;
         }
-
         case WE::COLLIDER_TYPE::CAPSULE: {
             float radius = 0.5f * glm::max(size->x, size->z);
             float height = glm::max(size->y - 2.0f * radius, 0.0f);
             collider =  std::make_unique<WE::CapsuleShape>(radius, height);
+            break;
+        }
+        case WE::COLLIDER_TYPE::OBB: { 
+            collider = std::make_unique<WE::OBBShape>(half_extents);
             break;
         }
     }
@@ -209,6 +213,19 @@ void Object::_UpdateCollider() {
 
             box->world_box = Object::GetAABB();
 
+            break;
+        }
+
+        case WE::COLLIDER_TYPE::OBB: {
+            auto* obb = static_cast<WE::OBBShape*>(collider.get());
+
+            // center
+            obb->center = pos;
+
+            // axes from model matrix
+            obb->axis[0] = glm::normalize(glm::vec3((*model_matrix)[0]));
+            obb->axis[1] = glm::normalize(glm::vec3((*model_matrix)[1]));
+            obb->axis[2] = glm::normalize(glm::vec3((*model_matrix)[2]));
             break;
         }
     }

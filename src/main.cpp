@@ -95,12 +95,12 @@ int main(int, char**) {
 
     std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/obj/ball/ball.obj", basic_material, WE::COLLIDER_TYPE::SPHERE, glm::vec3(0.0f, 2.0f, 0.0f));
 
-    std::shared_ptr<DynamicObject> box1 = model_loader.LoadDynamicObject("box1", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::AABB, glm::vec3(3.0f, 0.0f, -0.5f));
-    std::shared_ptr<DynamicObject> box2 = model_loader.LoadDynamicObject("box2", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::AABB, glm::vec3(3.0f, 0.0f, 0.5f));
-    std::shared_ptr<DynamicObject> box3 = model_loader.LoadDynamicObject("box3", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::AABB, glm::vec3(3.0f, 10.0f, -0.5f));
-    std::shared_ptr<DynamicObject> box4 = model_loader.LoadDynamicObject("box4", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::AABB, glm::vec3(3.0f, 10.0f, 0.5f));
-    std::shared_ptr<DynamicObject> box5 = model_loader.LoadDynamicObject("box5", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::AABB, glm::vec3(3.0f, 20.0f, -0.5f));
-    std::shared_ptr<DynamicObject> box6 = model_loader.LoadDynamicObject("box6", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::AABB, glm::vec3(3.0f, 20.0f, 0.5f));
+    std::shared_ptr<DynamicObject> box1 = model_loader.LoadDynamicObject("box1", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, 0.0f, -0.5f));
+    std::shared_ptr<DynamicObject> box2 = model_loader.LoadDynamicObject("box2", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, 0.0f, 0.5f));
+    std::shared_ptr<DynamicObject> box3 = model_loader.LoadDynamicObject("box3", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, 10.0f, -0.5f));
+    std::shared_ptr<DynamicObject> box4 = model_loader.LoadDynamicObject("box4", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, 10.0f, 0.5f));
+    std::shared_ptr<DynamicObject> box5 = model_loader.LoadDynamicObject("box5", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, 20.0f, -0.5f));
+    std::shared_ptr<DynamicObject> box6 = model_loader.LoadDynamicObject("box6", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, 20.0f, 0.5f));
 
     std::shared_ptr<StaticObject> floor = model_loader.LoadStaticObject("floor", "assets/obj/floor/floor.obj", matte, WE::COLLIDER_TYPE::AABB, glm::vec3(0.0f, -4.0f, 0.0f));
     std::shared_ptr<StaticObject> wall = model_loader.LoadStaticObject("wall", "assets/obj/wall/wall.obj", matte, WE::COLLIDER_TYPE::AABB, glm::vec3(-7.0f, 0.0f, 0.0f));
@@ -112,7 +112,7 @@ int main(int, char**) {
     box5->SetDynamicProperties(1.0f, 6.0f, 0.3f);
     box6->SetDynamicProperties(1.0f, 6.0f, 0.3f);
 
-    ball->SetDynamicProperties(0.5f, 10.0f, 1.0f);
+    ball->SetDynamicProperties(0.5f, 10.0f, 0.6f);
 
     wall->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -183,10 +183,10 @@ int main(int, char**) {
                         if (e.key.scancode == SDL_SCANCODE_2) {
                             state_handler.Reload();
                         }
-                        if (e.key.scancode == SDL_SCANCODE_LEFT) ball->ApplyImpulse(glm::vec3(-50.0f, 0.0f, 0.0f));
-                        if (e.key.scancode == SDL_SCANCODE_RIGHT) ball->ApplyImpulse(glm::vec3(50.0f, 0.0f, 0.0f));
-                        if (e.key.scancode == SDL_SCANCODE_UP) ball->ApplyImpulse(glm::vec3(0.0f, 50.0f, 0.0f));
-                        if (e.key.scancode == SDL_SCANCODE_DOWN) ball->ApplyImpulse(glm::vec3(0.0f, -50.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_LEFT) ball->ApplyImpulse(glm::vec3(-20.0f, 0.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_RIGHT) ball->ApplyImpulse(glm::vec3(20.0f, 0.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_UP) ball->ApplyImpulse(glm::vec3(0.0f, 20.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_DOWN) ball->ApplyImpulse(glm::vec3(0.0f, -20.0f, 0.0f));
 
                         if (e.key.scancode == SDL_SCANCODE_DELETE) state_handler.SetState(WE::STATE::EXIT);
 

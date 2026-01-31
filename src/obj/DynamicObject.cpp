@@ -18,7 +18,7 @@ void DynamicObject::ApplyImpulse(glm::vec3 impulse) {
     velocity += impulse * inv_mass;
 }
 
-void DynamicObject::ApplyAngularImpulse(glm::vec3 impulse, glm::vec3 manifold_contact_point) {
+void DynamicObject::ApplyAngularImpulse(glm::vec3 impulse, WE::CollisionManifold manifold) {
     _UpdateInvInertiaWorld();
 
     // world center of mass = position + rotated local center
@@ -29,8 +29,8 @@ void DynamicObject::ApplyAngularImpulse(glm::vec3 impulse, glm::vec3 manifold_co
         com = *position + (R * (*center));   // <-- uses Object::center (local)
     }
 
-    glm::vec3 r = manifold_contact_point - com;
-    angular_velocity += inv_inertia_world * glm::cross(r, impulse);
+    //glm::vec3 r = manifold_contact_point - com;
+    //angular_velocity += inv_inertia_world * glm::cross(r, impulse);
 }
 
 void DynamicObject::SetVelocity(glm::vec3 p_velocity) {
@@ -114,7 +114,7 @@ void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
     glm::vec3 impulse = impulse_magnitude * manifold.normal;
 
     ApplyImpulse(impulse);
-    if (collider->type == WE::COLLIDER_TYPE::OBB) ApplyAngularImpulse(impulse, manifold.contact_point);
+    if (collider->type == WE::COLLIDER_TYPE::OBB) ApplyAngularImpulse(impulse, manifold);
 }
 
 void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionManifold manifold) {
@@ -161,9 +161,9 @@ void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionM
     glm::vec3 impulse = impulse_magnitude * normal;
 
     DynamicObject::ApplyImpulse(-impulse);
-    if (collider->type == WE::COLLIDER_TYPE::OBB) ApplyAngularImpulse(-impulse, manifold.contact_point);
+    if (collider->type == WE::COLLIDER_TYPE::OBB) ApplyAngularImpulse(-impulse, manifold);
     other.ApplyImpulse(impulse);
-    if (other.collider->type == WE::COLLIDER_TYPE::OBB) other.ApplyAngularImpulse(impulse, manifold.contact_point);
+    if (other.collider->type == WE::COLLIDER_TYPE::OBB) other.ApplyAngularImpulse(impulse, manifold);
 
     // ==============================
     // Calculate correction

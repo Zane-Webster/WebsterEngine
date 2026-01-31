@@ -20,7 +20,7 @@ public:
 
     void ApplyForce(glm::vec3 force);       // a force acts over time, e.g. wind pushing an object
     void ApplyImpulse(glm::vec3 impulse);   // an impulse is a jolt of force, e.g. jumping or throwing an object
-    void ApplyAngularImpulse(glm::vec3 impulse, glm::vec3 manifold_contact_point);
+    void ApplyAngularImpulse(glm::vec3 impulse, WE::CollisionManifold manifold);
 
     void SetVelocity(glm::vec3 velocity);
 
@@ -57,7 +57,9 @@ public:
     float max_speed = 4.0f;
     float restitution = 0.7f;
     float linear_damping = 0.98f;
-    float angular_damping = 0.33f;
+    float angular_damping = 0.99f;
+    float friction = 4.0f;
+    float static_friction = 2.2f;
 
     glm::quat orientation = glm::quat(1, 0, 0, 0);
     glm::vec3 angular_velocity = glm::vec3(0.0f);
@@ -73,6 +75,9 @@ private:
 
     void _ComputeBoxInertia();
     void _UpdateInvInertiaWorld();
+    
+    glm::vec3 _GetCOM();
+    glm::vec3 _GetVelocityAtPoint(glm::vec3 world_point);
 };
 
 #endif // WE_OBJ_DYNAMICOBJECT_H_

@@ -28,7 +28,7 @@
 #define WE_CONTACT_EPSILON 0.01f
 #define WE_VELOCITY_EPSILON 0.01f
 
-#define WE_PHYSICS_PASSES 4
+#define WE_PHYSICS_PASSES 10
 
 class Texture; // forward declaration for Material
 
@@ -220,7 +220,8 @@ namespace WE {
         bool hit = false;
         glm::vec3 normal = glm::vec3(0.0f);
         float penetration = 0.0f;
-        glm::vec3 contact_point = glm::vec3(0.0f);
+        glm::vec3 contacts[4];
+        int contact_count = 0;
     };
 }
 

@@ -426,7 +426,9 @@ WE::CollisionManifold CollisionUtils::OBBAABBManifold(const WE::OBBShape& obb, c
     float minOverlap = FLT_MAX;
     glm::vec3 bestAxis;
 
-    // --- OBB axes ---
+    // =========================
+    // 1. OBB axes
+    // =========================
     for (int i = 0; i < 3; i++) {
         glm::vec3 axis = obb.axis[i];
 
@@ -435,7 +437,7 @@ WE::CollisionManifold CollisionUtils::OBBAABBManifold(const WE::OBBShape& obb, c
         float r2 = ProjectAABB(aabb, axis);
 
         float overlap = r1 + r2 - dist;
-        if (overlap < 0) return m;
+        if (overlap < 0.0f) return m;
 
         if (overlap < minOverlap) {
             minOverlap = overlap;
@@ -443,7 +445,9 @@ WE::CollisionManifold CollisionUtils::OBBAABBManifold(const WE::OBBShape& obb, c
         }
     }
 
-    // --- world axes ---
+    // =========================
+    // 2. World axes
+    // =========================
     const glm::vec3 worldAxes[3] = {
         {1,0,0}, {0,1,0}, {0,0,1}
     };
@@ -456,7 +460,7 @@ WE::CollisionManifold CollisionUtils::OBBAABBManifold(const WE::OBBShape& obb, c
         float r2 = ProjectAABB(aabb, axis);
 
         float overlap = r1 + r2 - dist;
-        if (overlap < 0) return m;
+        if (overlap < 0.0f) return m;
 
         if (overlap < minOverlap) {
             minOverlap = overlap;
@@ -464,25 +468,89 @@ WE::CollisionManifold CollisionUtils::OBBAABBManifold(const WE::OBBShape& obb, c
         }
     }
 
+    // =========================
+    // Collision confirmed
+    // =========================
     m.hit = true;
     m.penetration = minOverlap;
-    m.normal = glm::normalize(bestAxis);
 
-    if (glm::dot(m.normal, d) < 0.0f)
-        m.normal = -m.normal;
+    glm::vec3 n = glm::normalize(bestAxis);
+    if (glm::dot(n, d) < 0.0f)
+        n = -n;
 
-    // 🔥 contact point
-    glm::vec3 pA = SupportFaceCenterOBB(obb, -m.normal);
+    m.normal = n;
 
-    glm::vec3 pB;
-    pB.x = glm::clamp(pA.x, aabb.min.x, aabb.max.x);
-    pB.y = glm::clamp(pA.y, aabb.min.y, aabb.max.y);
-    pB.z = glm::clamp(pA.z, aabb.min.z, aabb.max.z);
+    // ======================================================
+    // 3. Build contact manifold (face contact)
+    // ======================================================
 
-    m.contact_point = 0.5f * (pA + pB);
+    // center of OBB face opposing normal
+    glm::vec3 faceCenter = SupportFaceCenterOBB(obb, -n);
+
+    // choose face axes
+    float d0 = std::abs(glm::dot(n, obb.axis[0]));
+    float d1 = std::abs(glm::dot(n, obb.axis[1]));
+    float d2 = std::abs(glm::dot(n, obb.axis[2]));
+
+    glm::vec3 u, v;
+    float hu, hv;
+
+    if (d0 > d1 && d0 > d2) {
+        u = obb.axis[1];
+        v = obb.axis[2];
+        hu = obb.half_extents.y;
+        hv = obb.half_extents.z;
+    }
+    else if (d1 > d2) {
+        u = obb.axis[0];
+        v = obb.axis[2];
+        hu = obb.half_extents.x;
+        hv = obb.half_extents.z;
+    }
+    else {
+        u = obb.axis[0];
+        v = obb.axis[1];
+        hu = obb.half_extents.x;
+        hv = obb.half_extents.y;
+    }
+
+    // 4 face corners
+    glm::vec3 pts[4] = {
+        faceCenter + u*hu + v*hv,
+        faceCenter - u*hu + v*hv,
+        faceCenter + u*hu - v*hv,
+        faceCenter - u*hu - v*hv
+    };
+
+    // =========================
+    // 4. Clip against AABB
+    // =========================
+    m.contact_count = 0;
+
+    for (int i = 0; i < 4; i++) {
+        glm::vec3 p = pts[i];
+
+        glm::vec3 clipped;
+        clipped.x = glm::clamp(p.x, aabb.min.x, aabb.max.x);
+        clipped.y = glm::clamp(p.y, aabb.min.y, aabb.max.y);
+        clipped.z = glm::clamp(p.z, aabb.min.z, aabb.max.z);
+
+        // must be behind plane
+        float depth = glm::dot(clipped - faceCenter, n);
+        if (depth <= 0.01f) {
+            m.contacts[m.contact_count++] = clipped;
+        }
+    }
+
+    // fallback (should rarely happen)
+    if (m.contact_count == 0) {
+        m.contacts[0] = faceCenter;
+        m.contact_count = 1;
+    }
 
     return m;
 }
+
 
 
 // ==================================
@@ -540,10 +608,16 @@ WE::CollisionManifold CollisionUtils::SphereCapsuleManifold(const WE::SphereShap
     return m;
 }
 
-WE::CollisionManifold CollisionUtils::SphereOBBManifold(const WE::SphereShape& sphere, const WE::OBBShape& obb) {
+WE::CollisionManifold CollisionUtils::SphereOBBManifold(
+    const WE::SphereShape& sphere,
+    const WE::OBBShape& obb)
+{
     WE::CollisionManifold m;
 
+    // vector from OBB center to sphere center
     glm::vec3 d = sphere.center - obb.center;
+
+    // closest point on OBB to sphere center
     glm::vec3 closest = obb.center;
 
     for (int i = 0; i < 3; i++) {
@@ -552,25 +626,53 @@ WE::CollisionManifold CollisionUtils::SphereOBBManifold(const WE::SphereShape& s
         closest += obb.axis[i] * dist;
     }
 
+    // vector from closest point to sphere center
     glm::vec3 diff = sphere.center - closest;
     float dist2 = glm::dot(diff, diff);
 
-    if (dist2 > sphere.radius * sphere.radius)
+    float r = sphere.radius;
+
+    if (dist2 > r * r)
         return m;
 
-    float distLen = std::sqrt(dist2);
+    float dist = std::sqrt(dist2);
 
+    // =========================
+    // Build manifold
+    // =========================
     m.hit = true;
 
-    if (distLen > 0.0001f)
-        m.normal = diff / distLen;
-    else
-        m.normal = glm::vec3(0,1,0);
+    if (dist > 0.0001f) {
+        m.normal = diff / dist;
+        m.penetration = r - dist;
+    }
+    else {
+        // sphere center is inside OBB
+        // choose best separating axis
+        float minDist = FLT_MAX;
+        glm::vec3 bestAxis;
 
-    m.penetration = sphere.radius - distLen;
+        for (int i = 0; i < 3; i++) {
+            float proj = glm::dot(d, obb.axis[i]);
+            float faceDist = obb.half_extents[i] - std::abs(proj);
 
-    // 🔥 contact point
-    m.contact_point = closest;
+            if (faceDist < minDist) {
+                minDist = faceDist;
+                bestAxis = obb.axis[i] * (proj < 0.0f ? -1.0f : 1.0f);
+            }
+        }
+
+        m.normal = bestAxis;
+        m.penetration = r + minDist;
+
+        closest = sphere.center - bestAxis * r;
+    }
+
+    // =========================
+    // Contact point
+    // =========================
+    m.contacts[0] = closest;
+    m.contact_count = 1;
 
     return m;
 }
@@ -646,74 +748,219 @@ WE::CollisionManifold CollisionUtils::CapsuleCapsuleManifold(const WE::CapsuleSh
     return m;
 }
 
-WE::CollisionManifold CollisionUtils::CapsuleOBBManifold(const WE::CapsuleShape& capsule, const WE::OBBShape& obb) {
+WE::CollisionManifold CollisionUtils::CapsuleOBBManifold(
+    const WE::CapsuleShape& capsule,
+    const WE::OBBShape& obb)
+{
+    WE::CollisionManifold m;
+
+    // capsule segment
     glm::vec3 ab = capsule.tip - capsule.base;
-    float t = glm::dot(obb.center - capsule.base, ab) / glm::dot(ab, ab);
-    t = glm::clamp(t, 0.0f, 1.0f);
+    float abLen2 = glm::dot(ab, ab);
 
+    // closest point on capsule segment to OBB center
+    float t = 0.0f;
+    if (abLen2 > 0.00001f) {
+        t = glm::dot(obb.center - capsule.base, ab) / abLen2;
+        t = glm::clamp(t, 0.0f, 1.0f);
+    }
+
+    glm::vec3 sphereCenter = capsule.base + ab * t;
+
+    // treat capsule as sphere at closest point
     WE::SphereShape s(capsule.radius);
-    s.center = capsule.base + ab * t;
+    s.center = sphereCenter;
 
-    WE::CollisionManifold m = SphereOBBManifold(s, obb);
+    // reuse sphere–OBB
+    WE::CollisionManifold sm = SphereOBBManifold(s, obb);
+    if (!sm.hit)
+        return m;
 
-    if (m.hit)
-        m.contact_point = s.center - m.normal * capsule.radius;
+    // =========================
+    // build capsule manifold
+    // =========================
+    m.hit = true;
+    m.normal = sm.normal;
+    m.penetration = sm.penetration;
+
+    // contact point on capsule surface
+    glm::vec3 contact =
+        sphereCenter - sm.normal * capsule.radius;
+
+    m.contacts[0] = contact;
+    m.contact_count = 1;
 
     return m;
 }
 
-
 // ==================================
 // OBB MANIFOLD
 // ==================================
-WE::CollisionManifold CollisionUtils::OBBOBBManifold(const WE::OBBShape& a, const WE::OBBShape& b) {
+WE::CollisionManifold CollisionUtils::OBBOBBManifold(
+    const WE::OBBShape& A,
+    const WE::OBBShape& B)
+{
     WE::CollisionManifold m;
 
-    glm::vec3 d = b.center - a.center;
+    glm::vec3 d = B.center - A.center;
+
     float minOverlap = FLT_MAX;
     glm::vec3 bestAxis;
+    bool axisFromA = true;
+    int bestAxisIndex = 0;
 
-    auto testAxis = [&](const glm::vec3& axis) {
-        if (glm::length(axis) < 0.0001f) return true;
+    auto testAxis = [&](const glm::vec3& axis, bool fromA, int index) {
+        if (glm::length(axis) < 1e-6f)
+            return true;
 
         glm::vec3 n = glm::normalize(axis);
 
         float dist = std::abs(glm::dot(d, n));
-        float ra = ProjectOBB(a, n);
-        float rb = ProjectOBB(b, n);
+        float ra = ProjectOBB(A, n);
+        float rb = ProjectOBB(B, n);
 
         float overlap = ra + rb - dist;
-        if (overlap < 0) return false;
+        if (overlap < 0.0f)
+            return false;
 
         if (overlap < minOverlap) {
             minOverlap = overlap;
             bestAxis = n;
+            axisFromA = fromA;
+            bestAxisIndex = index;
         }
+
         return true;
     };
 
+    // face axes
     for (int i = 0; i < 3; i++) {
-        if (!testAxis(a.axis[i])) return m;
-        if (!testAxis(b.axis[i])) return m;
+        if (!testAxis(A.axis[i], true, i)) return m;
+        if (!testAxis(B.axis[i], false, i)) return m;
     }
 
+    // edge-edge axes
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
-            if (!testAxis(glm::cross(a.axis[i], b.axis[j])))
+            if (!testAxis(glm::cross(A.axis[i], B.axis[j]), true, -1))
                 return m;
 
+    // collision confirmed
     m.hit = true;
     m.penetration = minOverlap;
+
+    if (glm::dot(bestAxis, d) < 0)
+        bestAxis = -bestAxis;
+
     m.normal = bestAxis;
 
-    if (glm::dot(m.normal, d) < 0)
-        m.normal = -m.normal;
+    // =====================================
+    // CONTACT GENERATION
+    // =====================================
 
-    // 🔥 contact point
-    glm::vec3 pA = SupportFaceCenterOBB(a, -m.normal);
-    glm::vec3 pB = SupportFaceCenterOBB(b,  m.normal);
+    const WE::OBBShape& ref = axisFromA ? A : B;
+    const WE::OBBShape& inc = axisFromA ? B : A;
 
-    m.contact_point = 0.5f * (pA + pB);
+    glm::vec3 refNormal = m.normal;
+    if (!axisFromA)
+        refNormal = -refNormal;
+
+    // reference face
+    int refFace = 0;
+    float maxDot = -FLT_MAX;
+    for (int i = 0; i < 3; i++) {
+        float d = glm::dot(ref.axis[i], refNormal);
+        if (d > maxDot) {
+            maxDot = d;
+            refFace = i;
+        }
+    }
+
+    glm::vec3 refAxis = ref.axis[refFace];
+
+    // reference face center
+    glm::vec3 refCenter =
+        ref.center +
+        refAxis * ref.half_extents[refFace] * (glm::dot(refAxis, refNormal) > 0 ? 1.f : -1.f);
+
+    // build reference face quad
+    glm::vec3 refU = ref.axis[(refFace + 1) % 3];
+    glm::vec3 refV = ref.axis[(refFace + 2) % 3];
+
+    float hu = ref.half_extents[(refFace + 1) % 3];
+    float hv = ref.half_extents[(refFace + 2) % 3];
+
+    glm::vec3 refVerts[4] = {
+        refCenter + refU*hu + refV*hv,
+        refCenter - refU*hu + refV*hv,
+        refCenter - refU*hu - refV*hv,
+        refCenter + refU*hu - refV*hv
+    };
+
+    // incident face
+    int incFace = 0;
+    maxDot = -FLT_MAX;
+    for (int i = 0; i < 3; i++) {
+        float d = glm::dot(inc.axis[i], -refNormal);
+        if (d > maxDot) {
+            maxDot = d;
+            incFace = i;
+        }
+    }
+
+    glm::vec3 incAxis = inc.axis[incFace];
+    glm::vec3 incCenter =
+        inc.center +
+        incAxis * inc.half_extents[incFace] * (glm::dot(incAxis, -refNormal) > 0 ? 1.f : -1.f);
+
+    glm::vec3 incU = inc.axis[(incFace + 1) % 3];
+    glm::vec3 incV = inc.axis[(incFace + 2) % 3];
+
+    float ihu = inc.half_extents[(incFace + 1) % 3];
+    float ihv = inc.half_extents[(incFace + 2) % 3];
+
+    glm::vec3 poly[4] = {
+        incCenter + incU*ihu + incV*ihv,
+        incCenter - incU*ihu + incV*ihv,
+        incCenter - incU*ihu - incV*ihv,
+        incCenter + incU*ihu - incV*ihv
+    };
+
+    // clip incident polygon against reference face planes
+    std::vector<glm::vec3> contacts;
+
+    auto clip = [&](const glm::vec3& n, float d,
+                    std::vector<glm::vec3>& pts)
+    {
+        std::vector<glm::vec3> out;
+        for (size_t i = 0; i < pts.size(); i++) {
+            glm::vec3 a = pts[i];
+            glm::vec3 b = pts[(i + 1) % pts.size()];
+
+            float da = glm::dot(n, a) - d;
+            float db = glm::dot(n, b) - d;
+
+            if (da >= 0) out.push_back(a);
+            if (da * db < 0) {
+                float t = da / (da - db);
+                out.push_back(a + t * (b - a));
+            }
+        }
+        pts = out;
+    };
+
+    std::vector<glm::vec3> pts(poly, poly + 4);
+
+    clip( refU,  glm::dot(refU, refCenter) + hu, pts);
+    clip(-refU, -glm::dot(refU, refCenter) + hu, pts);
+    clip( refV,  glm::dot(refV, refCenter) + hv, pts);
+    clip(-refV, -glm::dot(refV, refCenter) + hv, pts);
+
+    for (glm::vec3& p : pts) {
+        if (m.contact_count < 4) {
+            m.contacts[m.contact_count++] = p;
+        }
+    }
 
     return m;
 }

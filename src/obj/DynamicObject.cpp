@@ -1,5 +1,9 @@
 #include "obj/DynamicObject.h"
 
+//=============================
+// SETTERS
+//=============================
+
 void DynamicObject::SetDynamicProperties(float p_mass, float p_max_speed, float p_restitution, float p_linear_damping, bool p_use_gravity) {
     mass = p_mass;
     inv_mass = 1.0f / mass;
@@ -8,6 +12,21 @@ void DynamicObject::SetDynamicProperties(float p_mass, float p_max_speed, float 
     linear_damping = p_linear_damping;
     use_gravity = p_use_gravity;
     DynamicObject::_ComputeBoxInertia();
+}
+
+void DynamicObject::SetVelocity(glm::vec3 p_velocity) {
+    velocity = p_velocity;
+}
+
+//=============================
+// APPLY
+//=============================
+
+void DynamicObject::ApplyPhysics() {
+    DynamicObject::SetPosition(predicted_position);
+    DynamicObject::_UpdateModelMatrix();
+    DynamicObject::_UpdateCOM();
+    accumulated_force = glm::vec3(0.0f);
 }
 
 void DynamicObject::ApplyForce(glm::vec3 force) {
@@ -19,55 +38,36 @@ void DynamicObject::ApplyImpulse(glm::vec3 impulse) {
 }
 
 void DynamicObject::ApplyAngularImpulse(glm::vec3 impulse, WE::CollisionManifold manifold) {
-    _UpdateInvInertiaWorld();
+    DynamicObject::_UpdateInvInertiaWorld();
 
-    // world center of mass = position + rotated local center
-    glm::vec3 com = *position;
+    if (manifold.contact_count == 0) return;
 
-    if (collider && collider->type == WE::COLLIDER_TYPE::OBB) {
-        glm::mat3 R = glm::mat3_cast(orientation);
-        com = *position + (R * (*center));   // <-- uses Object::center (local)
+    glm::vec3 per_contact_impulse = impulse / float(manifold.contact_count);
+
+    for (int i = 0; i < manifold.contact_count; i++) {
+        glm::vec3 r = manifold.contacts[i] - center_of_mass;
+
+        angular_velocity += inv_inertia_world * glm::cross(r, per_contact_impulse);
     }
-
-    //glm::vec3 r = manifold_contact_point - com;
-    //angular_velocity += inv_inertia_world * glm::cross(r, impulse);
 }
 
-void DynamicObject::SetVelocity(glm::vec3 p_velocity) {
-    velocity = p_velocity;
-}
+//=============================
+// PROCESS
+//=============================
 
 bool DynamicObject::ProcessPhysics(double delta_time) {
     float dt = static_cast<float>(delta_time);
 
     DynamicObject::_ApplyGravity();
     DynamicObject::_ProcessMovement(dt);
-    if (collider->type == WE::COLLIDER_TYPE::OBB) DynamicObject::Integrate(dt);
+
+    if (collider->type == WE::COLLIDER_TYPE::OBB) DynamicObject::IntegrateAngular(dt);
 
     return DynamicObject::IsMoving();
 }
 
-void DynamicObject::ApplyPhysics() {
-    DynamicObject::SetPosition(predicted_position);
-    DynamicObject::_UpdateModelMatrix();
-    accumulated_force = glm::vec3(0.0f);
-}
-
-void DynamicObject::ResetPhysics() {
-    velocity = glm::vec3(0.0f);
-    acceleration = glm::vec3(0.0f);
-    accumulated_force = glm::vec3(0.0f);
-    predicted_position = DynamicObject::GetPosition();
-    predicted_aabb = DynamicObject::GetAABB();
-    grounded = false;
-}
-
 void DynamicObject::ProcessGrounded(WE::CollisionManifold manifold) {
     if (!manifold.hit) return;
-
-    // ==============================
-    // Calculate if object is on the ground (if manifold normal is almost flat and velocity is low)
-    // ==============================
     
     if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < (0.3f * (1.0f + restitution))) {
         grounded = true;
@@ -83,38 +83,14 @@ void DynamicObject::ProcessGrounded(WE::CollisionManifold manifold) {
 
 void DynamicObject::ProcessManifold(WE::CollisionManifold manifold) {
     if (!manifold.hit) return;
-    
+
     if (manifold.normal.y > 0.7f) {
         grounded = true;
         ground_normal = manifold.normal;
     }
 
-    // ==============================
-    // Calculate correction
-    // ==============================
-
-    float correction = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f);
-
-    correction *= WE_CORRECTION_PERCENT;
-    correction = std::min(correction, 0.02f);
-
-    if (!grounded) predicted_position += manifold.normal * correction;
-    DynamicObject::UpdatePredictedAABB();
-
-    // ==============================
-    // Calculate impulse
-    // ==============================
-
-    float velocity_normal = glm::dot(velocity, manifold.normal);
-    if (velocity_normal > 0.0f) return;
-
-    float impulse_magnitude = -(1.0f + restitution) * velocity_normal;
-    impulse_magnitude /= inv_mass;
-
-    glm::vec3 impulse = impulse_magnitude * manifold.normal;
-
-    ApplyImpulse(impulse);
-    if (collider->type == WE::COLLIDER_TYPE::OBB) ApplyAngularImpulse(impulse, manifold);
+    DynamicObject::_CalculateDynamicStaticCorrection(manifold);
+    DynamicObject::_CalculateDynamicStaticImpulse(manifold);
 }
 
 void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionManifold manifold) {
@@ -136,52 +112,30 @@ void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionM
     // flip normal if < 0
     if (glm::dot(delta, normal) < 0.0f) normal = -normal;
 
-    // ==============================
-    // Calculate velocity between objects
-    // ==============================
-
-    glm::vec3 relative_velocity = other.velocity - velocity;
-    float vel_along_normal = glm::dot(relative_velocity, normal);
-
-    if (vel_along_normal > 0.0f) return;
-
-    // ==============================
-    // Calculate restitution between objects
-    // ==============================
-
-    float effective_restitution = std::min(restitution, other.restitution);
-
-    // ==============================
-    // Calculate impulse
-    // ==============================
-
-    float impulse_magnitude = -(1.0f + effective_restitution) * vel_along_normal;
-    impulse_magnitude /= inv_mass + other.inv_mass;
-
-    glm::vec3 impulse = impulse_magnitude * normal;
-
-    DynamicObject::ApplyImpulse(-impulse);
-    if (collider->type == WE::COLLIDER_TYPE::OBB) ApplyAngularImpulse(-impulse, manifold);
-    other.ApplyImpulse(impulse);
-    if (other.collider->type == WE::COLLIDER_TYPE::OBB) other.ApplyAngularImpulse(impulse, manifold);
-
-    // ==============================
-    // Calculate correction
-    // ==============================
-
-    float correction_magnitude = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f) / (inv_mass + other.inv_mass) * WE_CORRECTION_PERCENT;
-    glm::vec3 correction = correction_magnitude * -normal;
-    glm::vec3 other_correction = -correction;
-
-    if (grounded && correction.y < 0.0f) correction.y = 0.0f;
-    if (other.grounded && other_correction.y < 0.0f) other_correction.y = 0.0f;
-
-    predicted_position += correction * inv_mass;
-    other.predicted_position += other_correction * other.inv_mass;
-
-    DynamicObject::UpdatePredictedAABB();
-    other.UpdatePredictedAABB();
+    DynamicObject::_CalculateDynamicDynamicImpulse(other, manifold, normal);
+    DynamicObject::_CalculateDynamicDynamicCorrection(other, manifold, normal);  
 }
+
+//=============================
+// RESET
+//=============================
+
+void DynamicObject::ResetPhysics() {
+    velocity = glm::vec3(0.0f);
+    angular_velocity = glm::vec3(0.0f);
+    acceleration = glm::vec3(0.0f);
+    accumulated_force = glm::vec3(0.0f);
+    accumulated_torque = glm::vec3(0.0f);
+    predicted_position = DynamicObject::GetPosition();
+    predicted_aabb = DynamicObject::GetAABB();
+    orientation = glm::quat(1, 0, 0, 0);
+    grounded = false;
+    DynamicObject::_UpdateCOM();
+}
+
+//=============================
+// UPDATE
+//=============================
 
 void DynamicObject::UpdatePredictedAABB() {
     predicted_aabb = DynamicObject::GetAABB();
@@ -191,11 +145,11 @@ void DynamicObject::UpdatePredictedAABB() {
     predicted_aabb.max += offset;
 }
 
-void DynamicObject::Integrate(float dt) {
+void DynamicObject::IntegrateAngular(float dt) {
     // angular acceleration
     DynamicObject::_UpdateInvInertiaWorld();
 
-    glm::vec3 angular_accel = inv_inertia_world * torque_accum;
+    glm::vec3 angular_accel = inv_inertia_world * accumulated_torque;
     angular_velocity += angular_accel * dt;
 
     // integrate quaternion
@@ -203,16 +157,24 @@ void DynamicObject::Integrate(float dt) {
 
     orientation += 0.5f * wq * orientation * dt;
     orientation = glm::normalize(orientation);
+    DynamicObject::_UpdateCOM();
 
-    torque_accum = glm::vec3(0.0f);
+    accumulated_torque = glm::vec3(0.0f);
 
     angular_velocity *= angular_damping;
 }
 
+//=============================
+// GETTERS
+//=============================
 
 bool DynamicObject::IsMoving() {
     return glm::length(velocity) > 0.001f;
 }
+
+//=============================
+// BASIC PHYSICS
+//=============================
 
 void DynamicObject::_UpdateModelMatrix() {
     *model_matrix = glm::mat4(1.0f);
@@ -224,7 +186,6 @@ void DynamicObject::_UpdateModelMatrix() {
 
     _UpdateCollider();
 }
-
 
 void DynamicObject::_ApplyGravity() {
     if (!use_gravity || grounded) return;
@@ -251,6 +212,73 @@ void DynamicObject::_ProcessMovement(float dt) {
     predicted_aabb.max += desired_move;
 }
 
+//=============================
+// DYNAMIC VS STATIC COLLISION
+//=============================
+
+void DynamicObject::_CalculateDynamicStaticCorrection(WE::CollisionManifold manifold) {
+    float correction = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f);
+
+    correction *= WE_CORRECTION_PERCENT;
+    correction = std::min(correction, 0.02f);
+
+    if (!grounded) predicted_position += manifold.normal * correction;
+    DynamicObject::UpdatePredictedAABB();
+}
+
+void DynamicObject::_CalculateDynamicStaticImpulse(WE::CollisionManifold manifold) {
+    float velocity_normal = glm::dot(velocity, manifold.normal);
+    if (velocity_normal > 0.0f) return;
+
+    float impulse_magnitude = -(1.0f + restitution) * velocity_normal;
+    impulse_magnitude /= inv_mass;
+
+    glm::vec3 impulse = impulse_magnitude * manifold.normal;
+
+    ApplyImpulse(impulse);
+    if (collider->type == WE::COLLIDER_TYPE::OBB) ApplyAngularImpulse(impulse, manifold);
+}
+
+//=============================
+// DYNAMIC VS DYNAMIC COLLISION
+//=============================
+
+void DynamicObject::_CalculateDynamicDynamicCorrection(DynamicObject& other, WE::CollisionManifold manifold, glm::vec3 normal) {
+    float correction_magnitude = std::max(manifold.penetration - WE_PENETRATION_SLOP, 0.0f) / (inv_mass + other.inv_mass) * WE_CORRECTION_PERCENT;
+    glm::vec3 correction = correction_magnitude * -normal;
+    glm::vec3 other_correction = -correction;
+
+    if (grounded && correction.y < 0.0f) correction.y = 0.0f;
+    if (other.grounded && other_correction.y < 0.0f) other_correction.y = 0.0f;
+
+    predicted_position += correction * inv_mass;
+    other.predicted_position += other_correction * other.inv_mass;
+
+    DynamicObject::UpdatePredictedAABB();
+    other.UpdatePredictedAABB();
+}
+
+void DynamicObject::_CalculateDynamicDynamicImpulse(DynamicObject& other, WE::CollisionManifold manifold, glm::vec3 normal) {
+    float vel_along_normal = glm::dot((other.velocity - velocity), normal);
+    if (vel_along_normal > 0.0f) return;
+
+    float effective_restitution = std::min(restitution, other.restitution);
+
+    float impulse_magnitude = -(1.0f + effective_restitution) * vel_along_normal;
+    impulse_magnitude /= inv_mass + other.inv_mass;
+
+    glm::vec3 impulse = impulse_magnitude * normal;
+
+    DynamicObject::ApplyImpulse(-impulse);
+    if (collider->type == WE::COLLIDER_TYPE::OBB) ApplyAngularImpulse(-impulse, manifold);
+    other.ApplyImpulse(impulse);
+    if (other.collider->type == WE::COLLIDER_TYPE::OBB) other.ApplyAngularImpulse(impulse, manifold);
+}
+
+//=============================
+// ANGULAR
+//=============================
+
 void DynamicObject::_ComputeBoxInertia() {
     float w = half_extents.x * 2.0f;    
     float h = half_extents.y * 2.0f;
@@ -274,4 +302,12 @@ void DynamicObject::_ComputeBoxInertia() {
 void DynamicObject::_UpdateInvInertiaWorld() {
     glm::mat3 R = glm::mat3_cast(orientation);
     inv_inertia_world = R * inv_inertia_body * glm::transpose(R);
+}
+
+void DynamicObject::_UpdateCOM() {
+    if (collider->type == WE::COLLIDER_TYPE::OBB) center_of_mass = *position + (glm::mat3_cast(orientation) * (*center));
+}
+
+glm::vec3 GetVelocityAtPoint(glm::vec3 world_point) {
+    return {};
 }

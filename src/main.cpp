@@ -61,7 +61,7 @@ int main(int, char**) {
     WE::KEYSET keyset = WE::KEYSET::WASD;
 
     Window window(WE_LAUNCH_WINDOW_RESOLUTION, WE::WINDOW_TITLE);
-    Renderer renderer;
+    Renderer renderer(window.GetSize().x, window.GetSize().y);
     StateHandler state_handler;
     ShaderHandler shader_handler;
     ModelLoader model_loader;
@@ -105,14 +105,14 @@ int main(int, char**) {
     std::shared_ptr<StaticObject> floor = model_loader.LoadStaticObject("floor", "assets/obj/floor/floor.obj", matte, WE::COLLIDER_TYPE::AABB, glm::vec3(0.0f, -4.0f, 0.0f));
     std::shared_ptr<StaticObject> wall = model_loader.LoadStaticObject("wall", "assets/obj/wall/wall.obj", matte, WE::COLLIDER_TYPE::AABB, glm::vec3(-7.0f, 0.0f, 0.0f));
 
-    box1->SetDynamicProperties(1.0f, 6.0f, 0.3f);
-    box2->SetDynamicProperties(1.0f, 6.0f, 0.3f);
-    box3->SetDynamicProperties(1.0f, 6.0f, 0.3f);
-    box4->SetDynamicProperties(1.0f, 6.0f, 0.3f);
-    box5->SetDynamicProperties(1.0f, 6.0f, 0.3f);
-    box6->SetDynamicProperties(1.0f, 6.0f, 0.3f);
+    box1->SetDynamicProperties(3.0f, 6.0f, 0.3f);
+    box2->SetDynamicProperties(3.0f, 6.0f, 0.3f);
+    box3->SetDynamicProperties(3.0f, 6.0f, 0.3f);
+    box4->SetDynamicProperties(3.0f, 6.0f, 0.3f);
+    box5->SetDynamicProperties(3.0f, 6.0f, 0.3f);
+    box6->SetDynamicProperties(3.0f, 6.0f, 0.3f);
 
-    ball->SetDynamicProperties(0.5f, 10.0f, 0.6f);
+    ball->SetDynamicProperties(2.0f, 20.0f, 0.6f);
 
     wall->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -132,6 +132,10 @@ int main(int, char**) {
     shader_handler.AddShader("sky", "assets/shader/sky/frag/sky.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("sky", "assets/shader/sky/vert/sky.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("sky");
+
+    shader_handler.AddShader("shadow", "assets/shader/shadow/frag/shadow.frag", GL_FRAGMENT_SHADER);
+    shader_handler.AddShader("shadow", "assets/shader/shadow/vert/shadow.vert", GL_VERTEX_SHADER);
+    shader_handler.CompileProgram("shadow");
 
     std::shared_ptr<Scene> test_scene = std::make_shared<Scene>("test_scene");
     test_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
@@ -161,7 +165,7 @@ int main(int, char**) {
                 renderer.Clear();
                 renderer.AddScene(test_scene);
                 test_scene->Reload();
-                renderer.Build();
+                renderer.Build(shader_handler.GetProgram("shadow"));
 
                 window.NeedRender();
                 window.UpdateDeltaTime();
@@ -183,10 +187,10 @@ int main(int, char**) {
                         if (e.key.scancode == SDL_SCANCODE_2) {
                             state_handler.Reload();
                         }
-                        if (e.key.scancode == SDL_SCANCODE_LEFT) ball->ApplyImpulse(glm::vec3(-20.0f, 0.0f, 0.0f));
-                        if (e.key.scancode == SDL_SCANCODE_RIGHT) ball->ApplyImpulse(glm::vec3(20.0f, 0.0f, 0.0f));
-                        if (e.key.scancode == SDL_SCANCODE_UP) ball->ApplyImpulse(glm::vec3(0.0f, 20.0f, 0.0f));
-                        if (e.key.scancode == SDL_SCANCODE_DOWN) ball->ApplyImpulse(glm::vec3(0.0f, -20.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_LEFT) ball->ApplyImpulse(glm::vec3(-40.0f, 0.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_RIGHT) ball->ApplyImpulse(glm::vec3(40.0f, 0.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_UP) ball->ApplyImpulse(glm::vec3(0.0f, 40.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_DOWN) ball->ApplyImpulse(glm::vec3(0.0f, -40.0f, 0.0f));
 
                         if (e.key.scancode == SDL_SCANCODE_DELETE) state_handler.SetState(WE::STATE::EXIT);
 

@@ -8,5 +8,8 @@ constexpr bool WE_LAUNCH_VSYNC = false;
 constexpr bool WE_LAUNCH_FULLSCREEN = false;
 constexpr float WE_LAUNCH_FPS_CAP = 60.0f;
 
+//  ===== SHADOW OPTIONS =====
+constexpr int WE_LAUNCH_SHADOW_QUALITY = 1024;
+
 //  ===== STARTING STATE =====
 constexpr WE::STATE WE_LAUNCH_STATE = WE::STATE::EDITOR;

@@ -69,7 +69,7 @@ bool DynamicObject::ProcessPhysics(double delta_time) {
 void DynamicObject::ProcessGrounded(WE::CollisionManifold manifold) {
     if (!manifold.hit) return;
     
-    if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < (0.3f * (1.0f + restitution))) {
+    if (manifold.normal.y > 0.7f && velocity.y < 0.0f && std::abs(velocity.y) < (0.5f * (1.0f + restitution))) {
         grounded = true;
         ground_normal = manifold.normal;
 
@@ -113,7 +113,7 @@ void DynamicObject::ProcessDynamicCollision(DynamicObject& other, WE::CollisionM
     if (glm::dot(delta, normal) < 0.0f) normal = -normal;
 
     DynamicObject::_CalculateDynamicDynamicImpulse(other, manifold, normal);
-    DynamicObject::_CalculateDynamicDynamicCorrection(other, manifold, normal);  
+    DynamicObject::_CalculateDynamicDynamicCorrection(other, manifold, normal); 
 }
 
 //=============================

@@ -1,14 +1,14 @@
 #include "renderer/Renderer.h"
 
-Renderer::Renderer() {
-    ;
+Renderer::Renderer(Uint16 p_window_width, Uint16 p_window_height) : window_width(p_window_width), window_height(p_window_height) {
+    shadow_resolution = WE_LAUNCH_SHADOW_QUALITY;
 }
 
 //=============================
 // BASIC
 //=============================
 
-void Renderer::Build() {
+void Renderer::Build(GLuint p_shadow_depth_shader) {
     // add scene items to renderer
     for (auto& [name, scene] : scenes) {
         for (auto& item : scene->items) {
@@ -20,13 +20,42 @@ void Renderer::Build() {
     }
 
     Renderer::_MakeBatches();
+
+    shadow_depth_shader = p_shadow_depth_shader;
+    Renderer::_BuildShadows();
+
+    Renderer::_ComputeLightSpaceMatrix();
 }
 
 void Renderer::RenderAll(glm::mat4 view_matrix, glm::mat4 projection_matrix, glm::mat4 view_projection_matrix, glm::vec3 camera_pos) {
+    // =============================
+    // SHADOW PASS
+    // =============================
+    Renderer::_RenderShadowPass();
+
+    // restore viewport after shadow pass
+    glViewport(0, 0, window_width, window_height);
+
+    // =============================
+    // MAIN RENDER PASS
+    // =============================
     for (auto& batch : items) {
         glUseProgram(batch.program);
         
         glUniform1i(batch.uniforms.diffuse, 0);
+
+        GLint shadowMapLoc = glGetUniformLocation(batch.program, "shadowMap");
+        GLint lightSpaceLoc = glGetUniformLocation(batch.program, "lightSpaceMatrix");
+
+        if (shadowMapLoc != -1) {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, shadow_depth_texture);
+            glUniform1i(shadowMapLoc, 1);
+        }
+
+        if (lightSpaceLoc != -1) {
+            glUniformMatrix4fv(lightSpaceLoc, 1, GL_FALSE, glm::value_ptr(light_space_matrix));
+        }
 
         for (auto& light : lights) {
             glUniform3fv(batch.uniforms.camera_pos, 1, glm::value_ptr(camera_pos));
@@ -218,4 +247,77 @@ void Renderer::_MakeBatches() {
     }
 
     unbatched_items.clear();
+}
+
+void Renderer::_BuildShadows() {
+    glGenFramebuffers(1, &shadowFBO);
+
+    glGenTextures(1, &shadow_depth_texture);
+    glBindTexture(GL_TEXTURE_2D, shadow_depth_texture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_resolution, shadow_resolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float border[] = {1,1,1,1};
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadow_depth_texture, 0);
+
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::_ComputeLightSpaceMatrix() {
+    if (lights.empty()) return;
+
+    auto& light = lights[0];
+
+    glm::vec3 light_dir = glm::normalize(light->direction);
+    glm::vec3 light_pos = -light_dir * 30.0f; // pull back along direction
+
+    glm::mat4 light_projection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 60.0f);
+    glm::mat4 light_view = glm::lookAt(light_pos, glm::vec3(0.0f), glm::vec3(0,1,0));
+
+    light_space_matrix = light_projection * light_view;
+}
+
+void Renderer::_RenderShadowPass() {
+    if (lights.empty()) return;
+
+    glViewport(0, 0, shadow_resolution, shadow_resolution);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(shadow_depth_shader);
+
+    GLint lsLoc = glGetUniformLocation(shadow_depth_shader, "lightSpaceMatrix");
+    GLint modelLoc = glGetUniformLocation(shadow_depth_shader, "model");
+
+    glUniformMatrix4fv(lsLoc, 1, GL_FALSE, glm::value_ptr(light_space_matrix));
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT); // reduces shadow acne
+
+    for (auto& batch : items) {
+        for (auto& item : batch.items) {
+            if (!item || !item->active) continue;
+
+            if (item->type != WE::RENDERITEM_TYPE::OBJECT && item->type != WE::RENDERITEM_TYPE::STATIC_OBJECT && item->type != WE::RENDERITEM_TYPE::DYNAMIC_OBJECT) continue;
+
+            auto obj = std::static_pointer_cast<Object>(item->ptr);
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(obj->GetModelMatrix()));
+
+            obj->Render();
+        }
+    }
+
+    glCullFace(GL_BACK);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

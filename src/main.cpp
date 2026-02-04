@@ -75,10 +75,14 @@ int main(int, char**) {
 
     std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
     WE::Material basic_material = {0.15f, 0.5f, 32.0f};
-    WE::Material matte = {0.15f, 0.0f, 0.0f};
+    WE::Material matte_brick = {0.15f, 0.0f, 0.0f};
+    WE::Material matte_pavement = {0.15f, 0.0f, 0.0f};
     
     texture_handler.LoadTexture("brick", "assets/tex/brick.jpg");
-    matte.diffuse = texture_handler.GetTexture("brick");
+    matte_brick.diffuse = texture_handler.GetTexture("brick");
+
+    texture_handler.LoadTexture("pavement", "assets/tex/pavement.jpg");
+    matte_pavement.diffuse = texture_handler.GetTexture("pavement");
 
     texture_handler.LoadTexture("sky_side1", "assets/tex/sky/side1.png");
     texture_handler.LoadTexture("sky_side2", "assets/tex/sky/side2.png");
@@ -93,35 +97,69 @@ int main(int, char**) {
 
     std::shared_ptr<Skybox> skybox = std::make_shared<Skybox>(skybox_textures);
 
-    std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/obj/ball/ball.obj", basic_material, WE::COLLIDER_TYPE::SPHERE, glm::vec3(0.0f, 2.0f, 0.0f));
+    std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/obj/ball/ball.obj", basic_material, WE::COLLIDER_TYPE::SPHERE, glm::vec3(4.0f, -2.0f, 0.0f));
 
-    std::shared_ptr<DynamicObject> box1 = model_loader.LoadDynamicObject("box1", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, -3.5f, -0.5f));
-    std::shared_ptr<DynamicObject> box2 = model_loader.LoadDynamicObject("box2", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, -3.5f, 0.5f));
-    std::shared_ptr<DynamicObject> box3 = model_loader.LoadDynamicObject("box3", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, -2.5f, -0.5f));
-    std::shared_ptr<DynamicObject> box4 = model_loader.LoadDynamicObject("box4", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, -2.5f, 0.5f));
-    std::shared_ptr<DynamicObject> box5 = model_loader.LoadDynamicObject("box5", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, -1.5f, -0.5f));
-    std::shared_ptr<DynamicObject> box6 = model_loader.LoadDynamicObject("box6", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(3.0f, -1.5f, 0.5f));
+    std::shared_ptr<DynamicObject> box1 = model_loader.LoadDynamicObject("box1", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.75f, -0.25f));
+    std::shared_ptr<DynamicObject> box2 = model_loader.LoadDynamicObject("box2", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.75f, 0.25f));
+    std::shared_ptr<DynamicObject> box3 = model_loader.LoadDynamicObject("box3", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.75f, -0.75f));
+    std::shared_ptr<DynamicObject> box4 = model_loader.LoadDynamicObject("box4", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.75f, 0.75f));
 
-    std::shared_ptr<StaticObject> floor = model_loader.LoadStaticObject("floor", "assets/obj/floor/floor.obj", matte, WE::COLLIDER_TYPE::AABB, glm::vec3(0.0f, -4.0f, 0.0f));
-    std::shared_ptr<StaticObject> wall = model_loader.LoadStaticObject("wall", "assets/obj/wall/wall.obj", matte, WE::COLLIDER_TYPE::AABB, glm::vec3(-7.0f, 0.0f, 0.0f));
+    std::shared_ptr<DynamicObject> box5 = model_loader.LoadDynamicObject("box5", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.25f, -0.25f));
+    std::shared_ptr<DynamicObject> box6 = model_loader.LoadDynamicObject("box6", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.25f, 0.25f));
+    std::shared_ptr<DynamicObject> box7 = model_loader.LoadDynamicObject("box7", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.25f, -0.75f));
+    std::shared_ptr<DynamicObject> box8 = model_loader.LoadDynamicObject("box8", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.25f, 0.75f));
 
-    box1->SetDynamicProperties(3.0f, 6.0f, 0.3f);
-    box2->SetDynamicProperties(3.0f, 6.0f, 0.3f);
-    box3->SetDynamicProperties(3.0f, 6.0f, 0.3f);
-    box4->SetDynamicProperties(3.0f, 6.0f, 0.3f);
-    box5->SetDynamicProperties(3.0f, 6.0f, 0.3f);
-    box6->SetDynamicProperties(3.0f, 6.0f, 0.3f);
+    std::shared_ptr<DynamicObject> box9 = model_loader.LoadDynamicObject("box9", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.75f, -0.25f));
+    std::shared_ptr<DynamicObject> box10 = model_loader.LoadDynamicObject("box10", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.75f, 0.25f));
+    std::shared_ptr<DynamicObject> box11 = model_loader.LoadDynamicObject("box11", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.75f, -0.75f));
+    std::shared_ptr<DynamicObject> box12 = model_loader.LoadDynamicObject("box12", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.75f, 0.75f));
 
-    ball->SetDynamicProperties(2.0f, 20.0f, 0.6f);
+    std::shared_ptr<DynamicObject> box13 = model_loader.LoadDynamicObject("box13", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.25f, -0.25f));
+    std::shared_ptr<DynamicObject> box14 = model_loader.LoadDynamicObject("box14", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.25f, 0.25f));
+    std::shared_ptr<DynamicObject> box15 = model_loader.LoadDynamicObject("box15", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.25f, -0.75f));
+    std::shared_ptr<DynamicObject> box16 = model_loader.LoadDynamicObject("box16", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.25f, 0.75f));
 
-    wall->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
+    std::shared_ptr<StaticObject> floor = model_loader.LoadStaticObject("floor", "assets/obj/floor/floor.obj", matte_pavement, WE::COLLIDER_TYPE::AABB, glm::vec3(0.0f, -4.0f, 0.0f));
+    std::shared_ptr<StaticObject> wall = model_loader.LoadStaticObject("wall", "assets/obj/wall/wall.obj", matte_brick, WE::COLLIDER_TYPE::AABB, glm::vec3(-12.0f, 0.0f, 0.0f));
+
+    box1->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box2->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box3->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box4->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box5->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box6->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box7->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box8->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box9->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box10->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box11->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box12->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box13->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box14->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box15->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+    box16->SetDynamicProperties(1.0f, 6.0f, 1.0f);
+
+    ball->SetDynamicProperties(5.0f, 40.0f, 1.0f);
 
     box1->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
     box2->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
     box3->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
     box4->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
-    box5->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
-    box6->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
+
+    box5->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
+    box6->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
+    box7->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
+    box8->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
+
+    box9->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
+    box10->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
+    box11->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
+    box12->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
+
+    box13->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
+    box14->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
+    box15->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
+    box16->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
 
     ball->SetColor(glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -147,6 +185,16 @@ int main(int, char**) {
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box4", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box4));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box5", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box5));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("box6", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box6));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("box7", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box7));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("box8", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box8));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("box9", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box9));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("box10", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box10));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("box11", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box11));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("box12", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box12));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("box13", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box13));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("box14", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box14));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("box15", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box15));
+    test_scene->AddItem(std::make_shared<WE::RenderItem>("box16", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box16));
     
     test_scene->AddItem(std::make_shared<WE::RenderItem>("floor", WE::RENDERITEM_TYPE::STATIC_OBJECT, shader_handler.GetProgram("basic"), floor));
     test_scene->AddItem(std::make_shared<WE::RenderItem>("wall", WE::RENDERITEM_TYPE::STATIC_OBJECT, shader_handler.GetProgram("basic"), wall));
@@ -187,10 +235,10 @@ int main(int, char**) {
                         if (e.key.scancode == SDL_SCANCODE_2) {
                             state_handler.Reload();
                         }
-                        if (e.key.scancode == SDL_SCANCODE_LEFT) ball->ApplyImpulse(glm::vec3(-40.0f, 0.0f, 0.0f));
-                        if (e.key.scancode == SDL_SCANCODE_RIGHT) ball->ApplyImpulse(glm::vec3(40.0f, 0.0f, 0.0f));
-                        if (e.key.scancode == SDL_SCANCODE_UP) ball->ApplyImpulse(glm::vec3(0.0f, 40.0f, 0.0f));
-                        if (e.key.scancode == SDL_SCANCODE_DOWN) ball->ApplyImpulse(glm::vec3(0.0f, -40.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_LEFT) ball->ApplyImpulse(glm::vec3(-100.0f, 0.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_RIGHT) ball->ApplyImpulse(glm::vec3(100.0f, 0.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_UP) ball->ApplyImpulse(glm::vec3(0.0f, 100.0f, 0.0f));
+                        if (e.key.scancode == SDL_SCANCODE_DOWN) ball->ApplyImpulse(glm::vec3(0.0f, -100.0f, 0.0f));
 
                         if (e.key.scancode == SDL_SCANCODE_DELETE) state_handler.SetState(WE::STATE::EXIT);
 

@@ -5,9 +5,9 @@ v 0.0  -7.5   7.5
 
 # texture coordinates
 vt 0.0 0.0
-vt 1.0 0.0
-vt 1.0 1.0
-vt 0.0 1.0
+vt 7.5 0.0
+vt 7.5 7.5
+vt 0.0 7.5
 
 vn 1.0 0.0 0.0
 

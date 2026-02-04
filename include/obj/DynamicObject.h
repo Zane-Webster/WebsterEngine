@@ -53,7 +53,7 @@ public:
     
     float inv_mass = 0.5f;
     float linear_damping = 0.98f;
-    float angular_damping = 0.99f;
+    float angular_damping = 0.95f;
 
     glm::vec3 predicted_position = glm::vec3(0.0f);
     WE::AABB predicted_aabb = {};

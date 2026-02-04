@@ -28,7 +28,7 @@
 #define WE_CONTACT_EPSILON 0.01f
 #define WE_VELOCITY_EPSILON 0.01f
 
-#define WE_PHYSICS_PASSES 4
+#define WE_PHYSICS_PASSES 10
 
 class Texture; // forward declaration for Material
 
@@ -89,7 +89,8 @@ namespace WE {
         UNDECLARED,
         AABB,
         SPHERE,
-        CAPSULE
+        CAPSULE,
+        OBB
     };
 
     struct RenderItem {
@@ -202,10 +203,25 @@ namespace WE {
         glm::vec3 tip = glm::vec3(0.0f);
     };
 
+    struct OBBShape final : ColliderShape {
+        OBBShape(glm::vec3 p_half_extents) : ColliderShape(WE::COLLIDER_TYPE::OBB), half_extents(p_half_extents) {}
+        
+        glm::vec3 half_extents = glm::vec3(0.5f);
+
+        // world space orthonormal axes
+        glm::vec3 axis[3] = {
+            glm::vec3(1, 0, 0),
+            glm::vec3(0, 1, 0),
+            glm::vec3(0, 0, 1)
+        };
+    };
+
     struct CollisionManifold {
         bool hit = false;
         glm::vec3 normal = glm::vec3(0.0f);
         float penetration = 0.0f;
+        glm::vec3 contacts[4];
+        int contact_count = 0;
     };
 }
 

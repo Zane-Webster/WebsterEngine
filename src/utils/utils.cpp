@@ -56,6 +56,13 @@ std::string Utils::WETypeToString(WE::RENDERITEM_TYPE type) {
     }
 }
 
+WE::COLLIDER_TYPE Utils::ColliderTypeFromString(std::string str) {
+    if (str == "sphere") return WE::COLLIDER_TYPE::SPHERE;
+    else if (str == "capsule") return WE::COLLIDER_TYPE::CAPSULE;
+    else if (str == "obb") return WE::COLLIDER_TYPE::OBB;
+    else return WE::COLLIDER_TYPE::AABB;
+}
+
 bool Utils::RayIntersectsAABB(WE::Ray ray, WE::AABB box, float& t) {
     float tmin = 0.0f;
     float tmax = FLT_MAX;

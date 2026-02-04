@@ -1,0 +1,2 @@
+# NAME              AMBIENT   SPECULAR    SHININESS   TEXTURE NAME    TEXTURE PATH
+"matte_pavement"    0.15      0.0         0.0         "pavement"      "assets/tex/pavement.jpg"

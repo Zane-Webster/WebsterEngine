@@ -1,0 +1,20 @@
+# TYPE          NAME        MODEL PATH                      MATERIAL NAME       SHADER NAME     COLLIDER TYPE   ORIGIN                  COLOR           MASS    MAX SPEED   RESTIUTION  USE GRAVITY
+dynamicobject   "ball"      "assets/obj/ball/ball.obj"      "basic"             "basic"         sphere          4.0 -2.0 0.0            0.0 1.0 0.0     5.0     40.0        1.0         1 
+dynamicobject   "box1"      "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -3.75 -0.75        0.0 1.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box2"      "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -3.75 -0.25        0.0 0.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box3"      "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -3.75 0.25         0.0 1.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box4"      "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -3.75 0.75         0.0 0.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box5"      "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -3.25 -0.75        0.0 0.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box6"      "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -3.25 -0.25        0.0 1.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box7"      "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -3.25 0.25         0.0 0.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box8"      "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -3.25 0.75         0.0 1.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box9"      "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -2.75 -0.75        0.0 1.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box10"     "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -2.75 -0.25        0.0 0.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box11"     "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -2.75 0.25         0.0 1.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box12"     "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -2.75 0.75         0.0 0.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box13"     "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -2.25 -0.75        0.0 0.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box14"     "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -2.25 -0.25        0.0 1.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box15"     "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -2.25 0.25         0.0 0.0 1.0     1.0     6.0         1.0         1 
+dynamicobject   "box16"     "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -2.25 0.75         0.0 1.0 1.0     1.0     6.0         1.0         1 
+staticobject    "floor"     "assets/obj/floor/floor.obj"    "matte_pavement"    "basic"         aabb            0.0 -4.0 0.0                                                             
+staticobject    "wall"      "assets/obj/wall/wall.obj"      "matte_brick"       "basic"         aabb            -12.0 0.0 0.0                                                            

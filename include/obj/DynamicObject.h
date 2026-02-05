@@ -17,7 +17,7 @@ public:
     using Object::Object;
 
     // ======== SETTER ========
-    void SetDynamicProperties(float mass = 2.0f, float max_speed = 4.0f, float restitution = 0.7f, float linear_damping = 0.98f, bool use_gravity = true);
+    void SetDynamicProperties(float mass = 2.0f, float max_speed = 4.0f, float restitution = 0.7f, bool use_gravity = true);
     void SetVelocity(glm::vec3 velocity);
 
     // ======== APPLY PHYSICS ========

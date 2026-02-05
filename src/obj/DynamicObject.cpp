@@ -4,12 +4,11 @@
 // SETTERS
 //=============================
 
-void DynamicObject::SetDynamicProperties(float p_mass, float p_max_speed, float p_restitution, float p_linear_damping, bool p_use_gravity) {
+void DynamicObject::SetDynamicProperties(float p_mass, float p_max_speed, float p_restitution, bool p_use_gravity) {
     mass = p_mass;
     inv_mass = 1.0f / mass;
     max_speed = p_max_speed;
     restitution = p_restitution;
-    linear_damping = p_linear_damping;
     use_gravity = p_use_gravity;
     DynamicObject::_ComputeBoxInertia();
 }

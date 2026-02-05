@@ -23,6 +23,7 @@ public:
 
     void UseProgram(std::string name);
     GLuint GetProgram(std::string name);
+    std::unordered_map<std::string, GLuint> GetAllPrograms();
 
 private:
     std::unordered_map<std::string, std::vector<std::unique_ptr<Shader>>> shaders = WE_EMPTY_MAP;

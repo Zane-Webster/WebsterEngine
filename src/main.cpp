@@ -25,7 +25,9 @@
 #include "core/Logger.h"
 
 // ===== LOAD =====
+#include "load/MaterialLoader.h"
 #include "load/ModelLoader.h"
+#include "load/SceneLoader.h"
 
 // ===== OBJ =====
 #include "obj/Object.h"
@@ -61,108 +63,28 @@ int main(int, char**) {
     WE::KEYSET keyset = WE::KEYSET::WASD;
 
     Window window(WE_LAUNCH_WINDOW_RESOLUTION, WE::WINDOW_TITLE);
-    Renderer renderer(window.GetSize().x, window.GetSize().y);
+    Renderer renderer((Uint16)window.GetSize().x, (Uint16)window.GetSize().y);
     StateHandler state_handler;
     ShaderHandler shader_handler;
-    ModelLoader model_loader;
+    std::shared_ptr<TextureHandler> texture_handler = std::make_shared<TextureHandler>();
+    MaterialLoader material_loader(texture_handler);
+    std::shared_ptr<ModelLoader> model_loader = std::make_shared<ModelLoader>();
+    SceneLoader scene_loader(model_loader);
     Camera camera(window.GetAspectRatio(), keyset, window.delta_time);
-    TextureHandler texture_handler;
 
-    texture_handler.LoadTexture("basic", "assets/tex/basic.png");
-    renderer.basic_texture = texture_handler.GetTexture("basic");
+    // ===============================
+    // SET STATES AND INITS
+    // ===============================
 
     state_handler.SetState(WE_LAUNCH_STATE);
 
-    std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
-    WE::Material basic_material = {0.15f, 0.5f, 32.0f};
-    WE::Material matte_brick = {0.15f, 0.0f, 0.0f};
-    WE::Material matte_pavement = {0.15f, 0.0f, 0.0f};
+    texture_handler->LoadTexture("basic", "assets/tex/basic.png");
+    renderer.basic_texture = texture_handler->GetTexture("basic");
+
+    // ===============================
+    // COMPILE SHADERS
+    // ===============================
     
-    texture_handler.LoadTexture("brick", "assets/tex/brick.jpg");
-    matte_brick.diffuse = texture_handler.GetTexture("brick");
-
-    texture_handler.LoadTexture("pavement", "assets/tex/pavement.jpg");
-    matte_pavement.diffuse = texture_handler.GetTexture("pavement");
-
-    texture_handler.LoadTexture("sky_side1", "assets/tex/sky/side1.png");
-    texture_handler.LoadTexture("sky_side2", "assets/tex/sky/side2.png");
-
-    WE::SKYBOX_TEXTURES skybox_textures = { texture_handler.GetTexture("sky_side1"), 
-                                            texture_handler.GetTexture("sky_side1"), 
-                                            texture_handler.LoadTexture("sky_top", "assets/tex/sky/top.png"), 
-                                            texture_handler.LoadTexture("sky_bottom", "assets/tex/sky/bottom.png"), 
-                                            texture_handler.GetTexture("sky_side2"), 
-                                            texture_handler.GetTexture("sky_side2")
-                                          };
-
-    std::shared_ptr<Skybox> skybox = std::make_shared<Skybox>(skybox_textures);
-
-    std::shared_ptr<DynamicObject> ball = model_loader.LoadDynamicObject("ball", "assets/obj/ball/ball.obj", basic_material, WE::COLLIDER_TYPE::SPHERE, glm::vec3(4.0f, -2.0f, 0.0f));
-
-    std::shared_ptr<DynamicObject> box1 = model_loader.LoadDynamicObject("box1", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.75f, -0.25f));
-    std::shared_ptr<DynamicObject> box2 = model_loader.LoadDynamicObject("box2", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.75f, 0.25f));
-    std::shared_ptr<DynamicObject> box3 = model_loader.LoadDynamicObject("box3", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.75f, -0.75f));
-    std::shared_ptr<DynamicObject> box4 = model_loader.LoadDynamicObject("box4", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.75f, 0.75f));
-
-    std::shared_ptr<DynamicObject> box5 = model_loader.LoadDynamicObject("box5", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.25f, -0.25f));
-    std::shared_ptr<DynamicObject> box6 = model_loader.LoadDynamicObject("box6", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.25f, 0.25f));
-    std::shared_ptr<DynamicObject> box7 = model_loader.LoadDynamicObject("box7", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.25f, -0.75f));
-    std::shared_ptr<DynamicObject> box8 = model_loader.LoadDynamicObject("box8", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -3.25f, 0.75f));
-
-    std::shared_ptr<DynamicObject> box9 = model_loader.LoadDynamicObject("box9", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.75f, -0.25f));
-    std::shared_ptr<DynamicObject> box10 = model_loader.LoadDynamicObject("box10", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.75f, 0.25f));
-    std::shared_ptr<DynamicObject> box11 = model_loader.LoadDynamicObject("box11", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.75f, -0.75f));
-    std::shared_ptr<DynamicObject> box12 = model_loader.LoadDynamicObject("box12", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.75f, 0.75f));
-
-    std::shared_ptr<DynamicObject> box13 = model_loader.LoadDynamicObject("box13", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.25f, -0.25f));
-    std::shared_ptr<DynamicObject> box14 = model_loader.LoadDynamicObject("box14", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.25f, 0.25f));
-    std::shared_ptr<DynamicObject> box15 = model_loader.LoadDynamicObject("box15", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.25f, -0.75f));
-    std::shared_ptr<DynamicObject> box16 = model_loader.LoadDynamicObject("box16", "assets/obj/box/box.obj", basic_material, WE::COLLIDER_TYPE::OBB, glm::vec3(-5.0f, -2.25f, 0.75f));
-
-    std::shared_ptr<StaticObject> floor = model_loader.LoadStaticObject("floor", "assets/obj/floor/floor.obj", matte_pavement, WE::COLLIDER_TYPE::AABB, glm::vec3(0.0f, -4.0f, 0.0f));
-    std::shared_ptr<StaticObject> wall = model_loader.LoadStaticObject("wall", "assets/obj/wall/wall.obj", matte_brick, WE::COLLIDER_TYPE::AABB, glm::vec3(-12.0f, 0.0f, 0.0f));
-
-    box1->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box2->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box3->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box4->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box5->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box6->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box7->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box8->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box9->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box10->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box11->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box12->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box13->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box14->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box15->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-    box16->SetDynamicProperties(1.0f, 6.0f, 1.0f);
-
-    ball->SetDynamicProperties(5.0f, 40.0f, 1.0f);
-
-    box1->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
-    box2->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
-    box3->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
-    box4->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
-
-    box5->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
-    box6->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
-    box7->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
-    box8->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
-
-    box9->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
-    box10->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
-    box11->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
-    box12->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
-
-    box13->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
-    box14->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
-    box15->SetColor(glm::vec3(0.0f, 0.0f, 1.0f));
-    box16->SetColor(glm::vec3(0.0f, 1.0f, 1.0f));
-
-    ball->SetColor(glm::vec3(0.0f, 1.0f, 0.0f));
-
     shader_handler.AddShader("basic", "assets/shader/basic/frag/basic.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("basic", "assets/shader/basic/vert/basic.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("basic");
@@ -175,30 +97,43 @@ int main(int, char**) {
     shader_handler.AddShader("shadow", "assets/shader/shadow/vert/shadow.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("shadow");
 
-    std::shared_ptr<Scene> test_scene = std::make_shared<Scene>("test_scene");
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("ball", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), ball));
+    // ===============================
+    // LOAD MATERIALS
+    // ===============================
 
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box1", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box1));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box2", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box2));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box3", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box3));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box4", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box4));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box5", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box5));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box6", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box6));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box7", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box7));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box8", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box8));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box9", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box9));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box10", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box10));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box11", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box11));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box12", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box12));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box13", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box13));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box14", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box14));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box15", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box15));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("box16", WE::RENDERITEM_TYPE::DYNAMIC_OBJECT, shader_handler.GetProgram("basic"), box16));
-    
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("floor", WE::RENDERITEM_TYPE::STATIC_OBJECT, shader_handler.GetProgram("basic"), floor));
-    test_scene->AddItem(std::make_shared<WE::RenderItem>("wall", WE::RENDERITEM_TYPE::STATIC_OBJECT, shader_handler.GetProgram("basic"), wall));
-    test_scene->AddLight(sun_light);
+    material_loader.LoadMaterial("assets/material/basic.wemat");
+    material_loader.LoadMaterial("assets/material/matte_brick.wemat");
+    material_loader.LoadMaterial("assets/material/matte_pavement.wemat");
+
+    // ===============================
+    // LOAD SCENES
+    // ===============================
+
+    std::shared_ptr<Scene> demo_scene = std::make_shared<Scene>("demo");
+    demo_scene->AddItems(scene_loader.LoadScene("assets/scene/demo.wescn", material_loader.GetAllMaterials(), shader_handler.GetAllPrograms()));
+
+    std::shared_ptr<DynamicObject> ball = std::dynamic_pointer_cast<DynamicObject>(demo_scene->GetObject("ball"));
+
+    // ===============================
+    // LOAD SKYBOXES AND LIGHTS
+    // ===============================
+
+    std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
+    demo_scene->AddLight(sun_light);
+
+    texture_handler->LoadTexture("sky_side1", "assets/tex/sky/side1.png");
+    texture_handler->LoadTexture("sky_side2", "assets/tex/sky/side2.png");
+
+    WE::SKYBOX_TEXTURES skybox_textures = { texture_handler->GetTexture("sky_side1"), 
+                                            texture_handler->GetTexture("sky_side1"), 
+                                            texture_handler->LoadTexture("sky_top", "assets/tex/sky/top.png"), 
+                                            texture_handler->LoadTexture("sky_bottom", "assets/tex/sky/bottom.png"), 
+                                            texture_handler->GetTexture("sky_side2"), 
+                                            texture_handler->GetTexture("sky_side2")
+                                          };
+
+    std::shared_ptr<Skybox> skybox = std::make_shared<Skybox>(skybox_textures);
+    demo_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
 
     SDL_Delay(1500);
 
@@ -211,8 +146,8 @@ int main(int, char**) {
         if (state_handler.GetState() == WE::STATE::EDITOR) {
             if (state_handler.Load()) {
                 renderer.Clear();
-                renderer.AddScene(test_scene);
-                test_scene->Reload();
+                renderer.AddScene(demo_scene);
+                demo_scene->Reload();
                 renderer.Build(shader_handler.GetProgram("shadow"));
 
                 window.NeedRender();
@@ -251,7 +186,7 @@ int main(int, char**) {
                         break;
                     case SDL_EVENT_MOUSE_BUTTON_DOWN:
                         WE::RayHit hit;
-                        if (test_scene->Raycast(camera.GetForwardRay(), hit)) {
+                        if (demo_scene->Raycast(camera.GetForwardRay(), hit)) {
                             ball->ApplyImpulse(-hit.normal*25.0f);
                             window.NeedRender();
                         }
@@ -261,9 +196,9 @@ int main(int, char**) {
 
             if (camera.ProcessKey()) window.NeedRender();
 
-            if (test_scene->ProcessPhysics(*window.delta_time)) {
-                test_scene->ProcessCollisions(*window.delta_time);
-                test_scene->ApplyPhysics();
+            if (demo_scene->ProcessPhysics(*window.delta_time)) {
+                demo_scene->ProcessCollisions(*window.delta_time);
+                demo_scene->ApplyPhysics();
                 window.NeedRender();
             }
 
@@ -280,9 +215,9 @@ int main(int, char**) {
 
     renderer.Clear();
 
-    test_scene->Destroy();
+    demo_scene->Destroy();
 
-    texture_handler.Destroy();
+    texture_handler->Destroy();
     shader_handler.Destroy();
 
     SDL_Quit();

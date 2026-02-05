@@ -107,3 +107,7 @@ GLuint ShaderHandler::GetProgram(std::string name) {
     }
     return shader_programs[name];
 }
+
+std::unordered_map<std::string, GLuint> ShaderHandler::GetAllPrograms() {
+    return shader_programs;
+}

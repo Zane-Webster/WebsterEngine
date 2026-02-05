@@ -143,6 +143,8 @@ namespace WE {
         GLint specular_strength = -1;
         GLint shininess = -1;
         GLint diffuse = -1;
+        GLint shadow_map = -1;
+        GLint light_space = -1;
     };
 
     struct RenderBatch {

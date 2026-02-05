@@ -5,8 +5,8 @@ out vec4 FragColor;
 
 uniform samplerCube skybox;
 
-uniform sampler2D shadowMap;
-uniform mat4 lightSpaceMatrix;
+uniform sampler2D shadow_map;
+uniform mat4 light_space_matrix;
 
 void main()
 {

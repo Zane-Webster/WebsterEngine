@@ -44,18 +44,13 @@ void Renderer::RenderAll(glm::mat4 view_matrix, glm::mat4 projection_matrix, glm
         
         glUniform1i(batch.uniforms.diffuse, 0);
 
-        GLint shadowMapLoc = glGetUniformLocation(batch.program, "shadowMap");
-        GLint lightSpaceLoc = glGetUniformLocation(batch.program, "lightSpaceMatrix");
-
-        if (shadowMapLoc != -1) {
+        if (batch.uniforms.shadow_map != -1) {
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, shadow_depth_texture);
-            glUniform1i(shadowMapLoc, 1);
+            glUniform1i(batch.uniforms.shadow_map, 1);
         }
 
-        if (lightSpaceLoc != -1) {
-            glUniformMatrix4fv(lightSpaceLoc, 1, GL_FALSE, glm::value_ptr(light_space_matrix));
-        }
+        glUniformMatrix4fv(batch.uniforms.light_space, 1, GL_FALSE, glm::value_ptr(light_space_matrix));
 
         for (auto& light : lights) {
             glUniform3fv(batch.uniforms.camera_pos, 1, glm::value_ptr(camera_pos));
@@ -235,10 +230,12 @@ void Renderer::_MakeBatches() {
             batch.uniforms.camera_pos = glGetUniformLocation(shader, "camera_pos");
             batch.uniforms.light_dir = glGetUniformLocation(shader, "light_dir");
             batch.uniforms.light_color = glGetUniformLocation(shader, "light_color");
+            batch.uniforms.light_space = glGetUniformLocation(batch.program, "light_space_matrix");
             batch.uniforms.ambient_strength = glGetUniformLocation(shader, "ambient_strength");
             batch.uniforms.specular_strength = glGetUniformLocation(shader, "specular_strength");
             batch.uniforms.shininess = glGetUniformLocation(shader, "shininess");
             batch.uniforms.diffuse = glGetUniformLocation(shader, "u_Diffuse");
+            batch.uniforms.shadow_map = glGetUniformLocation(batch.program, "shadow_map");
 
             items.push_back(std::move(batch));
         }

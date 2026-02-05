@@ -109,17 +109,17 @@ int main(int, char**) {
     // LOAD SCENES
     // ===============================
 
-    std::shared_ptr<Scene> demo_scene = std::make_shared<Scene>("demo");
-    demo_scene->AddItems(scene_loader.LoadScene("assets/scene/demo.wescn", material_loader.GetAllMaterials(), shader_handler.GetAllPrograms()));
+    std::shared_ptr<Scene> boxes_demo_scene = std::make_shared<Scene>("demo");
+    boxes_demo_scene->AddItems(scene_loader.LoadScene("assets/scene/boxes_demo.wescn", material_loader.GetAllMaterials(), shader_handler.GetAllPrograms()));
 
-    std::shared_ptr<DynamicObject> ball = std::dynamic_pointer_cast<DynamicObject>(demo_scene->GetObject("ball"));
+    std::shared_ptr<DynamicObject> ball = std::dynamic_pointer_cast<DynamicObject>(boxes_demo_scene->GetObject("ball"));
 
     // ===============================
     // LOAD SKYBOXES AND LIGHTS
     // ===============================
 
     std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
-    demo_scene->AddLight(sun_light);
+    boxes_demo_scene->AddLight(sun_light);
 
     texture_handler->LoadTexture("sky_side1", "assets/tex/sky/side1.png");
     texture_handler->LoadTexture("sky_side2", "assets/tex/sky/side2.png");
@@ -133,7 +133,7 @@ int main(int, char**) {
                                           };
 
     std::shared_ptr<Skybox> skybox = std::make_shared<Skybox>(skybox_textures);
-    demo_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
+    boxes_demo_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
 
     SDL_Delay(1500);
 
@@ -146,8 +146,8 @@ int main(int, char**) {
         if (state_handler.GetState() == WE::STATE::EDITOR) {
             if (state_handler.Load()) {
                 renderer.Clear();
-                renderer.AddScene(demo_scene);
-                demo_scene->Reload();
+                renderer.AddScene(boxes_demo_scene);
+                boxes_demo_scene->Reload();
                 renderer.Build(shader_handler.GetProgram("shadow"));
 
                 window.NeedRender();
@@ -186,7 +186,7 @@ int main(int, char**) {
                         break;
                     case SDL_EVENT_MOUSE_BUTTON_DOWN:
                         WE::RayHit hit;
-                        if (demo_scene->Raycast(camera.GetForwardRay(), hit)) {
+                        if (boxes_demo_scene->Raycast(camera.GetForwardRay(), hit)) {
                             ball->ApplyImpulse(-hit.normal*25.0f);
                             window.NeedRender();
                         }
@@ -196,9 +196,9 @@ int main(int, char**) {
 
             if (camera.ProcessKey()) window.NeedRender();
 
-            if (demo_scene->ProcessPhysics(*window.delta_time)) {
-                demo_scene->ProcessCollisions(*window.delta_time);
-                demo_scene->ApplyPhysics();
+            if (boxes_demo_scene->ProcessPhysics(*window.delta_time)) {
+                boxes_demo_scene->ProcessCollisions(*window.delta_time);
+                boxes_demo_scene->ApplyPhysics();
                 window.NeedRender();
             }
 
@@ -215,7 +215,7 @@ int main(int, char**) {
 
     renderer.Clear();
 
-    demo_scene->Destroy();
+    boxes_demo_scene->Destroy();
 
     texture_handler->Destroy();
     shader_handler.Destroy();

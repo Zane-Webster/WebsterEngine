@@ -58,7 +58,7 @@ namespace WE {
     enum class STATE {
         BOOT,
         MAIN_MENU,
-        EDITOR,
+        MAIN,
         PAUSE_MENU,
         EXIT
     };

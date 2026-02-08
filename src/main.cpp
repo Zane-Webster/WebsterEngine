@@ -183,9 +183,7 @@ int main(int, char**) {
                 camera.SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
 
                 window.NeedRender();
-
                 window.WaitLoad(2000);
-
                 window.UpdateDeltaTime();
             }
 

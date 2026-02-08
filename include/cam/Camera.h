@@ -23,6 +23,7 @@ public:
     glm::mat4 GetViewProjectionMatrix();
 
     // ======== POSITION ========
+    void SetPosition(glm::vec3 position);
     glm::vec3 GetPosition();
 
     void Translate(glm::vec3 translation);

@@ -78,8 +78,7 @@ int main(int, char**) {
 
     state_handler.SetState(WE_LAUNCH_STATE);
 
-    texture_handler->LoadTexture("basic", "assets/tex/basic.png");
-    renderer.basic_texture = texture_handler->GetTexture("basic");
+    renderer.basic_texture = texture_handler->LoadTexture("basic", "assets/tex/basic.png");
 
     // ===============================
     // COMPILE SHADERS
@@ -96,6 +95,17 @@ int main(int, char**) {
     shader_handler.AddShader("shadow", "assets/shader/shadow/frag/shadow.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("shadow", "assets/shader/shadow/vert/shadow.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("shadow");
+    
+    shader_handler.AddShader("splash", "assets/shader/splash/frag/splash.frag", GL_FRAGMENT_SHADER);
+    shader_handler.AddShader("splash", "assets/shader/splash/vert/splash.vert", GL_VERTEX_SHADER);
+    shader_handler.CompileProgram("splash");
+
+    // ===============================
+    // SET WINDOW SPLASH
+    // ===============================
+
+    window.SetSplash(texture_handler->LoadTexture("splash", "assets/tex/splashscreen.png"), shader_handler.GetProgram("splash"));
+    window.WaitLoad(0);
 
     // ===============================
     // LOAD MATERIALS
@@ -109,17 +119,23 @@ int main(int, char**) {
     // LOAD SCENES
     // ===============================
 
-    std::shared_ptr<Scene> demo_scene = std::make_shared<Scene>("demo");
-    demo_scene->AddItems(scene_loader.LoadScene("assets/scene/demo.wescn", material_loader.GetAllMaterials(), shader_handler.GetAllPrograms()));
+    std::shared_ptr<Scene> boxes_demo_scene = std::make_shared<Scene>("boxes_demo");
+    boxes_demo_scene->AddItems(scene_loader.LoadScene("assets/scene/boxes_demo.wescn", material_loader.GetAllMaterials(), shader_handler.GetAllPrograms()));
 
-    std::shared_ptr<DynamicObject> ball = std::dynamic_pointer_cast<DynamicObject>(demo_scene->GetObject("ball"));
+    std::shared_ptr<Scene> spheres_demo_scene = std::make_shared<Scene>("spheres_demo");
+    spheres_demo_scene->AddItems(scene_loader.LoadScene("assets/scene/spheres_demo.wescn", material_loader.GetAllMaterials(), shader_handler.GetAllPrograms()));
+
+    std::shared_ptr<Scene> wall_demo_scene = std::make_shared<Scene>("wall_demo");
+    wall_demo_scene->AddItems(scene_loader.LoadScene("assets/scene/wall_demo.wescn", material_loader.GetAllMaterials(), shader_handler.GetAllPrograms()));
 
     // ===============================
     // LOAD SKYBOXES AND LIGHTS
     // ===============================
 
     std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
-    demo_scene->AddLight(sun_light);
+    boxes_demo_scene->AddLight(sun_light);
+    spheres_demo_scene->AddLight(sun_light);
+    wall_demo_scene->AddLight(sun_light);
 
     texture_handler->LoadTexture("sky_side1", "assets/tex/sky/side1.png");
     texture_handler->LoadTexture("sky_side2", "assets/tex/sky/side2.png");
@@ -133,9 +149,20 @@ int main(int, char**) {
                                           };
 
     std::shared_ptr<Skybox> skybox = std::make_shared<Skybox>(skybox_textures);
-    demo_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
+    boxes_demo_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
+    spheres_demo_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
+    wall_demo_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
 
-    SDL_Delay(1500);
+    // ===============================
+    // INIT STATE AND SCENES
+    // ===============================
+
+    state_handler.AddScene("boxes", boxes_demo_scene);
+    state_handler.AddScene("spheres", spheres_demo_scene);
+    state_handler.AddScene("wall", wall_demo_scene);
+    state_handler.SetScene("wall");
+
+    std::shared_ptr<DynamicObject> ball = nullptr;
 
     while (state_handler.GetState() != WE::STATE::EXIT) {
         window.UpdateDeltaTime();
@@ -143,14 +170,20 @@ int main(int, char**) {
         // ===============================
         // EDITOR
         // ===============================
-        if (state_handler.GetState() == WE::STATE::EDITOR) {
+        if (state_handler.GetState() == WE::STATE::MAIN) {
             if (state_handler.Load()) {
                 renderer.Clear();
-                renderer.AddScene(demo_scene);
-                demo_scene->Reload();
+                renderer.AddScene(state_handler.GetCurrentScene());
+
+                state_handler.GetCurrentScene()->Reload();
+                ball = std::dynamic_pointer_cast<DynamicObject>(state_handler.GetCurrentScene()->GetObject("ball"));
+
                 renderer.Build(shader_handler.GetProgram("shadow"));
 
+                camera.SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+
                 window.NeedRender();
+                window.WaitLoad(2000);
                 window.UpdateDeltaTime();
             }
 
@@ -166,8 +199,16 @@ int main(int, char**) {
                         if (e.key.scancode == SDL_SCANCODE_1) {
                             ball->ResetToOrigin();
                             ball->ResetPhysics();
-                        }
-                        if (e.key.scancode == SDL_SCANCODE_2) {
+                        } else if (e.key.scancode == SDL_SCANCODE_2) {
+                            state_handler.Reload();
+                        } else if (e.key.scancode == SDL_SCANCODE_3) {
+                            state_handler.SetScene("boxes");
+                            state_handler.Reload();
+                        } else if (e.key.scancode == SDL_SCANCODE_4) {
+                            state_handler.SetScene("spheres");
+                            state_handler.Reload();
+                        } else if (e.key.scancode == SDL_SCANCODE_5) {
+                            state_handler.SetScene("wall");
                             state_handler.Reload();
                         }
                         if (e.key.scancode == SDL_SCANCODE_LEFT) ball->ApplyImpulse(glm::vec3(-100.0f, 0.0f, 0.0f));
@@ -186,7 +227,7 @@ int main(int, char**) {
                         break;
                     case SDL_EVENT_MOUSE_BUTTON_DOWN:
                         WE::RayHit hit;
-                        if (demo_scene->Raycast(camera.GetForwardRay(), hit)) {
+                        if (state_handler.GetCurrentScene()->Raycast(camera.GetForwardRay(), hit)) {
                             ball->ApplyImpulse(-hit.normal*25.0f);
                             window.NeedRender();
                         }
@@ -196,9 +237,9 @@ int main(int, char**) {
 
             if (camera.ProcessKey()) window.NeedRender();
 
-            if (demo_scene->ProcessPhysics(*window.delta_time)) {
-                demo_scene->ProcessCollisions(*window.delta_time);
-                demo_scene->ApplyPhysics();
+            if (state_handler.GetCurrentScene()->ProcessPhysics(*window.delta_time)) {
+                state_handler.GetCurrentScene()->ProcessCollisions(*window.delta_time);
+                state_handler.GetCurrentScene()->ApplyPhysics();
                 window.NeedRender();
             }
 
@@ -215,8 +256,7 @@ int main(int, char**) {
 
     renderer.Clear();
 
-    demo_scene->Destroy();
-
+    state_handler.Destroy();
     texture_handler->Destroy();
     shader_handler.Destroy();
 

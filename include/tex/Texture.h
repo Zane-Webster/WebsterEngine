@@ -16,6 +16,8 @@ public:
     void Destroy();
     void Bind(uint32_t slot);
 
+    void ScreenRender();
+
     std::string name = WE_EMPTY_STRING;
     int width = 0;
     int height = 0;

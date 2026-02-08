@@ -17,4 +17,4 @@ dynamicobject   "box14"     "assets/obj/box/box.obj"        "basic"             
 dynamicobject   "box15"     "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -2.25 0.25         0.0 0.0 1.0     1.0     6.0         1.0         1 
 dynamicobject   "box16"     "assets/obj/box/box.obj"        "basic"             "basic"         obb             -5.0 -2.25 0.75         0.0 1.0 1.0     1.0     6.0         1.0         1 
 staticobject    "floor"     "assets/obj/floor/floor.obj"    "matte_pavement"    "basic"         aabb            0.0 -4.0 0.0                                                             
-staticobject    "wall"      "assets/obj/wall/wall.obj"      "matte_brick"       "basic"         aabb            -12.0 0.0 0.0                                                            
+staticobject    "wall"      "assets/obj/wall/wall.obj"      "matte_brick"       "basic"         aabb            -12.0 0.0 0.0

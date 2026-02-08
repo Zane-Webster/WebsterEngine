@@ -39,6 +39,11 @@ void Camera::_UpdateMatrices() {
 //=============================
 // POSITION
 //=============================
+void Camera::SetPosition(glm::vec3 p_position) {
+    *position = p_position;
+    _UpdateViewMatrix();
+}
+
 glm::vec3 Camera::GetPosition() {
     return *position;
 }

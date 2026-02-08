@@ -169,7 +169,7 @@ void Object::_BuildCollider(WE::COLLIDER_TYPE type) {
             collider = std::make_unique<WE::AABBShape>(aabb);
             break;
         case WE::COLLIDER_TYPE::SPHERE: {
-            float radius = 0.5f * glm::length(*size);
+            float radius = 0.5f * std::max({size->x, size->y, size->z});
             collider =  std::make_unique<WE::SphereShape>(radius);
             break;
         }

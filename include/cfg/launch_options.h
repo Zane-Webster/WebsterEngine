@@ -12,4 +12,4 @@ constexpr float WE_LAUNCH_FPS_CAP = 60.0f;
 constexpr int WE_LAUNCH_SHADOW_QUALITY = 1028;
 
 //  ===== STARTING STATE =====
-constexpr WE::STATE WE_LAUNCH_STATE = WE::STATE::EDITOR;
+constexpr WE::STATE WE_LAUNCH_STATE = WE::STATE::MAIN;

@@ -61,7 +61,9 @@ private:
     GLuint shadow_depth_texture = 0;
     int shadow_resolution = 2048;
     GLuint shadow_depth_shader = 0;
+    
     glm::mat4 light_space_matrix = glm::mat4(0.0f);
+
     Uint16 window_width = 0;
     Uint16 window_height = 0;
 

@@ -1,0 +1,4 @@
+# TYPE          NAME        MODEL PATH                      MATERIAL NAME       SHADER NAME     COLLIDER TYPE   ORIGIN                  COLOR           MASS    MAX SPEED   RESTIUTION  USE GRAVITY
+dynamicobject   "ball"      "assets/obj/ball/ball.obj"      "basic"             "basic"         sphere          4.0 -2.0 0.0            0.0 1.0 0.0     5.0     10.0        0.5         1
+staticobject    "floor"     "assets/obj/floor/floor.obj"    "matte_pavement"    "basic"         aabb            0.0 -4.0 0.0
+dynamicobject   "wall"      "assets/obj/thickwall.obj"      "matte_brick"       "basic"         obb             -8.0 1.0 0.0            1.0 1.0 1.0     20.0    190.0       0.2         1

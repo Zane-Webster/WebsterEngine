@@ -14,6 +14,9 @@
 #include "core/Logger.h"
 #include "cfg/launch_options.h"
 
+#include "tex/Texture.h"
+#include "shader/Shader.h"
+
 class Window {
 public:
     Window(WE::WINDOW_RESOLUTION resolution, std::string title);
@@ -24,6 +27,9 @@ public:
     void NeedRender();
     bool StartRender();
     void EndRender();
+
+    void SetSplash(std::shared_ptr<Texture> splash_texture, GLuint shader_program);
+    void WaitLoad(int ms);
 
     void UpdateDeltaTime();
 
@@ -40,6 +46,9 @@ private:
     WE::WINDOW_RESOLUTION resolution;
     std::string title;
     glm::vec2 size;
+
+    GLuint shader_program = 0;
+    std::shared_ptr<Texture> splash_texture = nullptr;
     
     bool need_render = true;
 

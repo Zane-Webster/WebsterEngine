@@ -122,10 +122,11 @@ int main(int, char**) {
     std::shared_ptr<Scene> boxes_demo_scene = std::make_shared<Scene>("boxes_demo");
     boxes_demo_scene->AddItems(scene_loader.LoadScene("assets/scene/boxes_demo.wescn", material_loader.GetAllMaterials(), shader_handler.GetAllPrograms()));
 
-    std::shared_ptr<DynamicObject> ball = std::dynamic_pointer_cast<DynamicObject>(boxes_demo_scene->GetObject("ball"));
-
-    std::shared_ptr<Scene> spheres_demo_scene = std::make_shared<Scene>("sphers_demo");
+    std::shared_ptr<Scene> spheres_demo_scene = std::make_shared<Scene>("spheres_demo");
     spheres_demo_scene->AddItems(scene_loader.LoadScene("assets/scene/spheres_demo.wescn", material_loader.GetAllMaterials(), shader_handler.GetAllPrograms()));
+
+    std::shared_ptr<Scene> wall_demo_scene = std::make_shared<Scene>("wall_demo");
+    wall_demo_scene->AddItems(scene_loader.LoadScene("assets/scene/wall_demo.wescn", material_loader.GetAllMaterials(), shader_handler.GetAllPrograms()));
 
     // ===============================
     // LOAD SKYBOXES AND LIGHTS
@@ -134,6 +135,7 @@ int main(int, char**) {
     std::shared_ptr<WE::Light> sun_light = std::make_shared<WE::Light>("sun", glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f)), glm::vec3(1.0f, 0.95f, 0.9f));
     boxes_demo_scene->AddLight(sun_light);
     spheres_demo_scene->AddLight(sun_light);
+    wall_demo_scene->AddLight(sun_light);
 
     texture_handler->LoadTexture("sky_side1", "assets/tex/sky/side1.png");
     texture_handler->LoadTexture("sky_side2", "assets/tex/sky/side2.png");
@@ -149,6 +151,7 @@ int main(int, char**) {
     std::shared_ptr<Skybox> skybox = std::make_shared<Skybox>(skybox_textures);
     boxes_demo_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
     spheres_demo_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
+    wall_demo_scene->AddItem(std::make_shared<WE::RenderItem>("skybox", WE::RENDERITEM_TYPE::SKYBOX, shader_handler.GetProgram("sky"), skybox));
 
     // ===============================
     // INIT STATE AND SCENES
@@ -156,7 +159,10 @@ int main(int, char**) {
 
     state_handler.AddScene("boxes", boxes_demo_scene);
     state_handler.AddScene("spheres", spheres_demo_scene);
-    state_handler.SetScene("spheres");
+    state_handler.AddScene("wall", wall_demo_scene);
+    state_handler.SetScene("wall");
+
+    std::shared_ptr<DynamicObject> ball = nullptr;
 
     while (state_handler.GetState() != WE::STATE::EXIT) {
         window.UpdateDeltaTime();
@@ -168,7 +174,10 @@ int main(int, char**) {
             if (state_handler.Load()) {
                 renderer.Clear();
                 renderer.AddScene(state_handler.GetCurrentScene());
+
                 state_handler.GetCurrentScene()->Reload();
+                ball = std::dynamic_pointer_cast<DynamicObject>(state_handler.GetCurrentScene()->GetObject("ball"));
+
                 renderer.Build(shader_handler.GetProgram("shadow"));
 
                 camera.SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
@@ -192,16 +201,16 @@ int main(int, char**) {
                         if (e.key.scancode == SDL_SCANCODE_1) {
                             ball->ResetToOrigin();
                             ball->ResetPhysics();
-                        }
-                        if (e.key.scancode == SDL_SCANCODE_2) {
+                        } else if (e.key.scancode == SDL_SCANCODE_2) {
                             state_handler.Reload();
-                        }
-                        if (e.key.scancode == SDL_SCANCODE_3) {
+                        } else if (e.key.scancode == SDL_SCANCODE_3) {
                             state_handler.SetScene("boxes");
                             state_handler.Reload();
-                        }
-                        if (e.key.scancode == SDL_SCANCODE_4) {
+                        } else if (e.key.scancode == SDL_SCANCODE_4) {
                             state_handler.SetScene("spheres");
+                            state_handler.Reload();
+                        } else if (e.key.scancode == SDL_SCANCODE_5) {
+                            state_handler.SetScene("wall");
                             state_handler.Reload();
                         }
                         if (e.key.scancode == SDL_SCANCODE_LEFT) ball->ApplyImpulse(glm::vec3(-100.0f, 0.0f, 0.0f));

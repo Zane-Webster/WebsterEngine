@@ -78,8 +78,7 @@ int main(int, char**) {
 
     state_handler.SetState(WE_LAUNCH_STATE);
 
-    texture_handler->LoadTexture("basic", "assets/tex/basic.png");
-    renderer.basic_texture = texture_handler->GetTexture("basic");
+    renderer.basic_texture = texture_handler->LoadTexture("basic", "assets/tex/basic.png");
 
     // ===============================
     // COMPILE SHADERS
@@ -96,6 +95,17 @@ int main(int, char**) {
     shader_handler.AddShader("shadow", "assets/shader/shadow/frag/shadow.frag", GL_FRAGMENT_SHADER);
     shader_handler.AddShader("shadow", "assets/shader/shadow/vert/shadow.vert", GL_VERTEX_SHADER);
     shader_handler.CompileProgram("shadow");
+    
+    shader_handler.AddShader("splash", "assets/shader/splash/frag/splash.frag", GL_FRAGMENT_SHADER);
+    shader_handler.AddShader("splash", "assets/shader/splash/vert/splash.vert", GL_VERTEX_SHADER);
+    shader_handler.CompileProgram("splash");
+
+    // ===============================
+    // SET WINDOW SPLASH
+    // ===============================
+
+    window.SetSplash(texture_handler->LoadTexture("splash", "assets/tex/splashscreen.png"), shader_handler.GetProgram("splash"));
+    window.WaitLoad(0);
 
     // ===============================
     // LOAD MATERIALS
@@ -148,8 +158,6 @@ int main(int, char**) {
     state_handler.AddScene("spheres", spheres_demo_scene);
     state_handler.SetScene("spheres");
 
-    SDL_Delay(1500);
-
     while (state_handler.GetState() != WE::STATE::EXIT) {
         window.UpdateDeltaTime();
 
@@ -163,7 +171,12 @@ int main(int, char**) {
                 state_handler.GetCurrentScene()->Reload();
                 renderer.Build(shader_handler.GetProgram("shadow"));
 
+                camera.SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+
                 window.NeedRender();
+
+                window.WaitLoad(2000);
+
                 window.UpdateDeltaTime();
             }
 
@@ -181,6 +194,14 @@ int main(int, char**) {
                             ball->ResetPhysics();
                         }
                         if (e.key.scancode == SDL_SCANCODE_2) {
+                            state_handler.Reload();
+                        }
+                        if (e.key.scancode == SDL_SCANCODE_3) {
+                            state_handler.SetScene("boxes");
+                            state_handler.Reload();
+                        }
+                        if (e.key.scancode == SDL_SCANCODE_4) {
+                            state_handler.SetScene("spheres");
                             state_handler.Reload();
                         }
                         if (e.key.scancode == SDL_SCANCODE_LEFT) ball->ApplyImpulse(glm::vec3(-100.0f, 0.0f, 0.0f));

@@ -16,6 +16,44 @@ void Texture::Bind(uint32_t slot) {
     glBindTexture(GL_TEXTURE_2D, texture);
 }
 
+void Texture::ScreenRender() {
+    float quad[] = {
+        -1.0f, -1.0f, 0.0f, 1.0f,
+        1.0f, -1.0f, 1.0f, 1.0f,
+        1.0f,  1.0f, 1.0f, 0.0f,
+
+        -1.0f, -1.0f, 0.0f, 1.0f,
+        1.0f,  1.0f, 1.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f, 0.0f
+    };
+
+    GLuint vao, vbo;
+
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0); // position
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)0);
+
+    glEnableVertexAttribArray(1); // uv
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float)));
+
+    glDisable(GL_DEPTH_TEST);
+
+    Bind(0);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    glEnable(GL_DEPTH_TEST);
+
+    glDeleteBuffers(1, &vbo);
+    glDeleteVertexArrays(1, &vao);
+}
+
 void Texture::_LoadImage() {
     surface = IMG_Load(path.c_str());
     if (!surface) {

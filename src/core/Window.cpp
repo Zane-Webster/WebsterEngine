@@ -58,6 +58,24 @@ void Window::EndRender() {
     need_render = false;
 }
 
+void Window::SetSplash(std::shared_ptr<Texture> p_splash, GLuint p_shader_program) {
+    splash_texture = p_splash;
+    shader_program = p_shader_program;
+}
+
+void Window::WaitLoad(int ms) {
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(shader_program);
+    glUniform1i(glGetUniformLocation(shader_program, "u_Diffuse"), 0);
+
+    splash_texture->ScreenRender();
+    
+    SDL_GL_SwapWindow(window);
+    SDL_Delay(ms);
+}
+
 void Window::UpdateDeltaTime() {
     const uint64_t freq = SDL_GetPerformanceFrequency();
 

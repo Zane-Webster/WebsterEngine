@@ -1,10 +1,32 @@
 # WEBSTER ENGINE
 **3D Physics and Rendering Engine**
+
 *Version 1.0.0*
 
 ## ABOUT
-WebsterEngine is a 3D engine written in C++ using OpenGL, SDL3 and GLAD.
+WebsterEngine is a real time 3D engine written in C++ using OpenGL, SDL3, GLAD and GLM.
 
-It features 3D model loading, materials, textures, meshes, lighting and physics to create an engine designed for game production and 3D simulations.
+The project was built to explore graphics programming, physics simulation, and engine architecture using industry-standard libraries and low-level systems design.
 
-It is solely developed by Caleb Zane Wesbter to learn graphics programming and software engineering using industry-standard libraries.
+WebsterEngine supports 3D model rendering, texture rendering, lighting, raycasting, shadows, collision detection, and physics resolution, providing a foundation for game development and simulation environments.
+
+Developed independently by Caleb Zane Webster as a software and graphics programming project.
+
+## FEATURES
+- Real-time 3D rendering pipeline using OpenGL
+- Skybox cubemap environment rendering
+- Texture and material system
+- Directional lighting with shadow mapping
+- Diffuse and specular shading
+- Physics & Collision
+- Collision detection with AABB, OBB, Sphere and Capsule colliders supported
+- Impulse and angular impulse resolution
+- Restitution and friction simulation
+- Scene management system
+- Transform hierarchy and model matrices
+- Camera handler with view/projection control
+- Raycasting system for object interaction
+- Modular renderer and material pipeline
+- Asset Support
+- OBJ model loading
+- Mesh construction and batching

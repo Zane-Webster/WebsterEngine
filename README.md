@@ -44,6 +44,7 @@ Developed independently by Caleb Zane Webster as a software and graphics program
 
 ## AUTHOR
 **Caleb Zane Webster**
-Oregon State University
+
+*Oregon State University*
 
 LinkedIn: https://www.linkedin.com/in/caleb-zane-webster/

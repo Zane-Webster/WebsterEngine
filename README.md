@@ -48,3 +48,6 @@ Developed independently by Caleb Zane Webster as a software and graphics program
 *Oregon State University*
 
 LinkedIn: https://www.linkedin.com/in/caleb-zane-webster/
+
+## LICENSE
+MIT License

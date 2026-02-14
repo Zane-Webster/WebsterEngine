@@ -12,6 +12,8 @@ WebsterEngine supports 3D model rendering, texture rendering, lighting, raycasti
 
 Developed independently by Caleb Zane Webster as a software and graphics programming project.
 
+## DEMOS
+
 ## FEATURES
 - Real-time 3D rendering pipeline using OpenGL
 - Skybox cubemap environment rendering
@@ -30,8 +32,6 @@ Developed independently by Caleb Zane Webster as a software and graphics program
 - Asset Support
 - OBJ model loading
 - Mesh construction and batching
-
-## DEMOS
 
 ## STACK
 - C++

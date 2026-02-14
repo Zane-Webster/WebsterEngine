@@ -30,3 +30,20 @@ Developed independently by Caleb Zane Webster as a software and graphics program
 - Asset Support
 - OBJ model loading
 - Mesh construction and batching
+
+## DEMOS
+
+## STACK
+- C++
+- OpenGL
+- GLM
+- GLAD
+- SDL3
+- Assimp
+- CMake
+
+## AUTHOR
+**Caleb Zane Webster**
+Oregon State University
+
+LinkedIn: https://www.linkedin.com/in/caleb-zane-webster/

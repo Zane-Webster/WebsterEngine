@@ -1,9 +1,58 @@
 # WEBSTER ENGINE
-#### Version 0.1.0
+**3D Physics and Rendering Engine**
+
+*Version 1.0.0*
 
 ## ABOUT
-WebsterEngine is a 3D engine written in C++ using OpenGL, SDL3 and GLAD.
+WebsterEngine is a real time 3D engine written in C++ using OpenGL, SDL3, GLAD and GLM.
 
-It features 3D model loading, materials, textures, meshes, lighting and physics to create an engine designed for game production and 3D simulations.
+The project was built to explore graphics programming, physics simulation, and engine architecture using industry-standard libraries and low-level systems design.
 
-It is solely developed by Caleb Zane Wesbter to learn graphics programming and software engineering using industry-standard libraries.
+WebsterEngine supports 3D model rendering, texture rendering, lighting, raycasting, shadows, collision detection, and physics resolution, providing a foundation for game development and simulation environments.
+
+Developed independently by Caleb Zane Webster as a software and graphics programming project.
+
+## DEMOS
+https://github.com/user-attachments/assets/05a02695-62e6-4dec-a9a7-bf9d6e8a69b8
+
+https://github.com/user-attachments/assets/7f02325b-e455-4715-8259-f88b5b7c4719
+
+https://github.com/user-attachments/assets/4778655a-16ec-4bae-814a-7c8d0740b0e8
+
+## FEATURES
+- Real-time 3D rendering pipeline using OpenGL
+- Skybox cubemap environment rendering
+- Texture and material system
+- Directional lighting with shadow mapping
+- Diffuse and specular shading
+- Physics & Collision
+- Collision detection with AABB, OBB, Sphere and Capsule colliders supported
+- Impulse and angular impulse resolution
+- Restitution and friction simulation
+- Scene management system
+- Transform hierarchy and model matrices
+- Camera handler with view/projection control
+- Raycasting system for object interaction
+- Modular renderer and material pipeline
+- Asset Support
+- OBJ model loading
+- Mesh construction and batching
+
+## STACK
+- C++
+- OpenGL
+- GLM
+- GLAD
+- SDL3
+- Assimp
+- CMake
+
+## AUTHOR
+**Caleb Zane Webster**
+
+*Oregon State University*
+
+LinkedIn: https://www.linkedin.com/in/caleb-zane-webster/
+
+## LICENSE
+MIT License

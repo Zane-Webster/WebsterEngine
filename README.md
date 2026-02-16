@@ -13,7 +13,11 @@ WebsterEngine supports 3D model rendering, texture rendering, lighting, raycasti
 Developed independently by Caleb Zane Webster as a software and graphics programming project.
 
 ## DEMOS
-Coming soon...
+https://github.com/user-attachments/assets/05a02695-62e6-4dec-a9a7-bf9d6e8a69b8
+
+https://github.com/user-attachments/assets/7f02325b-e455-4715-8259-f88b5b7c4719
+
+https://github.com/user-attachments/assets/4778655a-16ec-4bae-814a-7c8d0740b0e8
 
 ## FEATURES
 - Real-time 3D rendering pipeline using OpenGL
